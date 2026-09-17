@@ -99,7 +99,7 @@ Changing product resets the right panel back to its empty state.
 | Which fields show per product (BMI, Health class/Credit estimate) | `PRODUCT_FIELD_CONFIG` / `getProductConfig` |
 | Resource link labels/URLs | `DEFAULT_RESOURCE_LINKS`, `RESOURCE_LINKS_BY_TAB` |
 | Change Product panel groupings | `PRODUCT_GROUPS` |
-| Included Benefits icons/labels | `BENEFIT_ITEMS` (icons sourced from the [Ethos Brand Icons](https://www.figma.com/design/yYKI6F7eDlWNrhYkhj9FEm/Brand-Icons) Figma library, saved locally under `public/assets/benefit-*.svg`) |
+| Included Benefits card copy/value | Inline JSX in `QuotePanel` (the `worth $1,198` line + checklist); illustration is `public/assets/benefit-family-illustration.png`, a flattened export from the [Master File Template](https://www.figma.com/design/Q5EQmNtF50NfKcim76lCwF/Master-File-Template) Figma |
 | Credit estimate tiers/criteria | `CREDIT_TIERS` |
 | Coverage/premium math (base rate, AD multiplier, agent earnings) | Top of `QuotePanel` |
 

@@ -416,22 +416,13 @@ function CoverageSlider({ value, min, max, step = 5000, minLabel, maxLabel, onCh
 
 /* ─── Included Benefits ─────────────────────────────────────── */
 
-function CheckBadgeIcon() {
+function BenefitCheckIcon() {
   return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="shrink-0">
-      <path d="M12 3l2.2 1.3 2.5-.3 1.1 2.3 2.3 1.1-.3 2.5L21 12l-1.3 2.2.3 2.5-2.3 1.1-1.1 2.3-2.5-.3L12 21l-2.2-1.3-2.5.3-1.1-2.3-2.3-1.1.3-2.5L3 12l1.3-2.2-.3-2.5 2.3-1.1 1.1-2.3 2.5.3L12 3z" stroke="#056257" strokeWidth="1.4" strokeLinejoin="round" />
-      <path d="M8.5 12.5l2.3 2.3 4.7-4.8" stroke="#056257" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+    <svg width="16" height="12" viewBox="0 0 16 12" fill="none" className="shrink-0">
+      <path d="M1 6.5L5.5 11L15 1" stroke="#054742" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
-
-/* Icons pulled from the Ethos Brand Icons library (Figma), 1C-D variant */
-const BENEFIT_ITEMS = [
-  { icon: "assets/benefit-estate-planning.svg", label: "Estate Planning" },
-  { icon: "assets/benefit-document-checkmark.svg", label: "Wills & Trust" },
-  { icon: "assets/benefit-circle-plus.svg", label: "+3 More Perks" },
-  { icon: "assets/benefit-heart-shield-group.svg", label: "ADBO/ABO Rider" },
-];
 
 /* ─── Quote Visualizer ──────────────────────────────────────── */
 
@@ -675,40 +666,43 @@ function QuotePanel({
       </div>
 
       {/* Included benefits */}
-      <div className="bg-white rounded-[8px] border border-[#e9e9e9] p-[24px] flex flex-col gap-[16px]">
-        <div className="flex items-center gap-[8px]">
-          <CheckBadgeIcon />
+      <div
+        className="rounded-[8px] border-2 border-white p-[24px] flex gap-[8px] items-start"
+        style={{ backgroundImage: "linear-gradient(-15deg, rgb(230,245,236) 33%, rgba(235,240,249,0.976) 69%)" }}
+      >
+        <div className="flex-1 flex flex-col gap-[16px]">
           <p
-            className="font-['Theinhardt:Bold',sans-serif] text-[#272727] text-[18px] leading-[28px]"
+            className="font-['Theinhardt:Medium',sans-serif] text-[#525252] text-[18px] leading-[28px]"
             style={{ fontFeatureSettings: '"case" 1' }}
           >
-            Included Benefits
+            Policy includes our free estate planning tools <span className="text-[#272727]">worth $1,198</span>
           </p>
-        </div>
-        <p
-          className="font-['Theinhardt:Regular',sans-serif] text-[#525252] text-[14px] leading-[20px]"
-          style={{ fontFeatureSettings: '"case" 1' }}
-        >
-          A <span className="line-through">$1,198</span> value — included at $0
-        </p>
-        <div className="grid gap-[12px] grid-cols-[repeat(auto-fit,minmax(130px,1fr))]">
-          {BENEFIT_ITEMS.map((benefit) => (
-            <div
-              key={benefit.label}
-              className="bg-[#f4f4f4] rounded-[12px] p-[16px] flex flex-col items-center gap-[8px] text-center"
-            >
-              <div className="size-[40px] rounded-full border border-[#056257] flex items-center justify-center">
-                <img src={benefit.icon} alt="" width={22} height={22} />
-              </div>
+          <div className="flex flex-col gap-[12px]">
+            <div className="flex gap-[12px] items-center">
+              <BenefitCheckIcon />
               <p
-                className="font-['Theinhardt:Medium',sans-serif] text-[#272727] text-[14px] leading-[18px]"
+                className="font-['Theinhardt:Regular',sans-serif] text-[#272727] text-[16px] leading-[24px]"
                 style={{ fontFeatureSettings: '"case" 1' }}
               >
-                {benefit.label}
+                Estate planning, Wills & trust, +3 additional perks
               </p>
             </div>
-          ))}
+            <div className="flex gap-[12px] items-center">
+              <BenefitCheckIcon />
+              <p
+                className="font-['Theinhardt:Regular',sans-serif] text-[#272727] text-[16px] leading-[24px]"
+                style={{ fontFeatureSettings: '"case" 1' }}
+              >
+                Accelerated Death Benefit Option (ADBO/ABO)
+              </p>
+            </div>
+          </div>
         </div>
+        <img
+          src="assets/benefit-family-illustration.png"
+          alt=""
+          className="shrink-0 w-[102px] h-[67px] object-contain"
+        />
       </div>
 
       {/* Agent earnings card */}

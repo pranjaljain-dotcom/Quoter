@@ -297,13 +297,14 @@ function SelectField({ label, value, options, onChange, placeholder, labelLink }
   );
 }
 
-function TextField({ label, value, placeholder, onChange, suffix, dateMask }: {
+function TextField({ label, value, placeholder, onChange, suffix, dateMask, type = "text" }: {
   label: string;
   value: string;
   placeholder?: string;
   onChange: (v: string) => void;
   suffix?: string;
   dateMask?: boolean;
+  type?: string;
 }) {
   function handleDateInput(raw: string) {
     // Strip non-digits
@@ -327,7 +328,7 @@ function TextField({ label, value, placeholder, onChange, suffix, dateMask }: {
       </label>
       <div className="relative bg-white rounded-[8px] border border-[#d4d4d4] w-full h-[56px] flex items-center px-[14px]">
         <input
-          type="text"
+          type={dateMask ? "text" : type}
           value={value}
           placeholder={placeholder}
           maxLength={dateMask ? 10 : undefined}
@@ -916,6 +917,95 @@ function CreditEstimateInfoPanel({ open, onClose }: { open: boolean; onClose: ()
   );
 }
 
+function ShareEstimatePanel({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const [email, setEmail] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+
+  useEffect(() => {
+    if (open) {
+      setEmail("");
+      setFirstName("");
+      setLastName("");
+    }
+  }, [open]);
+
+  const canSend = email.trim() !== "";
+
+  return (
+    <>
+      {/* Backdrop */}
+      <div
+        className={`fixed inset-0 z-40 bg-black transition-opacity duration-300 ${open ? "opacity-40 pointer-events-auto" : "opacity-0 pointer-events-none"}`}
+        onClick={onClose}
+      />
+      {/* Sliding panel */}
+      <div
+        className={`fixed top-0 right-0 h-full z-50 bg-white flex flex-col shadow-[0px_4px_6px_-2px_rgba(16,24,40,0.03),0px_12px_16px_-4px_rgba(16,24,40,0.08)] transition-transform duration-300 ease-in-out ${open ? "translate-x-0" : "translate-x-full"}`}
+        style={{ width: "520px" }}
+      >
+        {/* Header */}
+        <div className="flex items-start justify-between gap-[16px] px-[24px] py-[20px] border-b border-[#f4f4f4] shrink-0">
+          <div className="flex flex-col gap-[4px]">
+            <p
+              className="font-['Theinhardt:Medium',sans-serif] text-[#272727] text-[18px] leading-[26px]"
+              style={{ fontFeatureSettings: '"case" 1' }}
+            >
+              Share estimate
+            </p>
+            <p
+              className="font-['Theinhardt:Regular',sans-serif] text-[#7e7e7e] text-[14px] leading-[20px]"
+              style={{ fontFeatureSettings: '"case" 1' }}
+            >
+              Enter client's information below to share a personalized quote and track their progress:
+            </p>
+          </div>
+          <button
+            onClick={onClose}
+            className="shrink-0 size-[32px] flex items-center justify-center rounded-[6px] hover:bg-[#f4f4f4] border-none bg-transparent cursor-pointer transition-colors"
+          >
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M15 5L5 15M5 5l10 10" stroke="#525252" strokeWidth="1.5" strokeLinecap="round"/>
+            </svg>
+          </button>
+        </div>
+        {/* Fields */}
+        <div className="flex-1 overflow-y-auto px-[24px] py-[20px] flex flex-col gap-[20px]">
+          <TextField
+            label="Client's email address (required)"
+            value={email}
+            onChange={setEmail}
+            placeholder="client@email.com"
+            type="email"
+          />
+          <TextField label="First name" value={firstName} onChange={setFirstName} placeholder="First name" />
+          <TextField label="Last name" value={lastName} onChange={setLastName} placeholder="Last name" />
+        </div>
+        {/* Footer CTAs */}
+        <div className="sticky bottom-0 shrink-0 bg-white border-t border-[#e9e9e9] px-[24px] py-[20px] flex flex-col gap-[12px]">
+          <button
+            disabled={!canSend}
+            onClick={onClose}
+            className={`w-full rounded-[8px] border px-[16px] py-[12px] font-['Theinhardt:Medium',sans-serif] text-[16px] leading-[24px] transition-colors ${
+              canSend ? "bg-[#000000] border-[#000000] text-white cursor-pointer hover:bg-[#1a1a1a]" : "bg-[#d4d4d4] border-[#d4d4d4] text-white cursor-not-allowed"
+            }`}
+            style={{ fontFeatureSettings: '"case" 1' }}
+          >
+            Send Estimate to Client
+          </button>
+          <button
+            onClick={onClose}
+            className="w-full bg-white rounded-[8px] border border-[#525252] text-[#272727] px-[16px] py-[12px] font-['Theinhardt:Medium',sans-serif] text-[16px] leading-[24px] cursor-pointer hover:bg-gray-50 transition-colors"
+            style={{ fontFeatureSettings: '"case" 1' }}
+          >
+            Start Application
+          </button>
+        </div>
+      </div>
+    </>
+  );
+}
+
 /* ─── Main content: Quote form ──────────────────────────────── */
 
 const PRODUCTS = [
@@ -1297,6 +1387,7 @@ export default function App() {
   const [quoteLoading, setQuoteLoading] = useState(false);
   const [showChangeProduct, setShowChangeProduct] = useState(false);
   const [showCreditInfo, setShowCreditInfo] = useState(false);
+  const [showShareEstimate, setShowShareEstimate] = useState(false);
   const [productLoading, setProductLoading] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState("Final Expense Whole Life");
 
@@ -1458,6 +1549,7 @@ export default function App() {
             <div className="sticky bottom-0 shrink-0 bg-white border-t border-[#e9e9e9] px-[24px] py-[20px] flex gap-[20px]">
               <button
                 disabled={!isFormFilled}
+                onClick={() => setShowShareEstimate(true)}
                 className={`flex-1 bg-white rounded-[8px] border px-[16px] py-[8px] font-['Theinhardt:Medium',sans-serif] text-[16px] leading-[24px] transition-colors ${isFormFilled ? "border-[#525252] text-[#272727] cursor-pointer hover:bg-gray-50" : "border-[#d4d4d4] text-[#d4d4d4] cursor-not-allowed"}`}
                 style={{ fontFeatureSettings: '"case" 1' }}
               >
@@ -1476,6 +1568,7 @@ export default function App() {
       </div>
       <ChangeProductPanel open={showChangeProduct} onClose={() => setShowChangeProduct(false)} onSelect={handleProductSelect} selectedProduct={selectedProduct} />
       <CreditEstimateInfoPanel open={showCreditInfo} onClose={() => setShowCreditInfo(false)} />
+      <ShareEstimatePanel open={showShareEstimate} onClose={() => setShowShareEstimate(false)} />
     </div>
   );
 }

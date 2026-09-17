@@ -673,6 +673,13 @@ function QuotePanel({
             </p>
           </div>
         </div>
+        <div className="border-t border-dotted border-[#d4d4d4]" />
+        <p
+          className="font-['Theinhardt:Regular',sans-serif] text-[#7e7e7e] text-[13px] leading-[18px]"
+          style={{ fontFeatureSettings: '"case" 1' }}
+        >
+          Note: Premium is billed monthly. The weekly &amp; daily rates are for illustrative purposes only.
+        </p>
       </div>
 
       {/* Included benefits */}

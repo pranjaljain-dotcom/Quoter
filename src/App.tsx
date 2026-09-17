@@ -1405,7 +1405,7 @@ export default function App() {
   const [showCreditInfo, setShowCreditInfo] = useState(false);
   const [showShareEstimate, setShowShareEstimate] = useState(false);
   const [productLoading, setProductLoading] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState("Final Expense Whole Life");
+  const [selectedProduct, setSelectedProduct] = useState("Term Life Insurance");
 
   const handleProductSelect = (name: string) => {
     const cfg = getProductConfig(name);

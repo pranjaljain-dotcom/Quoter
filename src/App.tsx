@@ -1065,6 +1065,7 @@ function ShareEstimatePanel({
                     </p>
                   </div>
                 )}
+                {quote.adEnabled && <div className="h-px bg-[#e9e9e9]" />}
                 {quote.adEnabled && (
                   <div className="flex items-center justify-between">
                     <p className="font-['Theinhardt:Medium',sans-serif] text-[#272727] text-[14px] leading-[20px]" style={{ fontFeatureSettings: '"case" 1' }}>

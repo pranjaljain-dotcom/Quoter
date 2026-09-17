@@ -939,7 +939,14 @@ function CreditEstimateInfoPanel({ open, onClose }: { open: boolean; onClose: ()
   );
 }
 
-type QuotePreview = { product: string; coverage: number; premium: number };
+type QuotePreview = {
+  product: string;
+  coverage: number;
+  premium: number;
+  adEnabled: boolean;
+  adMultiplier: number;
+  adCoverage: number;
+};
 type QuoteEntry = QuotePreview & { id: number };
 
 function ShareEstimatePanel({
@@ -1048,6 +1055,26 @@ function ShareEstimatePanel({
                     {fmtCoverage(quote.coverage)}
                   </p>
                 </div>
+                {quote.adEnabled && (
+                  <div className="flex items-center justify-between">
+                    <p className="font-['Theinhardt:Regular',sans-serif] text-[#525252] text-[14px] leading-[20px]" style={{ fontFeatureSettings: '"case" 1' }}>
+                      AD Coverage ({quote.adMultiplier}x)
+                    </p>
+                    <p className="font-['Theinhardt:Medium',sans-serif] text-[#272727] text-[14px] leading-[20px]" style={{ fontFeatureSettings: '"case" 1' }}>
+                      +{fmtCoverage(quote.adCoverage)}
+                    </p>
+                  </div>
+                )}
+                {quote.adEnabled && (
+                  <div className="flex items-center justify-between">
+                    <p className="font-['Theinhardt:Medium',sans-serif] text-[#272727] text-[14px] leading-[20px]" style={{ fontFeatureSettings: '"case" 1' }}>
+                      Total Coverage
+                    </p>
+                    <p className="font-['Theinhardt:Medium',sans-serif] text-[#272727] text-[14px] leading-[20px]" style={{ fontFeatureSettings: '"case" 1' }}>
+                      {fmtCoverage(quote.coverage + quote.adCoverage)}
+                    </p>
+                  </div>
+                )}
                 <div className="flex items-center justify-between">
                   <p className="font-['Theinhardt:Regular',sans-serif] text-[#525252] text-[14px] leading-[20px]" style={{ fontFeatureSettings: '"case" 1' }}>
                     Premium
@@ -1573,8 +1600,11 @@ export default function App() {
   const previewAdPremium = adEnabled ? Math.round(previewBasePremium * adMultiplier * 100) / 100 : 0;
   const currentQuote: QuotePreview = {
     product: selectedProduct,
-    coverage: adEnabled ? coverage + coverage * adMultiplier : coverage,
+    coverage,
     premium: previewBasePremium + previewAdPremium,
+    adEnabled,
+    adMultiplier,
+    adCoverage: coverage * adMultiplier,
   };
 
   const handleOpenShareEstimate = () => {

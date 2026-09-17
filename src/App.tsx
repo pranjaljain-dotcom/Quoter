@@ -441,7 +441,7 @@ function QuotePanel({
   onCoverageChange: (v: number) => void;
   adEnabled: boolean;
   onAdToggle: () => void;
-  adMultiplier: number;
+  adMultiplier: number | null;
   onAdMultiplierChange: (v: number) => void;
 }) {
   const [coverageMode, setCoverageMode] = useState<"coverage" | "premium">("coverage");
@@ -451,10 +451,11 @@ function QuotePanel({
   const PREMIUM_MIN = 30;
   const PREMIUM_MAX = COVERAGE_MAX / COVERAGE_PER_PREMIUM_DOLLAR;
 
+  const adActive = adEnabled && adMultiplier != null;
   const basePremium = Math.round((coverage / 150000) * 60 * 100) / 100;
-  const adPremium = adEnabled ? Math.round(basePremium * adMultiplier * 100) / 100 : 0;
+  const adPremium = adActive ? Math.round(basePremium * adMultiplier * 100) / 100 : 0;
   const totalPremium = basePremium + adPremium;
-  const totalCoverage = adEnabled ? coverage + coverage * adMultiplier : coverage;
+  const totalCoverage = adActive ? coverage + coverage * adMultiplier : coverage;
   const agentEarnings = Math.round(totalPremium * 12 * 9.353 * 100) / 100;
 
   const fmt = (n: number) =>
@@ -1545,7 +1546,7 @@ export default function App() {
   const [activeProduct, setActiveProduct] = useState(0);
   const [coverage, setCoverage] = useState(150000);
   const [adEnabled, setAdEnabled] = useState(false);
-  const [adMultiplier, setAdMultiplier] = useState(1);
+  const [adMultiplier, setAdMultiplier] = useState<number | null>(null);
   const [formState, setFormState] = useState({
     sex: "",
     birthdate: "",
@@ -1608,15 +1609,16 @@ export default function App() {
     (!activeConfig.showHealthCredit || (formState.rateClass !== "" && formState.credit !== "")) &&
     (!activeConfig.showBMI || (formState.heightFt.trim() !== "" && formState.heightIn.trim() !== "" && formState.weight.trim() !== ""));
 
+  const previewAdActive = adEnabled && adMultiplier != null;
   const previewBasePremium = Math.round((coverage / 150000) * 60 * 100) / 100;
-  const previewAdPremium = adEnabled ? Math.round(previewBasePremium * adMultiplier * 100) / 100 : 0;
+  const previewAdPremium = previewAdActive ? Math.round(previewBasePremium * adMultiplier * 100) / 100 : 0;
   const currentQuote: QuotePreview = {
     product: selectedProduct,
     coverage,
     premium: previewBasePremium + previewAdPremium,
-    adEnabled,
-    adMultiplier,
-    adCoverage: coverage * adMultiplier,
+    adEnabled: previewAdActive,
+    adMultiplier: adMultiplier ?? 0,
+    adCoverage: previewAdActive ? coverage * adMultiplier : 0,
   };
 
   const handleOpenShareEstimate = () => {
@@ -1733,7 +1735,10 @@ export default function App() {
                   coverage={coverage}
                   onCoverageChange={setCoverage}
                   adEnabled={adEnabled}
-                  onAdToggle={() => setAdEnabled((v) => !v)}
+                  onAdToggle={() => {
+                    setAdEnabled((v) => !v);
+                    setAdMultiplier(null);
+                  }}
                   adMultiplier={adMultiplier}
                   onAdMultiplierChange={setAdMultiplier}
                 />

@@ -398,13 +398,13 @@ function CoverageSlider({ value, min, max, step = 5000, minLabel, maxLabel, onCh
       </div>
       <div className="flex justify-between w-full">
         <span
-          className="font-['Theinhardt:Regular',sans-serif] text-[#525252] text-[14px] leading-[20px]"
+          className="font-['Theinhardt:Regular',sans-serif] text-[#7e7e7e] text-[14px] leading-[20px]"
           style={{ fontFeatureSettings: '"case" 1' }}
         >
           {minLabel}
         </span>
         <span
-          className="font-['Theinhardt:Regular',sans-serif] text-[#525252] text-[14px] leading-[20px]"
+          className="font-['Theinhardt:Regular',sans-serif] text-[#7e7e7e] text-[14px] leading-[20px]"
           style={{ fontFeatureSettings: '"case" 1' }}
         >
           {maxLabel}

@@ -1029,12 +1029,22 @@ function ShareEstimatePanel({
             {quotes.map((quote, i) => (
               <div key={quote.id} className="bg-[#f3f7f7] border border-[#e9e9e9] rounded-[8px] p-[16px] flex flex-col gap-[8px]">
                 <div className="flex items-center justify-between gap-[8px]">
-                  <p
-                    className="font-['Theinhardt:Medium',sans-serif] text-[#272727] text-[16px] leading-[22px]"
-                    style={{ fontFeatureSettings: '"case" 1' }}
-                  >
-                    {quote.product}
-                  </p>
+                  <div className="flex items-center gap-[8px]">
+                    {quotes.length > 1 && (
+                      <span
+                        className="shrink-0 size-[20px] rounded-full bg-[#056257] text-white flex items-center justify-center font-['Theinhardt:Medium',sans-serif] text-[12px] leading-none"
+                        style={{ fontFeatureSettings: '"case" 1' }}
+                      >
+                        {i + 1}
+                      </span>
+                    )}
+                    <p
+                      className="font-['Theinhardt:Medium',sans-serif] text-[#272727] text-[16px] leading-[22px]"
+                      style={{ fontFeatureSettings: '"case" 1' }}
+                    >
+                      {quote.product}
+                    </p>
+                  </div>
                   {quotes.length > 1 && (
                     <button
                       onClick={() => onRemoveQuote(quote.id)}

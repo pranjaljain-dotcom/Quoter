@@ -226,17 +226,23 @@ function SelectField({ label, value, options, onChange, placeholder, labelLink, 
           <button
             type="button"
             onClick={labelLink.onClick}
-            className="font-['Theinhardt:Medium',sans-serif] text-[#865323] text-[14px] leading-[20px] underline decoration-dotted underline-offset-2 cursor-pointer bg-transparent border-none p-0"
+            disabled={disabled}
+            className={`font-['Theinhardt:Medium',sans-serif] text-[14px] leading-[20px] underline decoration-dotted underline-offset-2 bg-transparent border-none p-0 ${
+              disabled ? "text-[#d4d4d4] cursor-not-allowed" : "text-[#865323] cursor-pointer"
+            }`}
             style={{ fontFeatureSettings: '"case" 1' }}
           >
             {labelLink.text}
           </button>
         ) : (
           <a
-            href={labelLink.href}
+            href={disabled ? undefined : labelLink.href}
             target="_blank"
             rel="noopener noreferrer"
-            className="font-['Theinhardt:Medium',sans-serif] text-[#865323] text-[14px] leading-[20px] underline decoration-dotted underline-offset-2 cursor-pointer"
+            aria-disabled={disabled}
+            className={`font-['Theinhardt:Medium',sans-serif] text-[14px] leading-[20px] underline decoration-dotted underline-offset-2 ${
+              disabled ? "text-[#d4d4d4] cursor-not-allowed pointer-events-none" : "text-[#865323] cursor-pointer"
+            }`}
             style={{ fontFeatureSettings: '"case" 1' }}
           >
             {labelLink.text}

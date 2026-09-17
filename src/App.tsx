@@ -191,13 +191,14 @@ function Sidebar({ activeNav, onNavChange }: { activeNav: string; onNavChange: (
 
 type SelectOption = string | { value: string; health: string; bmi?: string };
 
-function SelectField({ label, value, options, onChange, placeholder, labelLink }: {
+function SelectField({ label, value, options, onChange, placeholder, labelLink, disabled }: {
   label: string;
   value: string;
   options: SelectOption[];
   onChange: (v: string) => void;
   placeholder?: string;
   labelLink?: { text: string; href?: string; onClick?: () => void };
+  disabled?: boolean;
 }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -245,8 +246,11 @@ function SelectField({ label, value, options, onChange, placeholder, labelLink }
       <div className="relative w-full">
         <button
           type="button"
+          disabled={disabled}
           onClick={() => setOpen((v) => !v)}
-          className={`bg-white rounded-[8px] border w-full h-[56px] flex items-center px-[14px] gap-[8px] transition-shadow ${open ? "border-[#056257] shadow-[0px_0px_0px_2px_#dae7e6]" : "border-[#d4d4d4]"}`}
+          className={`rounded-[8px] border w-full h-[56px] flex items-center px-[14px] gap-[8px] transition-shadow ${
+            disabled ? "bg-[#f4f4f4] border-[#e9e9e9] cursor-not-allowed" : open ? "bg-white border-[#056257] shadow-[0px_0px_0px_2px_#dae7e6]" : "bg-white border-[#d4d4d4]"
+          }`}
         >
           <span
             className={`flex-1 text-left font-['Theinhardt:Regular',sans-serif] text-[16px] leading-[24px] ${value ? "text-[#272727]" : "text-[#7e7e7e]"}`}
@@ -297,7 +301,7 @@ function SelectField({ label, value, options, onChange, placeholder, labelLink }
   );
 }
 
-function TextField({ label, value, placeholder, onChange, suffix, dateMask, type = "text" }: {
+function TextField({ label, value, placeholder, onChange, suffix, dateMask, type = "text", disabled }: {
   label: string;
   value: string;
   placeholder?: string;
@@ -305,6 +309,7 @@ function TextField({ label, value, placeholder, onChange, suffix, dateMask, type
   suffix?: string;
   dateMask?: boolean;
   type?: string;
+  disabled?: boolean;
 }) {
   function handleDateInput(raw: string) {
     // Strip non-digits
@@ -326,14 +331,15 @@ function TextField({ label, value, placeholder, onChange, suffix, dateMask, type
       >
         {label}
       </label>
-      <div className="relative bg-white rounded-[8px] border border-[#d4d4d4] w-full h-[56px] flex items-center px-[14px]">
+      <div className={`relative rounded-[8px] border w-full h-[56px] flex items-center px-[14px] ${disabled ? "bg-[#f4f4f4] border-[#e9e9e9]" : "bg-white border-[#d4d4d4]"}`}>
         <input
           type={dateMask ? "text" : type}
           value={value}
           placeholder={placeholder}
           maxLength={dateMask ? 10 : undefined}
+          disabled={disabled}
           onChange={(e) => dateMask ? handleDateInput(e.target.value) : onChange(e.target.value)}
-          className="flex-1 bg-transparent font-['Theinhardt:Regular',sans-serif] text-[#272727] text-[16px] leading-[24px] outline-none placeholder:text-[#7e7e7e]"
+          className={`flex-1 bg-transparent font-['Theinhardt:Regular',sans-serif] text-[16px] leading-[24px] outline-none placeholder:text-[#7e7e7e] ${disabled ? "text-[#7e7e7e] cursor-not-allowed" : "text-[#272727]"}`}
           style={{ fontFeatureSettings: '"case" 1' }}
         />
         {suffix && (
@@ -936,33 +942,35 @@ function CreditEstimateInfoPanel({ open, onClose }: { open: boolean; onClose: ()
 type QuotePreview = { product: string; coverage: number; premium: number };
 type QuoteEntry = QuotePreview & { id: number };
 
-function ShareEstimatePanel({ open, onClose, currentQuote }: { open: boolean; onClose: () => void; currentQuote: QuotePreview }) {
-  const [email, setEmail] = useState("");
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [quotes, setQuotes] = useState<QuoteEntry[]>([]);
-
-  useEffect(() => {
-    if (open) {
-      setEmail("");
-      setFirstName("");
-      setLastName("");
-      setQuotes([{ id: 1, ...currentQuote }]);
-    }
-  }, [open]);
-
+function ShareEstimatePanel({
+  open,
+  onClose,
+  quotes,
+  onAddAnotherQuote,
+  onRemoveQuote,
+  email,
+  onEmailChange,
+  firstName,
+  onFirstNameChange,
+  lastName,
+  onLastNameChange,
+}: {
+  open: boolean;
+  onClose: () => void;
+  quotes: QuoteEntry[];
+  onAddAnotherQuote: () => void;
+  onRemoveQuote: (id: number) => void;
+  email: string;
+  onEmailChange: (v: string) => void;
+  firstName: string;
+  onFirstNameChange: (v: string) => void;
+  lastName: string;
+  onLastNameChange: (v: string) => void;
+}) {
   const canSend = email.trim() !== "";
 
   const fmtCoverage = (n: number) => "$" + n.toLocaleString("en-US");
   const fmtPremium = (n: number) => "$" + n.toFixed(2) + "/mo";
-
-  function handleAddAnotherQuote() {
-    setQuotes((prev) => [...prev, { id: Date.now(), ...currentQuote }]);
-  }
-
-  function handleRemoveQuote(id: number) {
-    setQuotes((prev) => prev.filter((q) => q.id !== id));
-  }
 
   return (
     <>
@@ -1022,7 +1030,7 @@ function ShareEstimatePanel({ open, onClose, currentQuote }: { open: boolean; on
                   </p>
                   {quotes.length > 1 && (
                     <button
-                      onClick={() => handleRemoveQuote(quote.id)}
+                      onClick={() => onRemoveQuote(quote.id)}
                       className="shrink-0 size-[24px] flex items-center justify-center rounded-[6px] hover:bg-[#e9e9e9] border-none bg-transparent cursor-pointer transition-colors"
                       aria-label={`Remove quote ${i + 1}`}
                     >
@@ -1052,7 +1060,7 @@ function ShareEstimatePanel({ open, onClose, currentQuote }: { open: boolean; on
             ))}
             <button
               type="button"
-              onClick={handleAddAnotherQuote}
+              onClick={onAddAnotherQuote}
               className="w-full bg-white rounded-[8px] border border-[#525252] text-[#272727] px-[16px] py-[12px] font-['Theinhardt:Medium',sans-serif] text-[16px] leading-[24px] cursor-pointer hover:bg-gray-50 transition-colors"
               style={{ fontFeatureSettings: '"case" 1' }}
             >
@@ -1065,12 +1073,12 @@ function ShareEstimatePanel({ open, onClose, currentQuote }: { open: boolean; on
           <TextField
             label="Client's email address (required)"
             value={email}
-            onChange={setEmail}
+            onChange={onEmailChange}
             placeholder="client@email.com"
             type="email"
           />
-          <TextField label="First name" value={firstName} onChange={setFirstName} placeholder="First name" />
-          <TextField label="Last name" value={lastName} onChange={setLastName} placeholder="Last name" />
+          <TextField label="First name" value={firstName} onChange={onFirstNameChange} placeholder="First name" />
+          <TextField label="Last name" value={lastName} onChange={onLastNameChange} placeholder="Last name" />
         </div>
         {/* Footer CTAs */}
         <div className="sticky bottom-0 shrink-0 bg-white border-t border-[#e9e9e9] px-[24px] py-[20px] flex flex-col gap-[12px]">
@@ -1184,6 +1192,8 @@ function QuoteForm({
   onChangeProduct,
   selectedProduct,
   onShowCreditInfo,
+  locked,
+  onCancelLock,
 }: {
   activeProduct: number;
   onProductChange: (i: number) => void;
@@ -1195,6 +1205,8 @@ function QuoteForm({
   onChangeProduct: () => void;
   selectedProduct: string;
   onShowCreditInfo: () => void;
+  locked: boolean;
+  onCancelLock: () => void;
 }) {
   const [tabLoading, setTabLoading] = useState(false);
 
@@ -1210,6 +1222,26 @@ function QuoteForm({
 
   return (
     <div className="flex flex-col gap-[20px]">
+      {/* Locked banner — shown while configuring an additional quote for the same product */}
+      {locked && (
+        <div className="flex items-center justify-between gap-[16px] bg-[#f3f7f7] border border-[#dae7e6] rounded-[8px] px-[16px] py-[12px]">
+          <p
+            className="font-['Theinhardt:Regular',sans-serif] text-[#056257] text-[14px] leading-[20px]"
+            style={{ fontFeatureSettings: '"case" 1' }}
+          >
+            Adding another quote for the same product — update coverage on the right, then click Share estimate again.
+          </p>
+          <button
+            type="button"
+            onClick={onCancelLock}
+            className="shrink-0 font-['Theinhardt:Medium',sans-serif] text-[#056257] text-[14px] leading-[20px] underline decoration-dotted underline-offset-2 cursor-pointer bg-transparent border-none p-0"
+            style={{ fontFeatureSettings: '"case" 1' }}
+          >
+            Cancel
+          </button>
+        </div>
+      )}
+
       {/* Product header */}
       <div className="flex items-start justify-between gap-[8px]">
         <div className="flex flex-col gap-[4px]">
@@ -1222,7 +1254,10 @@ function QuoteForm({
         </div>
         <button
           onClick={onChangeProduct}
-          className="shrink-0 font-['Theinhardt:Medium',sans-serif] text-[#865323] text-[16px] leading-[24px] underline decoration-dotted underline-offset-2 cursor-pointer"
+          disabled={locked}
+          className={`shrink-0 font-['Theinhardt:Medium',sans-serif] text-[16px] leading-[24px] underline decoration-dotted underline-offset-2 ${
+            locked ? "text-[#d4d4d4] cursor-not-allowed" : "text-[#865323] cursor-pointer"
+          }`}
           style={{ fontFeatureSettings: '"case" 1' }}
         >
           Change Product
@@ -1231,7 +1266,7 @@ function QuoteForm({
 
       {/* Sub-product tabs — only for products that have variants */}
       {hasTabs && (
-        <div className="relative grid grid-cols-2 bg-[#f3f7f7] rounded-full p-[4px]">
+        <div className={`relative grid grid-cols-2 bg-[#f3f7f7] rounded-full p-[4px] ${locked ? "opacity-50" : ""}`}>
           {/* Sliding highlight */}
           <div
             className="absolute top-[4px] bottom-[4px] left-[4px] rounded-full bg-white shadow-[0px_1px_2px_0px_rgba(16,24,40,0.08)] transition-transform duration-300 ease-in-out"
@@ -1240,10 +1275,11 @@ function QuoteForm({
           {PRODUCTS.map((name, i) => (
             <button
               key={i}
-              onClick={() => handleTabChange(i)}
-              className={`relative z-10 h-[40px] rounded-full px-[16px] text-center cursor-pointer border-none bg-transparent transition-colors font-['Theinhardt:Medium',sans-serif] text-[14px] leading-[20px] truncate ${
-                activeProduct === i ? "text-[#056257]" : "text-[#525252] hover:text-[#272727]"
-              }`}
+              onClick={() => !locked && handleTabChange(i)}
+              disabled={locked}
+              className={`relative z-10 h-[40px] rounded-full px-[16px] text-center border-none bg-transparent transition-colors font-['Theinhardt:Medium',sans-serif] text-[14px] leading-[20px] truncate ${
+                locked ? "cursor-not-allowed" : "cursor-pointer"
+              } ${activeProduct === i ? "text-[#056257]" : "text-[#525252] hover:text-[#272727]"}`}
               style={{ fontFeatureSettings: '"case" 1', letterSpacing: "-0.14px" }}
             >
               {name}
@@ -1285,6 +1321,7 @@ function QuoteForm({
             options={["Male", "Female"]}
             onChange={(v) => onFormChange("sex", v)}
             placeholder="Select biological sex"
+            disabled={locked}
           />
         </div>
         <div className="flex-1">
@@ -1294,6 +1331,7 @@ function QuoteForm({
             placeholder="mm/dd/yyyy"
             onChange={(v) => onFormChange("birthdate", v)}
             dateMask
+            disabled={locked}
           />
         </div>
       </div>
@@ -1306,6 +1344,7 @@ function QuoteForm({
             options={["Non-smoker", "Smoker"]}
             onChange={(v) => onFormChange("smoking", v)}
             placeholder="Smoker or non-smoker?"
+            disabled={locked}
           />
         </div>
         <div className="flex-1">
@@ -1315,6 +1354,7 @@ function QuoteForm({
             options={["Arizona", "California", "Texas", "Florida", "New York"]}
             onChange={(v) => onFormChange("residence", v)}
             placeholder="Select state"
+            disabled={locked}
           />
         </div>
       </div>
@@ -1334,6 +1374,7 @@ function QuoteForm({
               ]}
               onChange={(v) => onFormChange("rateClass", v)}
               placeholder="Select health class"
+              disabled={locked}
             />
           </div>
           <div className="flex-1">
@@ -1344,6 +1385,7 @@ function QuoteForm({
               onChange={(v) => onFormChange("credit", v)}
               placeholder="Estimate credit score"
               labelLink={{ text: "How it works", onClick: onShowCreditInfo }}
+              disabled={locked}
             />
           </div>
         </div>
@@ -1379,13 +1421,14 @@ function QuoteForm({
                 Height
               </label>
               <div className="flex gap-[8px]">
-                <div className="relative bg-white rounded-[8px] border border-[#d4d4d4] flex-1 h-[56px] flex items-center px-[14px]">
+                <div className={`relative rounded-[8px] border flex-1 h-[56px] flex items-center px-[14px] ${locked ? "bg-[#f4f4f4] border-[#e9e9e9]" : "bg-white border-[#d4d4d4]"}`}>
                   <input
                     type="text"
                     value={formState.heightFt}
                     placeholder="0"
+                    disabled={locked}
                     onChange={(e) => onFormChange("heightFt", e.target.value)}
-                    className="flex-1 w-0 bg-transparent font-['Theinhardt:Regular',sans-serif] text-[#272727] text-[16px] outline-none placeholder:text-[#7e7e7e]"
+                    className={`flex-1 w-0 bg-transparent font-['Theinhardt:Regular',sans-serif] text-[16px] outline-none placeholder:text-[#7e7e7e] ${locked ? "text-[#7e7e7e] cursor-not-allowed" : "text-[#272727]"}`}
                     style={{ fontFeatureSettings: '"case" 1' }}
                   />
                   <span
@@ -1395,13 +1438,14 @@ function QuoteForm({
                     ft
                   </span>
                 </div>
-                <div className="relative bg-white rounded-[8px] border border-[#d4d4d4] flex-1 h-[56px] flex items-center px-[14px]">
+                <div className={`relative rounded-[8px] border flex-1 h-[56px] flex items-center px-[14px] ${locked ? "bg-[#f4f4f4] border-[#e9e9e9]" : "bg-white border-[#d4d4d4]"}`}>
                   <input
                     type="text"
                     value={formState.heightIn}
                     placeholder="0"
+                    disabled={locked}
                     onChange={(e) => onFormChange("heightIn", e.target.value)}
-                    className="flex-1 w-0 bg-transparent font-['Theinhardt:Regular',sans-serif] text-[#272727] text-[16px] outline-none placeholder:text-[#7e7e7e]"
+                    className={`flex-1 w-0 bg-transparent font-['Theinhardt:Regular',sans-serif] text-[16px] outline-none placeholder:text-[#7e7e7e] ${locked ? "text-[#7e7e7e] cursor-not-allowed" : "text-[#272727]"}`}
                     style={{ fontFeatureSettings: '"case" 1' }}
                   />
                   <span
@@ -1420,6 +1464,7 @@ function QuoteForm({
                 placeholder="0"
                 suffix="lbs"
                 onChange={(v) => onFormChange("weight", v)}
+                disabled={locked}
               />
             </div>
           </div>
@@ -1481,6 +1526,11 @@ export default function App() {
   const [showShareEstimate, setShowShareEstimate] = useState(false);
   const [productLoading, setProductLoading] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState("Term Life Insurance");
+  const [pendingQuotes, setPendingQuotes] = useState<QuoteEntry[]>([]);
+  const [lockedForAdditionalQuote, setLockedForAdditionalQuote] = useState(false);
+  const [clientEmail, setClientEmail] = useState("");
+  const [clientFirstName, setClientFirstName] = useState("");
+  const [clientLastName, setClientLastName] = useState("");
 
   const handleProductSelect = (name: string) => {
     const cfg = getProductConfig(name);
@@ -1525,6 +1575,28 @@ export default function App() {
     product: selectedProduct,
     coverage: adEnabled ? coverage + coverage * adMultiplier : coverage,
     premium: previewBasePremium + previewAdPremium,
+  };
+
+  const handleOpenShareEstimate = () => {
+    if (lockedForAdditionalQuote) {
+      setPendingQuotes((prev) => [...prev, { id: Date.now(), ...currentQuote }]);
+      setLockedForAdditionalQuote(false);
+    } else {
+      setPendingQuotes([{ id: Date.now(), ...currentQuote }]);
+      setClientEmail("");
+      setClientFirstName("");
+      setClientLastName("");
+    }
+    setShowShareEstimate(true);
+  };
+
+  const handleAddAnotherQuote = () => {
+    setShowShareEstimate(false);
+    setLockedForAdditionalQuote(true);
+  };
+
+  const handleRemovePendingQuote = (id: number) => {
+    setPendingQuotes((prev) => prev.filter((q) => q.id !== id));
   };
 
   return (
@@ -1589,6 +1661,8 @@ export default function App() {
                 onChangeProduct={() => setShowChangeProduct(true)}
                 selectedProduct={selectedProduct}
                 onShowCreditInfo={() => setShowCreditInfo(true)}
+                locked={lockedForAdditionalQuote}
+                onCancelLock={() => setLockedForAdditionalQuote(false)}
               />
             )}
           </div>
@@ -1648,7 +1722,7 @@ export default function App() {
             <div className="sticky bottom-0 shrink-0 bg-white border-t border-[#e9e9e9] px-[24px] py-[20px] flex gap-[20px]">
               <button
                 disabled={!isFormFilled}
-                onClick={() => setShowShareEstimate(true)}
+                onClick={handleOpenShareEstimate}
                 className={`flex-1 bg-white rounded-[8px] border px-[16px] py-[8px] font-['Theinhardt:Medium',sans-serif] text-[16px] leading-[24px] transition-colors ${isFormFilled ? "border-[#525252] text-[#272727] cursor-pointer hover:bg-gray-50" : "border-[#d4d4d4] text-[#d4d4d4] cursor-not-allowed"}`}
                 style={{ fontFeatureSettings: '"case" 1' }}
               >
@@ -1667,7 +1741,19 @@ export default function App() {
       </div>
       <ChangeProductPanel open={showChangeProduct} onClose={() => setShowChangeProduct(false)} onSelect={handleProductSelect} selectedProduct={selectedProduct} />
       <CreditEstimateInfoPanel open={showCreditInfo} onClose={() => setShowCreditInfo(false)} />
-      <ShareEstimatePanel open={showShareEstimate} onClose={() => setShowShareEstimate(false)} currentQuote={currentQuote} />
+      <ShareEstimatePanel
+        open={showShareEstimate}
+        onClose={() => setShowShareEstimate(false)}
+        quotes={pendingQuotes}
+        onAddAnotherQuote={handleAddAnotherQuote}
+        onRemoveQuote={handleRemovePendingQuote}
+        email={clientEmail}
+        onEmailChange={setClientEmail}
+        firstName={clientFirstName}
+        onFirstNameChange={setClientFirstName}
+        lastName={clientLastName}
+        onLastNameChange={setClientLastName}
+      />
     </div>
   );
 }

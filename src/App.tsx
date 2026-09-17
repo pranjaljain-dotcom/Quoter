@@ -1053,7 +1053,7 @@ function ShareEstimatePanel({ open, onClose, currentQuote }: { open: boolean; on
             <button
               type="button"
               onClick={handleAddAnotherQuote}
-              className="self-start font-['Theinhardt:Medium',sans-serif] text-[#865323] text-[14px] leading-[20px] underline decoration-dotted underline-offset-2 cursor-pointer bg-transparent border-none p-0"
+              className="w-full bg-white rounded-[8px] border border-[#525252] text-[#272727] px-[16px] py-[12px] font-['Theinhardt:Medium',sans-serif] text-[16px] leading-[24px] cursor-pointer hover:bg-gray-50 transition-colors"
               style={{ fontFeatureSettings: '"case" 1' }}
             >
               + Add another quote

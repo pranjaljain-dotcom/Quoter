@@ -359,7 +359,7 @@ function CoverageSlider({ value, min, max, step = 5000, minLabel, maxLabel, onCh
   maxLabel: string;
   onChange: (v: number) => void;
 }) {
-  const pct = ((value - min) / (max - min)) * 100;
+  const pct = Math.min(100, Math.max(0, ((value - min) / (max - min)) * 100));
 
   return (
     <div className="flex flex-col gap-[4px] items-start w-full">
@@ -439,9 +439,10 @@ function QuotePanel({
 }) {
   const [coverageMode, setCoverageMode] = useState<"coverage" | "premium">("coverage");
 
-  const PREMIUM_MIN = 30;
-  const PREMIUM_MAX = 779;
+  const COVERAGE_MAX = 300000;
   const COVERAGE_PER_PREMIUM_DOLLAR = 2500;
+  const PREMIUM_MIN = 30;
+  const PREMIUM_MAX = COVERAGE_MAX / COVERAGE_PER_PREMIUM_DOLLAR;
 
   const basePremium = Math.round((coverage / 150000) * 60 * 100) / 100;
   const adPremium = adEnabled ? Math.round(basePremium * adMultiplier * 100) / 100 : 0;
@@ -492,7 +493,7 @@ function QuotePanel({
         {/* Slider under coverage row */}
         {coverageMode === "coverage" && (
           <div className="pl-[40px]">
-            <CoverageSlider value={coverage} min={15000} max={300000} minLabel="$15K" maxLabel="$300K" onChange={onCoverageChange} />
+            <CoverageSlider value={coverage} min={15000} max={COVERAGE_MAX} minLabel="$15K" maxLabel="$300K" onChange={onCoverageChange} />
           </div>
         )}
 
@@ -533,7 +534,7 @@ function QuotePanel({
               max={PREMIUM_MAX}
               step={1}
               minLabel="$30/mo"
-              maxLabel="$779/mo"
+              maxLabel={`$${PREMIUM_MAX}/mo`}
               onChange={(premium) => onCoverageChange(premium * COVERAGE_PER_PREMIUM_DOLLAR)}
             />
           </div>

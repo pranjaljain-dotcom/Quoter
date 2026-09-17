@@ -492,11 +492,19 @@ function QuotePanel({
         </div>
 
         {/* Slider under coverage row */}
-        {coverageMode === "coverage" && (
-          <div className="pl-[40px]">
-            <CoverageSlider value={coverage} min={15000} max={COVERAGE_MAX} minLabel="$15K" maxLabel="$300K" onChange={onCoverageChange} />
+        <div
+          className="grid transition-all duration-300 ease-in-out"
+          style={{
+            gridTemplateRows: coverageMode === "coverage" ? "1fr" : "0fr",
+            marginTop: coverageMode === "coverage" ? "0px" : "-16px",
+          }}
+        >
+          <div className="overflow-hidden">
+            <div className="pl-[40px]">
+              <CoverageSlider value={coverage} min={15000} max={COVERAGE_MAX} minLabel="$15K" maxLabel="$300K" onChange={onCoverageChange} />
+            </div>
           </div>
-        )}
+        </div>
 
         {/* Divider */}
         <div className="h-px bg-[#e9e9e9]" />
@@ -527,19 +535,27 @@ function QuotePanel({
         </div>
 
         {/* Slider under premium row */}
-        {coverageMode === "premium" && (
-          <div className="pl-[40px]">
-            <CoverageSlider
-              value={basePremium}
-              min={PREMIUM_MIN}
-              max={PREMIUM_MAX}
-              step={1}
-              minLabel="$30/mo"
-              maxLabel={`$${PREMIUM_MAX}/mo`}
-              onChange={(premium) => onCoverageChange(premium * COVERAGE_PER_PREMIUM_DOLLAR)}
-            />
+        <div
+          className="grid transition-all duration-300 ease-in-out"
+          style={{
+            gridTemplateRows: coverageMode === "premium" ? "1fr" : "0fr",
+            marginTop: coverageMode === "premium" ? "0px" : "-16px",
+          }}
+        >
+          <div className="overflow-hidden">
+            <div className="pl-[40px]">
+              <CoverageSlider
+                value={basePremium}
+                min={PREMIUM_MIN}
+                max={PREMIUM_MAX}
+                step={1}
+                minLabel="$30/mo"
+                maxLabel={`$${PREMIUM_MAX}/mo`}
+                onChange={(premium) => onCoverageChange(premium * COVERAGE_PER_PREMIUM_DOLLAR)}
+              />
+            </div>
           </div>
-        )}
+        </div>
       </div>
 
       {/* AD coverage card */}

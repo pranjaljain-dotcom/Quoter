@@ -933,20 +933,36 @@ function CreditEstimateInfoPanel({ open, onClose }: { open: boolean; onClose: ()
   );
 }
 
-function ShareEstimatePanel({ open, onClose }: { open: boolean; onClose: () => void }) {
+type QuotePreview = { product: string; coverage: number; premium: number };
+type QuoteEntry = QuotePreview & { id: number };
+
+function ShareEstimatePanel({ open, onClose, currentQuote }: { open: boolean; onClose: () => void; currentQuote: QuotePreview }) {
   const [email, setEmail] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
+  const [quotes, setQuotes] = useState<QuoteEntry[]>([]);
 
   useEffect(() => {
     if (open) {
       setEmail("");
       setFirstName("");
       setLastName("");
+      setQuotes([{ id: 1, ...currentQuote }]);
     }
   }, [open]);
 
   const canSend = email.trim() !== "";
+
+  const fmtCoverage = (n: number) => "$" + n.toLocaleString("en-US");
+  const fmtPremium = (n: number) => "$" + n.toFixed(2) + "/mo";
+
+  function handleAddAnotherQuote() {
+    setQuotes((prev) => [...prev, { id: Date.now(), ...currentQuote }]);
+  }
+
+  function handleRemoveQuote(id: number) {
+    setQuotes((prev) => prev.filter((q) => q.id !== id));
+  }
 
   return (
     <>
@@ -987,6 +1003,65 @@ function ShareEstimatePanel({ open, onClose }: { open: boolean; onClose: () => v
         </div>
         {/* Fields */}
         <div className="flex-1 overflow-y-auto px-[24px] py-[20px] flex flex-col gap-[20px]">
+          {/* Quote preview(s) */}
+          <div className="flex flex-col gap-[8px]">
+            <p
+              className="font-['Theinhardt:Medium',sans-serif] text-[#272727] text-[16px] leading-[24px]"
+              style={{ fontFeatureSettings: '"case" 1' }}
+            >
+              {quotes.length > 1 ? "Quotes" : "Quote"}
+            </p>
+            {quotes.map((quote, i) => (
+              <div key={quote.id} className="bg-[#f3f7f7] border border-[#e9e9e9] rounded-[8px] p-[16px] flex flex-col gap-[8px]">
+                <div className="flex items-center justify-between gap-[8px]">
+                  <p
+                    className="font-['Theinhardt:Medium',sans-serif] text-[#272727] text-[16px] leading-[22px]"
+                    style={{ fontFeatureSettings: '"case" 1' }}
+                  >
+                    {quote.product}
+                  </p>
+                  {quotes.length > 1 && (
+                    <button
+                      onClick={() => handleRemoveQuote(quote.id)}
+                      className="shrink-0 size-[24px] flex items-center justify-center rounded-[6px] hover:bg-[#e9e9e9] border-none bg-transparent cursor-pointer transition-colors"
+                      aria-label={`Remove quote ${i + 1}`}
+                    >
+                      <svg width="14" height="14" viewBox="0 0 20 20" fill="none">
+                        <path d="M15 5L5 15M5 5l10 10" stroke="#525252" strokeWidth="1.5" strokeLinecap="round"/>
+                      </svg>
+                    </button>
+                  )}
+                </div>
+                <div className="flex items-center justify-between">
+                  <p className="font-['Theinhardt:Regular',sans-serif] text-[#525252] text-[14px] leading-[20px]" style={{ fontFeatureSettings: '"case" 1' }}>
+                    Coverage
+                  </p>
+                  <p className="font-['Theinhardt:Medium',sans-serif] text-[#272727] text-[14px] leading-[20px]" style={{ fontFeatureSettings: '"case" 1' }}>
+                    {fmtCoverage(quote.coverage)}
+                  </p>
+                </div>
+                <div className="flex items-center justify-between">
+                  <p className="font-['Theinhardt:Regular',sans-serif] text-[#525252] text-[14px] leading-[20px]" style={{ fontFeatureSettings: '"case" 1' }}>
+                    Premium
+                  </p>
+                  <p className="font-['Theinhardt:Medium',sans-serif] text-[#272727] text-[14px] leading-[20px]" style={{ fontFeatureSettings: '"case" 1' }}>
+                    {fmtPremium(quote.premium)}
+                  </p>
+                </div>
+              </div>
+            ))}
+            <button
+              type="button"
+              onClick={handleAddAnotherQuote}
+              className="self-start font-['Theinhardt:Medium',sans-serif] text-[#865323] text-[14px] leading-[20px] underline decoration-dotted underline-offset-2 cursor-pointer bg-transparent border-none p-0"
+              style={{ fontFeatureSettings: '"case" 1' }}
+            >
+              + Add another quote
+            </button>
+          </div>
+
+          <div className="h-px bg-[#f4f4f4]" />
+
           <TextField
             label="Client's email address (required)"
             value={email}
@@ -1444,6 +1519,14 @@ export default function App() {
     (!activeConfig.showHealthCredit || (formState.rateClass !== "" && formState.credit !== "")) &&
     (!activeConfig.showBMI || (formState.heightFt.trim() !== "" && formState.heightIn.trim() !== "" && formState.weight.trim() !== ""));
 
+  const previewBasePremium = Math.round((coverage / 150000) * 60 * 100) / 100;
+  const previewAdPremium = adEnabled ? Math.round(previewBasePremium * adMultiplier * 100) / 100 : 0;
+  const currentQuote: QuotePreview = {
+    product: selectedProduct,
+    coverage: adEnabled ? coverage + coverage * adMultiplier : coverage,
+    premium: previewBasePremium + previewAdPremium,
+  };
+
   return (
     <div className="flex h-screen w-screen bg-white overflow-hidden">
       <Sidebar activeNav={activeNav} onNavChange={setActiveNav} />
@@ -1584,7 +1667,7 @@ export default function App() {
       </div>
       <ChangeProductPanel open={showChangeProduct} onClose={() => setShowChangeProduct(false)} onSelect={handleProductSelect} selectedProduct={selectedProduct} />
       <CreditEstimateInfoPanel open={showCreditInfo} onClose={() => setShowCreditInfo(false)} />
-      <ShareEstimatePanel open={showShareEstimate} onClose={() => setShowShareEstimate(false)} />
+      <ShareEstimatePanel open={showShareEstimate} onClose={() => setShowShareEstimate(false)} currentQuote={currentQuote} />
     </div>
   );
 }

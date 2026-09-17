@@ -443,11 +443,21 @@ function QuotePanel({
 }) {
   const [coverageMode, setCoverageMode] = useState<"coverage" | "premium">("coverage");
   const [premiumPeriodIndex, setPremiumPeriodIndex] = useState(0);
+  const [periodMenuOpen, setPeriodMenuOpen] = useState(false);
+  const periodMenuRef = useRef<HTMLDivElement>(null);
   const PREMIUM_PERIODS = [
-    { label: "Mo", toPeriod: (monthly: number) => monthly },
-    { label: "Wk", toPeriod: (monthly: number) => (monthly * 12) / 52 },
-    { label: "Day", toPeriod: (monthly: number) => (monthly * 12) / 365 },
+    { label: "Month", suffix: "/mo", toPeriod: (monthly: number) => monthly },
+    { label: "Week", suffix: "/wk", toPeriod: (monthly: number) => (monthly * 12) / 52 },
+    { label: "Day", suffix: "/day", toPeriod: (monthly: number) => (monthly * 12) / 365 },
   ];
+
+  useEffect(() => {
+    function handle(e: MouseEvent) {
+      if (periodMenuRef.current && !periodMenuRef.current.contains(e.target as Node)) setPeriodMenuOpen(false);
+    }
+    document.addEventListener("mousedown", handle);
+    return () => document.removeEventListener("mousedown", handle);
+  }, []);
 
   const COVERAGE_MAX = 300000;
   const COVERAGE_PER_PREMIUM_DOLLAR = 2500;
@@ -662,30 +672,49 @@ function QuotePanel({
           >
             Estimated Premium
           </p>
-          <div className="flex items-center gap-[8px]">
+          <div className="flex items-center gap-[4px]">
             <p
               className="font-['Theinhardt:Medium',sans-serif] text-[#272727] text-[20px] leading-[28px]"
               style={{ fontFeatureSettings: '"case" 1' }}
             >
               ${PREMIUM_PERIODS[premiumPeriodIndex].toPeriod(totalPremium).toFixed(2)}
             </p>
-            <div className="relative grid grid-cols-3 bg-[#f3f7f7] rounded-full p-[3px] w-fit shrink-0">
-              <div
-                className="absolute top-[3px] bottom-[3px] left-[3px] rounded-full bg-white shadow-[0px_1px_2px_0px_rgba(16,24,40,0.08)] transition-transform duration-300 ease-in-out"
-                style={{ width: "calc(33.333% - 2px)", transform: `translateX(${premiumPeriodIndex * 100}%)` }}
-              />
-              {PREMIUM_PERIODS.map((period, i) => (
-                <button
-                  key={period.label}
-                  onClick={() => setPremiumPeriodIndex(i)}
-                  className={`relative z-10 h-[28px] rounded-full px-[14px] text-center border-none bg-transparent cursor-pointer transition-colors font-['Theinhardt:Medium',sans-serif] text-[12px] leading-[16px] ${
-                    premiumPeriodIndex === i ? "text-[#056257]" : "text-[#525252] hover:text-[#272727]"
-                  }`}
-                  style={{ fontFeatureSettings: '"case" 1' }}
-                >
-                  {period.label}
-                </button>
-              ))}
+            <div className="relative" ref={periodMenuRef}>
+              <button
+                type="button"
+                onClick={() => setPeriodMenuOpen((v) => !v)}
+                className="flex items-center gap-[2px] bg-[#f3f7f7] rounded-[6px] px-[8px] py-[4px] border-none cursor-pointer hover:bg-[#eaf1f0] transition-colors font-['Theinhardt:Medium',sans-serif] text-[#525252] text-[14px] leading-[20px]"
+                style={{ fontFeatureSettings: '"case" 1' }}
+              >
+                {PREMIUM_PERIODS[premiumPeriodIndex].suffix}
+                <img
+                  src="assets/d0a41.svg"
+                  alt=""
+                  width="16"
+                  height="16"
+                  className={`shrink-0 transition-transform duration-200 ${periodMenuOpen ? "rotate-180" : ""}`}
+                />
+              </button>
+              {periodMenuOpen && (
+                <div className="absolute z-50 right-0 top-full mt-[4px] bg-white border border-[#d4d4d4] rounded-[8px] shadow-[0px_4px_6px_-2px_rgba(16,24,40,0.03),0px_12px_16px_-4px_rgba(16,24,40,0.08)] overflow-hidden min-w-[100px]">
+                  {PREMIUM_PERIODS.map((period, i) => (
+                    <button
+                      key={period.label}
+                      type="button"
+                      onClick={() => {
+                        setPremiumPeriodIndex(i);
+                        setPeriodMenuOpen(false);
+                      }}
+                      className={`w-full text-left px-[12px] py-[8px] cursor-pointer border-none bg-white hover:bg-[#f3f7f7] transition-colors font-['Theinhardt:Regular',sans-serif] text-[14px] leading-[20px] ${
+                        i === premiumPeriodIndex ? "text-[#056257] font-['Theinhardt:Medium',sans-serif]" : "text-[#272727]"
+                      }`}
+                      style={{ fontFeatureSettings: '"case" 1' }}
+                    >
+                      {period.label}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </div>

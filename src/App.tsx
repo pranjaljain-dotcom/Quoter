@@ -442,22 +442,6 @@ function QuotePanel({
   onAdMultiplierChange: (v: number) => void;
 }) {
   const [coverageMode, setCoverageMode] = useState<"coverage" | "premium">("coverage");
-  const [premiumPeriodIndex, setPremiumPeriodIndex] = useState(0);
-  const [periodMenuOpen, setPeriodMenuOpen] = useState(false);
-  const periodMenuRef = useRef<HTMLDivElement>(null);
-  const PREMIUM_PERIODS = [
-    { label: "Month", suffix: "/mo", toPeriod: (monthly: number) => monthly },
-    { label: "Week", suffix: "/wk", toPeriod: (monthly: number) => (monthly * 12) / 52 },
-    { label: "Day", suffix: "/day", toPeriod: (monthly: number) => (monthly * 12) / 365 },
-  ];
-
-  useEffect(() => {
-    function handle(e: MouseEvent) {
-      if (periodMenuRef.current && !periodMenuRef.current.contains(e.target as Node)) setPeriodMenuOpen(false);
-    }
-    document.addEventListener("mousedown", handle);
-    return () => document.removeEventListener("mousedown", handle);
-  }, []);
 
   const COVERAGE_MAX = 300000;
   const COVERAGE_PER_PREMIUM_DOLLAR = 2500;
@@ -470,6 +454,8 @@ function QuotePanel({
   const totalPremium = basePremium + adPremium;
   const totalCoverage = adActive ? coverage + coverage * adMultiplier : coverage;
   const agentEarnings = Math.round(totalPremium * 12 * 9.353 * 100) / 100;
+  const weeklyPremium = (totalPremium * 12) / 52;
+  const dailyPremium = (totalPremium * 12) / 365;
 
   const fmt = (n: number) =>
     n >= 1000
@@ -665,57 +651,26 @@ function QuotePanel({
             {fmt(totalCoverage)}
           </p>
         </div>
-        <div className="flex items-center justify-between gap-[12px]">
+        <div className="flex items-start justify-between gap-[12px]">
           <p
             className="font-['Theinhardt:Bold',sans-serif] text-[#272727] text-[18px] leading-[28px]"
             style={{ fontFeatureSettings: '"case" 1' }}
           >
             Estimated Premium
           </p>
-          <div className="flex items-center gap-[4px]">
+          <div className="flex flex-col items-end gap-[2px]">
             <p
               className="font-['Theinhardt:Medium',sans-serif] text-[#272727] text-[20px] leading-[28px]"
               style={{ fontFeatureSettings: '"case" 1' }}
             >
-              ${PREMIUM_PERIODS[premiumPeriodIndex].toPeriod(totalPremium).toFixed(2)}
+              ${totalPremium.toFixed(2)}/mo
             </p>
-            <div className="relative" ref={periodMenuRef}>
-              <button
-                type="button"
-                onClick={() => setPeriodMenuOpen((v) => !v)}
-                className="flex items-center gap-[2px] bg-[#f3f7f7] rounded-[6px] px-[8px] py-[4px] border-none cursor-pointer hover:bg-[#eaf1f0] transition-colors font-['Theinhardt:Medium',sans-serif] text-[#525252] text-[14px] leading-[20px]"
-                style={{ fontFeatureSettings: '"case" 1' }}
-              >
-                {PREMIUM_PERIODS[premiumPeriodIndex].suffix}
-                <img
-                  src="assets/d0a41.svg"
-                  alt=""
-                  width="16"
-                  height="16"
-                  className={`shrink-0 transition-transform duration-200 ${periodMenuOpen ? "rotate-180" : ""}`}
-                />
-              </button>
-              {periodMenuOpen && (
-                <div className="absolute z-50 right-0 top-full mt-[4px] bg-white border border-[#d4d4d4] rounded-[8px] shadow-[0px_4px_6px_-2px_rgba(16,24,40,0.03),0px_12px_16px_-4px_rgba(16,24,40,0.08)] overflow-hidden min-w-[100px]">
-                  {PREMIUM_PERIODS.map((period, i) => (
-                    <button
-                      key={period.label}
-                      type="button"
-                      onClick={() => {
-                        setPremiumPeriodIndex(i);
-                        setPeriodMenuOpen(false);
-                      }}
-                      className={`w-full text-left px-[12px] py-[8px] cursor-pointer border-none bg-white hover:bg-[#f3f7f7] transition-colors font-['Theinhardt:Regular',sans-serif] text-[14px] leading-[20px] ${
-                        i === premiumPeriodIndex ? "text-[#056257] font-['Theinhardt:Medium',sans-serif]" : "text-[#272727]"
-                      }`}
-                      style={{ fontFeatureSettings: '"case" 1' }}
-                    >
-                      {period.label}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
+            <p
+              className="font-['Theinhardt:Regular',sans-serif] text-[#7e7e7e] text-[13px] leading-[18px]"
+              style={{ fontFeatureSettings: '"case" 1' }}
+            >
+              ${weeklyPremium.toFixed(2)}/wk &middot; ${dailyPremium.toFixed(2)}/day
+            </p>
           </div>
         </div>
       </div>

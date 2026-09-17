@@ -658,7 +658,7 @@ function QuotePanel({
           >
             Estimated Premium
           </p>
-          <div className="flex flex-col items-end gap-[2px]">
+          <div className="flex flex-col items-end gap-[6px]">
             <p
               className="font-['Theinhardt:Medium',sans-serif] text-[#272727] text-[20px] leading-[28px]"
               style={{ fontFeatureSettings: '"case" 1' }}

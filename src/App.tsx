@@ -667,7 +667,7 @@ function QuotePanel({
 
       {/* Included benefits */}
       <div
-        className="rounded-[8px] border-2 border-white p-[24px] flex gap-[8px] items-start"
+        className="rounded-[8px] border-2 border-white p-[24px] flex gap-[8px] items-center"
         style={{ backgroundImage: "linear-gradient(-15deg, rgb(230,245,236) 33%, rgba(235,240,249,0.976) 69%)" }}
       >
         <div className="flex-1 flex flex-col gap-[16px]">
@@ -701,7 +701,7 @@ function QuotePanel({
         <img
           src="assets/benefit-family-illustration.png"
           alt=""
-          className="shrink-0 w-[102px] h-[67px] object-contain"
+          className="shrink-0 w-[125px] h-[100px] object-contain"
         />
       </div>
 

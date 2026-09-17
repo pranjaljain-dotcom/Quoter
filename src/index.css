@@ -1,0 +1,44 @@
+@import 'tailwindcss';
+
+@font-face {
+  font-family: "Theinhardt:Regular";
+  font-style: normal;
+  font-weight: 400;
+  src: url('fonts/Theinhardt-Regular.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: "Theinhardt:Medium";
+  font-style: normal;
+  font-weight: 500;
+  src: url('fonts/Theinhardt-Medium.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: "Theinhardt:Bold";
+  font-style: normal;
+  font-weight: 700;
+  src: url('fonts/Theinhardt-Bold.woff2') format('woff2');
+}
+
+/* Alias used in a few import nodes */
+@font-face {
+  font-family: "Theinhardt2:Medium";
+  font-style: normal;
+  font-weight: 500;
+  src: url('fonts/Theinhardt-Medium.woff2') format('woff2');
+}
+
+/* Fallback for Cambon (sidebar logo) */
+@font-face {
+  font-family: "Cambon:Regular";
+  font-style: normal;
+  font-weight: 400;
+  src: local('Georgia'), local('serif');
+}
+
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}

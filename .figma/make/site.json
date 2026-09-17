@@ -1,0 +1,10 @@
+{
+  "description": "Provides insurance agents with a streamlined dashboard to navigate products and visualize quotes for Final Expense whole life policies efficiently.",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}

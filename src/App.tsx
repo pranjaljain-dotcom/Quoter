@@ -442,6 +442,12 @@ function QuotePanel({
   onAdMultiplierChange: (v: number) => void;
 }) {
   const [coverageMode, setCoverageMode] = useState<"coverage" | "premium">("coverage");
+  const [premiumPeriodIndex, setPremiumPeriodIndex] = useState(0);
+  const PREMIUM_PERIODS = [
+    { label: "Mo", suffix: "/mo", toPeriod: (monthly: number) => monthly },
+    { label: "Wk", suffix: "/wk", toPeriod: (monthly: number) => (monthly * 12) / 52 },
+    { label: "Day", suffix: "/day", toPeriod: (monthly: number) => (monthly * 12) / 365 },
+  ];
 
   const COVERAGE_MAX = 300000;
   const COVERAGE_PER_PREMIUM_DOLLAR = 2500;
@@ -660,8 +666,28 @@ function QuotePanel({
             className="font-['Theinhardt:Medium',sans-serif] text-[#272727] text-[20px] leading-[28px]"
             style={{ fontFeatureSettings: '"case" 1' }}
           >
-            ${totalPremium.toFixed(2)}/mo
+            ${PREMIUM_PERIODS[premiumPeriodIndex].toPeriod(totalPremium).toFixed(2)}{PREMIUM_PERIODS[premiumPeriodIndex].suffix}
           </p>
+        </div>
+        <div className="flex justify-end">
+          <div className="relative grid grid-cols-3 bg-[#f3f7f7] rounded-full p-[3px] w-fit">
+            <div
+              className="absolute top-[3px] bottom-[3px] left-[3px] rounded-full bg-white shadow-[0px_1px_2px_0px_rgba(16,24,40,0.08)] transition-transform duration-300 ease-in-out"
+              style={{ width: "calc(33.333% - 2px)", transform: `translateX(${premiumPeriodIndex * 100}%)` }}
+            />
+            {PREMIUM_PERIODS.map((period, i) => (
+              <button
+                key={period.label}
+                onClick={() => setPremiumPeriodIndex(i)}
+                className={`relative z-10 h-[28px] rounded-full px-[14px] text-center border-none bg-transparent cursor-pointer transition-colors font-['Theinhardt:Medium',sans-serif] text-[12px] leading-[16px] ${
+                  premiumPeriodIndex === i ? "text-[#056257]" : "text-[#525252] hover:text-[#272727]"
+                }`}
+                style={{ fontFeatureSettings: '"case" 1' }}
+              >
+                {period.label}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 

@@ -1173,7 +1173,16 @@ function UploadCloudIcon() {
   );
 }
 
-function CompareIllustrationPanel({ open, onClose, currentQuote }: { open: boolean; onClose: () => void; currentQuote: QuotePreview }) {
+const COMPETITOR_QUOTE = {
+  coverage: "$250,000",
+  premium: "$31.00/mo",
+  term: "20 Years (level premium; then increases annually to age 95)",
+  medicalExam: "Unknown",
+  decisionTime: "Not specified",
+  healthClass: "Preferred No Nicotine use",
+};
+
+function CompareIllustrationPanel({ open, onClose, currentQuote, healthClass }: { open: boolean; onClose: () => void; currentQuote: QuotePreview; healthClass: string }) {
   const [file, setFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -1292,43 +1301,47 @@ function CompareIllustrationPanel({ open, onClose, currentQuote }: { open: boole
                   className="font-['Theinhardt:Medium',sans-serif] text-[#272727] text-[16px] leading-[24px]"
                   style={{ fontFeatureSettings: '"case" 1' }}
                 >
-                  Your Ethos Quote
+                  Comparison
                 </p>
-                <div className="bg-[#f3f7f7] border border-[#e9e9e9] rounded-[8px] p-[20px] flex flex-col gap-[16px]">
-                  <p
-                    className="font-['Theinhardt:Medium',sans-serif] text-[#272727] text-[18px] leading-[26px]"
-                    style={{ fontFeatureSettings: '"case" 1' }}
-                  >
-                    {currentQuote.product}
-                  </p>
-                  <div className="h-px bg-[#e9e9e9] shrink-0" />
-                  <div className="flex items-center justify-between">
-                    <p className="font-['Theinhardt:Regular',sans-serif] text-[#525252] text-[16px] leading-[24px]" style={{ fontFeatureSettings: '"case" 1' }}>
-                      Coverage
-                    </p>
-                    <p className="font-['Theinhardt:Medium',sans-serif] text-[#272727] text-[18px] leading-[26px]" style={{ fontFeatureSettings: '"case" 1' }}>
-                      {fmtCoverage(currentQuote.coverage)}
-                    </p>
+                <div className="border border-[#e9e9e9] rounded-[8px] overflow-hidden">
+                  <div className="grid grid-cols-[100px_1fr_1fr] bg-[#f4f4f4] px-[16px] py-[10px] gap-[8px]">
+                    <span />
+                    <span className="font-['Theinhardt:Medium',sans-serif] text-[#525252] text-[13px] leading-[18px]" style={{ fontFeatureSettings: '"case" 1' }}>
+                      Competitor
+                    </span>
+                    <span className="font-['Theinhardt:Medium',sans-serif] text-[#056257] text-[13px] leading-[18px]" style={{ fontFeatureSettings: '"case" 1' }}>
+                      Your Ethos Quote
+                    </span>
                   </div>
-                  {currentQuote.adEnabled && (
-                    <div className="flex items-center justify-between">
-                      <p className="font-['Theinhardt:Regular',sans-serif] text-[#525252] text-[16px] leading-[24px]" style={{ fontFeatureSettings: '"case" 1' }}>
-                        AD Coverage ({currentQuote.adMultiplier}x)
-                      </p>
-                      <p className="font-['Theinhardt:Medium',sans-serif] text-[#272727] text-[18px] leading-[26px]" style={{ fontFeatureSettings: '"case" 1' }}>
-                        +{fmtCoverage(currentQuote.adCoverage)}
-                      </p>
+                  {[
+                    { label: "Coverage", competitor: COMPETITOR_QUOTE.coverage, ethos: fmtCoverage(currentQuote.coverage) },
+                    { label: "Premium", competitor: COMPETITOR_QUOTE.premium, ethos: fmtPremium(currentQuote.premium) },
+                    { label: "Term", competitor: COMPETITOR_QUOTE.term, ethos: "—" },
+                    { label: "Medical Exam", competitor: COMPETITOR_QUOTE.medicalExam, ethos: "—" },
+                    { label: "Decision Time", competitor: COMPETITOR_QUOTE.decisionTime, ethos: "—" },
+                    { label: "Health Class", competitor: COMPETITOR_QUOTE.healthClass, ethos: healthClass || "—" },
+                  ].map((row, i) => (
+                    <div
+                      key={row.label}
+                      className={`grid grid-cols-[100px_1fr_1fr] px-[16px] py-[12px] gap-[8px] ${i > 0 ? "border-t border-[#f4f4f4]" : ""}`}
+                    >
+                      <span className="font-['Theinhardt:Medium',sans-serif] text-[#525252] text-[13px] leading-[18px]" style={{ fontFeatureSettings: '"case" 1' }}>
+                        {row.label}
+                      </span>
+                      <span className="font-['Theinhardt:Regular',sans-serif] text-[#272727] text-[14px] leading-[20px]" style={{ fontFeatureSettings: '"case" 1' }}>
+                        {row.competitor}
+                      </span>
+                      <span className="font-['Theinhardt:Medium',sans-serif] text-[#272727] text-[14px] leading-[20px]" style={{ fontFeatureSettings: '"case" 1' }}>
+                        {row.ethos}
+                      </span>
                     </div>
-                  )}
-                  <div className="flex items-center justify-between">
-                    <p className="font-['Theinhardt:Regular',sans-serif] text-[#525252] text-[16px] leading-[24px]" style={{ fontFeatureSettings: '"case" 1' }}>
-                      Premium
-                    </p>
-                    <p className="font-['Theinhardt:Medium',sans-serif] text-[#272727] text-[18px] leading-[26px]" style={{ fontFeatureSettings: '"case" 1' }}>
-                      {fmtPremium(currentQuote.premium)}
-                    </p>
-                  </div>
+                  ))}
                 </div>
+                {currentQuote.adEnabled && (
+                  <p className="font-['Theinhardt:Regular',sans-serif] text-[#7e7e7e] text-[13px] leading-[18px]" style={{ fontFeatureSettings: '"case" 1' }}>
+                    Ethos Coverage above is Term Life only and excludes the AD add-on ({currentQuote.adMultiplier}x, +{fmtCoverage(currentQuote.adCoverage)}). Premium already includes it.
+                  </p>
+                )}
               </div>
             </div>
           )}
@@ -2000,6 +2013,7 @@ export default function App() {
         open={showCompareIllustration}
         onClose={() => setShowCompareIllustration(false)}
         currentQuote={currentQuote}
+        healthClass={formState.rateClass}
       />
     </div>
   );

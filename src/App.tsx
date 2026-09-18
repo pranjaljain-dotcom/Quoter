@@ -1184,7 +1184,7 @@ const COMPETITOR_QUOTE = {
   healthClass: "Preferred No Nicotine use",
 };
 
-function CompareIllustrationPanel({ open, onClose, currentQuote, healthClass }: { open: boolean; onClose: () => void; currentQuote: QuotePreview; healthClass: string }) {
+function CompareIllustrationPanel({ open, onClose, currentQuote, healthClass, clientFirstName }: { open: boolean; onClose: () => void; currentQuote: QuotePreview; healthClass: string; clientFirstName: string }) {
   const [file, setFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -1206,6 +1206,12 @@ function CompareIllustrationPanel({ open, onClose, currentQuote, healthClass }: 
     const f = e.target.files?.[0];
     if (f) setFile(f);
   }
+
+  // Display the file under a predictable Name-Product.pdf name (derived from the
+  // client's first name once captured via Share Estimate, and the product being
+  // compared) instead of whatever the uploaded file happened to be named.
+  const productSlug = COMPETITOR_QUOTE.product.split(" ").join("-");
+  const displayFileName = `${clientFirstName || "Pranjal"}-${productSlug}.pdf`;
 
   return (
     <>
@@ -1278,7 +1284,7 @@ function CompareIllustrationPanel({ open, onClose, currentQuote, healthClass }: 
                     className="font-['Theinhardt:Medium',sans-serif] text-[#272727] text-[16px] leading-[24px] truncate"
                     style={{ fontFeatureSettings: '"case" 1' }}
                   >
-                    {file.name}
+                    {displayFileName}
                   </p>
                   <button
                     type="button"
@@ -2057,6 +2063,7 @@ export default function App() {
         onClose={() => setShowCompareIllustration(false)}
         currentQuote={currentQuote}
         healthClass={formState.rateClass}
+        clientFirstName={clientFirstName}
       />
     </div>
   );

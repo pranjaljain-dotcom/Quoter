@@ -1419,7 +1419,14 @@ function CompareIllustrationPanel({ open, onClose, currentQuote, healthClass, cl
                     </div>
                   </div>
                   {[
-                    { label: "Coverage", competitor: fmtCoverage(COMPETITOR_QUOTE.coverageAmount), ethos: fmtCoverage(currentQuote.coverage) },
+                    {
+                      label: "Coverage",
+                      competitor: fmtCoverage(COMPETITOR_QUOTE.coverageAmount),
+                      ethos: fmtCoverage(currentQuote.coverage + (currentQuote.adEnabled ? currentQuote.adCoverage : 0)),
+                      ethosSubtext: currentQuote.adEnabled
+                        ? `Includes +${fmtCoverage(currentQuote.adCoverage)} AD (${currentQuote.adMultiplier}x)`
+                        : undefined,
+                    },
                     {
                       label: "Premium",
                       competitor: fmtPremium(COMPETITOR_QUOTE.premiumAmount),
@@ -1473,11 +1480,6 @@ function CompareIllustrationPanel({ open, onClose, currentQuote, healthClass, cl
                     </div>
                   ))}
                 </div>
-                {currentQuote.adEnabled && (
-                  <p className="font-['Theinhardt:Regular',sans-serif] text-[#7e7e7e] text-[13px] leading-[18px]" style={{ fontFeatureSettings: '"case" 1' }}>
-                    Ethos Coverage above is Term Life only and excludes the AD add-on ({currentQuote.adMultiplier}x, +{fmtCoverage(currentQuote.adCoverage)}). Premium already includes it.
-                  </p>
-                )}
               </div>
             </div>
           )}

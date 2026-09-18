@@ -1074,7 +1074,7 @@ function ShareEstimatePanel({
         <div className="flex-1 overflow-y-auto px-[24px] py-[20px] flex flex-col gap-[20px]">
           {/* Estimate disclaimer */}
           <div className="flex items-center gap-[12px] bg-[#fdeceb] border border-[#f0c4bf] rounded-[8px] px-[16px] py-[12px]">
-            <span className="shrink-0 size-[20px] rounded-full bg-[#c0392b] text-white flex items-center justify-center font-['Theinhardt:Medium',sans-serif] text-[13px] leading-none">
+            <span className="shrink-0 size-[20px] rounded-full bg-[#a86560] text-white flex items-center justify-center font-['Theinhardt:Medium',sans-serif] text-[13px] leading-none">
               !
             </span>
             <p

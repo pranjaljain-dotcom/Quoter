@@ -745,7 +745,7 @@ function QuotePanel({
 
 /* ─── Change Product Panel ──────────────────────────────────── */
 
-type ProductEntry = { id: string; name: React.ReactNode; provider: React.ReactNode };
+type ProductEntry = { id: string; name: React.ReactNode; provider: React.ReactNode; maxCoverage?: string };
 type ProductGroup = { category: string; products: ProductEntry[] };
 
 const PRODUCTS_WITH_TABS = ["Final Expense Whole Life", "TruStage Final Expense"];
@@ -754,29 +754,30 @@ const PRODUCT_GROUPS: ProductGroup[] = [
   {
     category: "TERM LIFE",
     products: [
-      { id: "Term Life Insurance", name: "Term Life Insurance", provider: "Banner Life, Protective & Ameritas" },
-      { id: "Term Life Insurance - Choice", name: "Term Life Insurance - Choice", provider: "Ameritas" },
+      { id: "Term Life Insurance", name: "Term Life Insurance", provider: "Banner Life, Protective & Ameritas", maxCoverage: "$2M" },
+      { id: "Term Life Insurance - Choice", name: "Term Life Insurance - Choice", provider: "Ameritas", maxCoverage: "$1M" },
       {
         id: "TruStage Term Life",
         name: <><span>TruStage</span><sup className="text-[10px]">®</sup><span> Term Life</span></>,
         provider: <><span>TruStage</span><sup className="text-[9px]">®</sup></>,
+        maxCoverage: "$300K",
       },
-      { id: "Return of Premium Term Life", name: "Return of Premium Term Life", provider: "John Hancock" },
-      { id: "Ethos Term Life - Prime Pros", name: "Ethos Term Life - Prime Pros", provider: "Banner Life" },
+      { id: "Return of Premium Term Life", name: "Return of Premium Term Life", provider: "John Hancock", maxCoverage: "$500K" },
+      { id: "Ethos Term Life - Prime Pros", name: "Ethos Term Life - Prime Pros", provider: "Banner Life", maxCoverage: "$3M" },
     ],
   },
   {
     category: "IUL",
     products: [
-      { id: "Accumulation IUL", name: "Accumulation IUL", provider: "North American" },
-      { id: "Ethos Protection IUL", name: "Ethos Protection IUL", provider: "Ameritas" },
+      { id: "Accumulation IUL", name: "Accumulation IUL", provider: "North American", maxCoverage: "$2M" },
+      { id: "Ethos Protection IUL", name: "Ethos Protection IUL", provider: "Ameritas", maxCoverage: "$3M" },
     ],
   },
   {
     category: "WHOLE LIFE",
     products: [
-      { id: "TruStage Final Expense", name: "TruStage Final Expense", provider: "TruStage®" },
-      { id: "Final Expense Whole Life", name: "Final Expense Whole Life", provider: "Banner Life" },
+      { id: "TruStage Final Expense", name: "TruStage Final Expense", provider: "TruStage®", maxCoverage: "$50K" },
+      { id: "Final Expense Whole Life", name: "Final Expense Whole Life", provider: "Banner Life", maxCoverage: "$50K" },
     ],
   },
 ];
@@ -795,16 +796,24 @@ function ChangeProductPanel({ open, onClose, onSelect, selectedProduct }: { open
         style={{ width: "520px" }}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-[24px] py-[20px] border-b border-[#f4f4f4] shrink-0">
-          <p
-            className="font-['Theinhardt:Medium',sans-serif] text-[#272727] text-[18px] leading-[26px]"
-            style={{ fontFeatureSettings: '"case" 1' }}
-          >
-            Change Product
-          </p>
+        <div className="flex items-start justify-between gap-[16px] px-[24px] py-[20px] border-b border-[#f4f4f4] shrink-0">
+          <div className="flex flex-col gap-[4px]">
+            <p
+              className="font-['Theinhardt:Medium',sans-serif] text-[#272727] text-[18px] leading-[26px]"
+              style={{ fontFeatureSettings: '"case" 1' }}
+            >
+              Change Product
+            </p>
+            <p
+              className="font-['Theinhardt:Regular',sans-serif] text-[#7e7e7e] text-[14px] leading-[20px]"
+              style={{ fontFeatureSettings: '"case" 1' }}
+            >
+              Select a different product to quote for this client.
+            </p>
+          </div>
           <button
             onClick={onClose}
-            className="size-[32px] flex items-center justify-center rounded-[6px] hover:bg-[#f4f4f4] border-none bg-transparent cursor-pointer transition-colors"
+            className="shrink-0 size-[32px] flex items-center justify-center rounded-[6px] hover:bg-[#f4f4f4] border-none bg-transparent cursor-pointer transition-colors"
           >
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
               <path d="M15 5L5 15M5 5l10 10" stroke="#525252" strokeWidth="1.5" strokeLinecap="round"/>
@@ -828,14 +837,14 @@ function ChangeProductPanel({ open, onClose, onSelect, selectedProduct }: { open
                 return (
                   <button
                     key={pi}
-                    className={`w-full text-left flex items-center px-[16px] py-[12px] cursor-pointer border-none transition-colors ${
+                    className={`w-full text-left flex items-center justify-between gap-[12px] px-[16px] py-[12px] cursor-pointer border-none transition-colors ${
                       isActive
                         ? "bg-[#f3f7f7] border-b border-[#f4f4f4]"
                         : "bg-white hover:bg-[#f9fafb]"
                     }`}
                     onClick={() => onSelect(product.id)}
                   >
-                    <div className="flex flex-col gap-[2px]">
+                    <div className="flex flex-col gap-[2px] min-w-0">
                       <p
                         className={`font-['Theinhardt:Medium',sans-serif] text-[16px] leading-[24px] ${isActive ? "text-[#056257]" : "text-[#272727]"}`}
                         style={{ fontFeatureSettings: '"case" 1' }}
@@ -849,6 +858,14 @@ function ChangeProductPanel({ open, onClose, onSelect, selectedProduct }: { open
                         {product.provider}
                       </p>
                     </div>
+                    {product.maxCoverage && (
+                      <span
+                        className="shrink-0 bg-[#dae7e6] text-[#056257] text-[12px] font-['Theinhardt:Medium',sans-serif] px-[10px] py-[4px] rounded-full whitespace-nowrap"
+                        style={{ fontFeatureSettings: '"case" 1' }}
+                      >
+                        Coverage up to {product.maxCoverage}
+                      </span>
+                    )}
                   </button>
                 );
               })}

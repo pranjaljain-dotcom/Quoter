@@ -852,7 +852,7 @@ function ChangeProductPanel({ open, onClose, onSelect, selectedProduct }: { open
                         {product.name}
                       </p>
                       <p
-                        className="font-['Theinhardt:Regular',sans-serif] text-[#525252] text-[14px] leading-[20px]"
+                        className="font-['Theinhardt:Regular',sans-serif] text-[#7e7e7e] text-[14px] leading-[20px]"
                         style={{ fontFeatureSettings: '"case" 1' }}
                       >
                         {product.provider}

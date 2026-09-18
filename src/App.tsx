@@ -1011,10 +1011,8 @@ function ShareEstimatePanel({
   onRemoveQuote,
   email,
   onEmailChange,
-  firstName,
-  onFirstNameChange,
-  lastName,
-  onLastNameChange,
+  name,
+  onNameChange,
 }: {
   open: boolean;
   onClose: () => void;
@@ -1023,10 +1021,8 @@ function ShareEstimatePanel({
   onRemoveQuote: (id: number) => void;
   email: string;
   onEmailChange: (v: string) => void;
-  firstName: string;
-  onFirstNameChange: (v: string) => void;
-  lastName: string;
-  onLastNameChange: (v: string) => void;
+  name: string;
+  onNameChange: (v: string) => void;
 }) {
   const canSend = email.trim() !== "";
 
@@ -1170,8 +1166,7 @@ function ShareEstimatePanel({
             placeholder="client@email.com"
             type="email"
           />
-          <TextField label="First name" value={firstName} onChange={onFirstNameChange} placeholder="First name" />
-          <TextField label="Last name" value={lastName} onChange={onLastNameChange} placeholder="Last name" />
+          <TextField label="Full Name" value={name} onChange={onNameChange} placeholder="Full name" />
         </div>
         {/* Footer CTAs */}
         <div className="sticky bottom-0 shrink-0 bg-white border-t border-[#e9e9e9] px-[24px] py-[20px] flex flex-col gap-[12px]">
@@ -2178,8 +2173,7 @@ export default function App() {
   const [pendingQuotes, setPendingQuotes] = useState<QuoteEntry[]>([]);
   const [lockedForAdditionalQuote, setLockedForAdditionalQuote] = useState(false);
   const [clientEmail, setClientEmail] = useState("");
-  const [clientFirstName, setClientFirstName] = useState("");
-  const [clientLastName, setClientLastName] = useState("");
+  const [clientName, setClientName] = useState("");
   const [knockoutHealth, setKnockoutHealth] = useState(false);
   const [knockoutCriminal, setKnockoutCriminal] = useState(false);
 
@@ -2259,8 +2253,7 @@ export default function App() {
     } else {
       setPendingQuotes([{ id: Date.now(), ...currentQuote }]);
       setClientEmail("");
-      setClientFirstName("");
-      setClientLastName("");
+      setClientName("");
     }
     setShowShareEstimate(true);
   };
@@ -2432,17 +2425,15 @@ export default function App() {
         onRemoveQuote={handleRemovePendingQuote}
         email={clientEmail}
         onEmailChange={setClientEmail}
-        firstName={clientFirstName}
-        onFirstNameChange={setClientFirstName}
-        lastName={clientLastName}
-        onLastNameChange={setClientLastName}
+        name={clientName}
+        onNameChange={setClientName}
       />
       <CompareIllustrationPanel
         open={showCompareIllustration}
         onClose={() => setShowCompareIllustration(false)}
         currentQuote={currentQuote}
         healthClass={formState.rateClass}
-        clientFirstName={clientFirstName}
+        clientFirstName={clientName.trim().split(/\s+/)[0] || ""}
       />
     </div>
   );

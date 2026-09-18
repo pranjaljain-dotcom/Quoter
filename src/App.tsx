@@ -1743,7 +1743,7 @@ export default function App() {
                 className="font-['Theinhardt:Medium',sans-serif] text-[#865323] text-[16px] leading-[24px] underline decoration-dotted underline-offset-2 cursor-pointer"
                 style={{ fontFeatureSettings: '"case" 1' }}
               >
-                +2 Backup Products
+                Compare Illustration
               </button>
             </div>
             <div className="flex-1 px-[24px] py-[32px]">

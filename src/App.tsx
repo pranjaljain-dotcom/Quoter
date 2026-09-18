@@ -1174,8 +1174,8 @@ function UploadCloudIcon() {
 }
 
 const COMPETITOR_QUOTE = {
-  coverage: "$250,000",
-  premium: "$31.00/mo",
+  coverageAmount: 250000,
+  premiumAmount: 31.0,
   term: "20 Years (level premium; then increases annually to age 95)",
   medicalExam: "Unknown",
   decisionTime: "Not specified",
@@ -1314,10 +1314,11 @@ function CompareIllustrationPanel({ open, onClose, currentQuote, healthClass }: 
                     </span>
                   </div>
                   {[
-                    { label: "Coverage", competitor: COMPETITOR_QUOTE.coverage, ethos: fmtCoverage(currentQuote.coverage) },
+                    { label: "Coverage", competitor: fmtCoverage(COMPETITOR_QUOTE.coverageAmount), ethos: fmtCoverage(currentQuote.coverage) },
                     {
                       label: "Premium",
-                      competitor: COMPETITOR_QUOTE.premium,
+                      competitor: fmtPremium(COMPETITOR_QUOTE.premiumAmount),
+                      competitorSubtext: `$${((COMPETITOR_QUOTE.premiumAmount / COMPETITOR_QUOTE.coverageAmount) * 1000).toFixed(2)} per $1,000 coverage`,
                       ethos: fmtPremium(currentQuote.premium),
                       ethosSubtext: `$${((currentQuote.premium / currentQuote.coverage) * 1000).toFixed(2)} per $1,000 coverage`,
                     },
@@ -1335,9 +1336,19 @@ function CompareIllustrationPanel({ open, onClose, currentQuote, healthClass }: 
                       <span className="font-['Theinhardt:Medium',sans-serif] text-[#525252] text-[13px] leading-[18px]" style={{ fontFeatureSettings: '"case" 1' }}>
                         {row.label}
                       </span>
-                      <span className="font-['Theinhardt:Regular',sans-serif] text-[#272727] text-[14px] leading-[20px]" style={{ fontFeatureSettings: '"case" 1' }}>
-                        {row.competitor}
-                      </span>
+                      <div className="flex flex-col gap-[2px]">
+                        <span className="font-['Theinhardt:Regular',sans-serif] text-[#272727] text-[14px] leading-[20px]" style={{ fontFeatureSettings: '"case" 1' }}>
+                          {row.competitor}
+                        </span>
+                        {row.competitorSubtext && (
+                          <span
+                            className="font-['Theinhardt:Regular',sans-serif] text-[#7e7e7e] text-[12px] leading-[16px]"
+                            style={{ fontFeatureSettings: '"case" 1' }}
+                          >
+                            {row.competitorSubtext}
+                          </span>
+                        )}
+                      </div>
                       <div className="flex flex-col gap-[2px]">
                         <span
                           className={`font-['Theinhardt:Medium',sans-serif] text-[14px] leading-[20px] ${row.ethosHighlight ? "text-[#056257]" : "text-[#272727]"}`}

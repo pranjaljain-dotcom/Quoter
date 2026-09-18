@@ -429,6 +429,10 @@ function BenefitCheckIcon() {
 function QuotePanel({
   coverage,
   onCoverageChange,
+  coverageMin,
+  coverageMax,
+  coverageStep,
+  selectedProduct,
   adEnabled,
   onAdToggle,
   adMultiplier,
@@ -436,6 +440,10 @@ function QuotePanel({
 }: {
   coverage: number;
   onCoverageChange: (v: number) => void;
+  coverageMin: number;
+  coverageMax: number;
+  coverageStep: number;
+  selectedProduct: string;
   adEnabled: boolean;
   onAdToggle: () => void;
   adMultiplier: number | null;
@@ -443,9 +451,10 @@ function QuotePanel({
 }) {
   const [coverageMode, setCoverageMode] = useState<"coverage" | "premium">("coverage");
 
-  const COVERAGE_MAX = 300000;
+  const COVERAGE_MIN = coverageMin;
+  const COVERAGE_MAX = coverageMax;
   const COVERAGE_PER_PREMIUM_DOLLAR = 2500;
-  const PREMIUM_MIN = 30;
+  const PREMIUM_MIN = COVERAGE_MIN / COVERAGE_PER_PREMIUM_DOLLAR;
   const PREMIUM_MAX = COVERAGE_MAX / COVERAGE_PER_PREMIUM_DOLLAR;
 
   const adActive = adEnabled && adMultiplier != null;
@@ -486,7 +495,7 @@ function QuotePanel({
               className="font-['Theinhardt:Regular',sans-serif] text-[#272727] text-[18px] leading-[28px]"
               style={{ fontFeatureSettings: '"case" 1' }}
             >
-              Term Life coverage
+              {getCoverageLabel(selectedProduct)}
             </p>
           </button>
           <p
@@ -507,7 +516,7 @@ function QuotePanel({
         >
           <div className="overflow-hidden">
             <div className="pl-[40px]">
-              <CoverageSlider value={coverage} min={15000} max={COVERAGE_MAX} minLabel="$15K" maxLabel="$300K" onChange={onCoverageChange} />
+              <CoverageSlider value={coverage} min={COVERAGE_MIN} max={COVERAGE_MAX} step={coverageStep} minLabel={fmtCoverageLabel(COVERAGE_MIN)} maxLabel={fmtCoverageLabel(COVERAGE_MAX)} onChange={onCoverageChange} />
             </div>
           </div>
         </div>
@@ -555,8 +564,8 @@ function QuotePanel({
                 min={PREMIUM_MIN}
                 max={PREMIUM_MAX}
                 step={1}
-                minLabel="$30/mo"
-                maxLabel={`$${PREMIUM_MAX}/mo`}
+                minLabel={fmtPremiumLabel(PREMIUM_MIN)}
+                maxLabel={fmtPremiumLabel(PREMIUM_MAX)}
                 onChange={(premium) => onCoverageChange(premium * COVERAGE_PER_PREMIUM_DOLLAR)}
               />
             </div>
@@ -799,6 +808,21 @@ const PRODUCT_GROUPS: ProductGroup[] = [
     ],
   },
 ];
+
+const PRODUCT_CATEGORY_BY_ID: Record<string, string> = {};
+for (const group of PRODUCT_GROUPS) {
+  for (const product of group.products) {
+    PRODUCT_CATEGORY_BY_ID[product.id] = group.category;
+  }
+}
+
+function getCoverageLabel(productId: string): string {
+  const category = PRODUCT_CATEGORY_BY_ID[productId];
+  if (category === "WHOLE LIFE") return "Whole Life coverage";
+  if (category === "TERM LIFE") return "Term Life coverage";
+  if (category === "IUL") return "IUL coverage";
+  return "Coverage";
+}
 
 function ChangeProductPanel({ open, onClose, onSelect, selectedProduct }: { open: boolean; onClose: () => void; onSelect: (name: string) => void; selectedProduct: string }) {
   return (
@@ -1547,6 +1571,32 @@ const SUB_PRODUCT_TABS: Record<string, SubProductTabConfig> = {
   },
 };
 
+type CoverageRangeConfig = { min: number; max: number; default: number; step?: number };
+
+const DEFAULT_COVERAGE_RANGE: CoverageRangeConfig = { min: 15000, max: 300000, default: 150000 };
+
+/* Coverage sliders are sized per sub-product where the range differs
+   materially from the standard term life range above — keyed by the
+   sub-product's display name (falls back to the top-level product name
+   for products without sub-product tabs). `step` defaults to 5000 and
+   should evenly divide into `default` so the slider can actually land on it. */
+const COVERAGE_RANGE_BY_PRODUCT: Record<string, CoverageRangeConfig> = {
+  "TruStage Advantage Whole Life": { min: 5000, max: 100000, default: 50000 },
+  "TruStage Guaranteed Acceptable Whole Life": { min: 2000, max: 25000, default: 13000, step: 1000 },
+};
+
+function getCoverageRange(productKey: string): CoverageRangeConfig {
+  return COVERAGE_RANGE_BY_PRODUCT[productKey] ?? DEFAULT_COVERAGE_RANGE;
+}
+
+function fmtCoverageLabel(n: number): string {
+  return n % 1000 === 0 ? `$${n / 1000}K` : `$${n.toLocaleString("en-US")}`;
+}
+
+function fmtPremiumLabel(n: number): string {
+  return `$${Number.isInteger(n) ? n.toString() : n.toFixed(2)}/mo`;
+}
+
 function ExternalLinkIcon({ size = 24 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className="shrink-0">
@@ -2190,6 +2240,8 @@ export default function App() {
     }
     setSelectedProduct(name);
     setActiveProduct(0);
+    const newSubProductName = SUB_PRODUCT_TABS[name]?.tabs[0] ?? name;
+    setCoverage(getCoverageRange(newSubProductName).default);
     setShowChangeProduct(false);
     setProductLoading(true);
     setQuoteGenerated(false);
@@ -2220,6 +2272,8 @@ export default function App() {
   const handleSubProductTabChange = (i: number) => {
     if (i === activeProduct) return;
     setActiveProduct(i);
+    const newSubProductName = SUB_PRODUCT_TABS[selectedProduct]?.tabs[i] ?? selectedProduct;
+    setCoverage(getCoverageRange(newSubProductName).default);
     if (quoteGenerated) {
       setQuoteGenerated(false);
       setSubProductQuoteLoading(true);
@@ -2253,6 +2307,7 @@ export default function App() {
     (!activeConfig.showKnockoutQuestions || (!knockoutHealth && !knockoutCriminal));
 
   const activeSubProductName = SUB_PRODUCT_TABS[selectedProduct]?.tabs[activeProduct] ?? selectedProduct;
+  const coverageRange = getCoverageRange(activeSubProductName);
 
   const previewAdActive = adEnabled && adMultiplier != null;
   const previewBasePremium = Math.round((coverage / 150000) * 60 * 100) / 100;
@@ -2398,6 +2453,10 @@ export default function App() {
                 <QuotePanel
                   coverage={coverage}
                   onCoverageChange={setCoverage}
+                  coverageMin={coverageRange.min}
+                  coverageMax={coverageRange.max}
+                  coverageStep={coverageRange.step ?? 5000}
+                  selectedProduct={selectedProduct}
                   adEnabled={adEnabled}
                   onAdToggle={() => {
                     setAdEnabled((v) => !v);

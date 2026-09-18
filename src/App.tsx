@@ -1309,7 +1309,7 @@ function CompareIllustrationPanel({ open, onClose, currentQuote, healthClass, cl
                   className="font-['Theinhardt:Medium',sans-serif] text-[#272727] text-[16px] leading-[24px]"
                   style={{ fontFeatureSettings: '"case" 1' }}
                 >
-                  Comparison
+                  Competitor Analysis
                 </p>
                 <div className="border border-[#e9e9e9] rounded-[8px] overflow-hidden">
                   <div className="grid grid-cols-[100px_1fr_1fr] bg-[#f4f4f4] px-[16px] py-[10px] gap-[8px]">

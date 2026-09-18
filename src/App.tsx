@@ -1187,6 +1187,7 @@ const COMPETITOR_QUOTE = {
 function CompareIllustrationPanel({ open, onClose, currentQuote, healthClass, clientFirstName }: { open: boolean; onClose: () => void; currentQuote: QuotePreview; healthClass: string; clientFirstName: string }) {
   const [file, setFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [analysisLoading, setAnalysisLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -1204,7 +1205,11 @@ function CompareIllustrationPanel({ open, onClose, currentQuote, healthClass, cl
 
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const f = e.target.files?.[0];
-    if (f) setFile(f);
+    if (f) {
+      setFile(f);
+      setAnalysisLoading(true);
+      setTimeout(() => setAnalysisLoading(false), 700);
+    }
   }
 
   // Display the file under a predictable Name-Product.pdf name (derived from the
@@ -1276,6 +1281,29 @@ function CompareIllustrationPanel({ open, onClose, currentQuote, healthClass, cl
                 PDF or image
               </p>
             </label>
+          ) : analysisLoading ? (
+            <div className="flex flex-col gap-[24px] animate-pulse">
+              <div className="flex flex-col gap-[12px]">
+                <div className="flex items-center justify-between gap-[8px]">
+                  <div className="h-[20px] w-[220px] bg-[#e9e9e9] rounded-[4px]" />
+                  <div className="h-[16px] w-[60px] bg-[#e9e9e9] rounded-[4px]" />
+                </div>
+                <div className="h-[400px] bg-[#e9e9e9] rounded-[8px]" />
+              </div>
+              <div className="flex flex-col gap-[12px]">
+                <div className="h-[20px] w-[180px] bg-[#e9e9e9] rounded-[4px]" />
+                <div className="border border-[#e9e9e9] rounded-[8px] overflow-hidden">
+                  <div className="h-[38px] bg-[#f4f4f4]" />
+                  {[...Array(8)].map((_, i) => (
+                    <div key={i} className="h-[44px] border-t border-[#f4f4f4] px-[16px] flex items-center gap-[16px]">
+                      <div className="h-[14px] w-[80px] shrink-0 bg-[#e9e9e9] rounded-[4px]" />
+                      <div className="h-[14px] flex-1 bg-[#e9e9e9] rounded-[4px]" />
+                      <div className="h-[14px] flex-1 bg-[#e9e9e9] rounded-[4px]" />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
           ) : (
             <div className="flex flex-col gap-[24px]">
               <div className="flex flex-col gap-[12px] min-h-0">

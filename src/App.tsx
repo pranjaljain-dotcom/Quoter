@@ -1072,19 +1072,6 @@ function ShareEstimatePanel({
         </div>
         {/* Fields */}
         <div className="flex-1 overflow-y-auto px-[24px] py-[20px] flex flex-col gap-[20px]">
-          {/* Estimate disclaimer */}
-          <div className="flex items-center gap-[12px] bg-[#fdeceb] border border-[#f0c4bf] rounded-[8px] px-[16px] py-[12px]">
-            <span className="shrink-0 size-[20px] rounded-full bg-[#a86560] text-white flex items-center justify-center font-['Theinhardt:Medium',sans-serif] text-[13px] leading-none">
-              !
-            </span>
-            <p
-              className="font-['Theinhardt:Regular',sans-serif] text-[#272727] text-[15px] leading-[22px]"
-              style={{ fontFeatureSettings: '"case" 1' }}
-            >
-              This is an estimate, not a quote. Final pricing and availability are subject to a licensed review and underwriting approval.
-            </p>
-          </div>
-
           {/* Quote preview(s) */}
           <div className="flex flex-col gap-[8px]">
             <p

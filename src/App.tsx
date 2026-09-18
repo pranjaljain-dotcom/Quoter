@@ -1310,7 +1310,12 @@ function CompareIllustrationPanel({ open, onClose, currentQuote, healthClass, cl
 
               {/* Competitor Analysis skeleton — loads concurrently with the upload */}
               <div className="flex flex-col gap-[12px]">
-                <div className="h-[20px] w-[180px] skeleton-shimmer rounded-[4px]" />
+                <p
+                  className="font-['Theinhardt:Medium',sans-serif] text-[#272727] text-[16px] leading-[24px]"
+                  style={{ fontFeatureSettings: '"case" 1' }}
+                >
+                  Competitor Analysis
+                </p>
                 <div className="h-[38px] skeleton-shimmer rounded-[8px]" />
                 {[...Array(8)].map((_, i) => (
                   <div key={i} className="h-[44px] skeleton-shimmer rounded-[8px]" />

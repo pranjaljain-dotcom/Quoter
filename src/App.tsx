@@ -1189,6 +1189,7 @@ function CompareIllustrationPanel({ open, onClose, currentQuote, healthClass, cl
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [uploadingFile, setUploadingFile] = useState<File | null>(null);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [contentVisible, setContentVisible] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -1199,6 +1200,18 @@ function CompareIllustrationPanel({ open, onClose, currentQuote, healthClass, cl
     const url = URL.createObjectURL(file);
     setPreviewUrl(url);
     return () => URL.revokeObjectURL(url);
+  }, [file]);
+
+  useEffect(() => {
+    if (!file) {
+      setContentVisible(false);
+      return;
+    }
+    // Fade the revealed preview/analysis in on the next frame rather than
+    // having it snap in the instant the upload timer finishes.
+    setContentVisible(false);
+    const id = requestAnimationFrame(() => requestAnimationFrame(() => setContentVisible(true)));
+    return () => cancelAnimationFrame(id);
   }, [file]);
 
   const fmtCoverage = (n: number) => "$" + n.toLocaleString("en-US");
@@ -1270,26 +1283,39 @@ function CompareIllustrationPanel({ open, onClose, currentQuote, healthClass, cl
         {/* Body */}
         <div className="flex-1 overflow-y-auto px-[24px] py-[20px]">
           {uploadingFile ? (
-            <div className="flex flex-col items-center justify-center gap-[12px] border-2 border-dashed border-[#d4d4d4] rounded-[8px] py-[64px] px-[24px]">
-              <UploadCloudIcon />
-              <p
-                className="font-['Theinhardt:Medium',sans-serif] text-[#272727] text-[16px] leading-[24px] truncate max-w-full"
-                style={{ fontFeatureSettings: '"case" 1' }}
-              >
-                {uploadingFile.name}
-              </p>
-              <div className="w-full max-w-[320px] h-[8px] bg-[#e9e9e9] rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-[#056257] rounded-full transition-[width] duration-[3000ms] ease-linear"
-                  style={{ width: `${uploadProgress}%` }}
-                />
+            <div className="flex flex-col gap-[24px]">
+              <div className="flex flex-col gap-[12px]">
+                <p
+                  className="font-['Theinhardt:Medium',sans-serif] text-[#272727] text-[16px] leading-[24px] truncate"
+                  style={{ fontFeatureSettings: '"case" 1' }}
+                >
+                  {uploadingFile.name}
+                </p>
+                <div className="h-[400px] flex flex-col items-center justify-center gap-[12px] border-2 border-dashed border-[#d4d4d4] rounded-[8px] px-[24px] bg-[#f9fafb]">
+                  <UploadCloudIcon />
+                  <div className="w-full max-w-[320px] h-[8px] bg-[#e9e9e9] rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-[#056257] rounded-full transition-[width] duration-[3000ms] ease-linear"
+                      style={{ width: `${uploadProgress}%` }}
+                    />
+                  </div>
+                  <p
+                    className="font-['Theinhardt:Regular',sans-serif] text-[#7e7e7e] text-[14px] leading-[20px] text-center max-w-[320px]"
+                    style={{ fontFeatureSettings: '"case" 1' }}
+                  >
+                    Uploading competitor illustration and analyzing with Ethos quote
+                  </p>
+                </div>
               </div>
-              <p
-                className="font-['Theinhardt:Regular',sans-serif] text-[#7e7e7e] text-[14px] leading-[20px] text-center"
-                style={{ fontFeatureSettings: '"case" 1' }}
-              >
-                Uploading competitor illustration and analyzing with Ethos quote
-              </p>
+
+              {/* Competitor Analysis skeleton — loads concurrently with the upload */}
+              <div className="flex flex-col gap-[12px]">
+                <div className="h-[20px] w-[180px] skeleton-shimmer rounded-[4px]" />
+                <div className="h-[38px] skeleton-shimmer rounded-[8px]" />
+                {[...Array(8)].map((_, i) => (
+                  <div key={i} className="h-[44px] skeleton-shimmer rounded-[8px]" />
+                ))}
+              </div>
             </div>
           ) : !file ? (
             <label className="flex flex-col items-center justify-center gap-[12px] border-2 border-dashed border-[#d4d4d4] rounded-[8px] py-[64px] cursor-pointer hover:bg-[#f9fafb] transition-colors">
@@ -1315,7 +1341,7 @@ function CompareIllustrationPanel({ open, onClose, currentQuote, healthClass, cl
               </p>
             </label>
           ) : (
-            <div className="flex flex-col gap-[24px]">
+            <div className={`flex flex-col gap-[24px] transition-opacity duration-500 ease-out ${contentVisible ? "opacity-100" : "opacity-0"}`}>
               <div className="flex flex-col gap-[12px] min-h-0">
                 <div className="flex items-center justify-between gap-[8px]">
                   <p
@@ -1628,11 +1654,11 @@ function QuoteForm({
       <div className="h-px bg-[#F4F4F4] mx-[-40px]" />
 
       {tabLoading ? (
-        <div className="flex flex-col gap-[16px] animate-pulse">
-          <div className="h-[20px] w-[140px] bg-[#e9e9e9] rounded-[4px]" />
-          <div className="h-[56px] bg-[#e9e9e9] rounded-[8px]" />
-          <div className="h-[56px] bg-[#e9e9e9] rounded-[8px]" />
-          <div className="h-[56px] w-2/3 bg-[#e9e9e9] rounded-[8px]" />
+        <div className="flex flex-col gap-[16px]">
+          <div className="h-[20px] w-[140px] skeleton-shimmer rounded-[4px]" />
+          <div className="h-[56px] skeleton-shimmer rounded-[8px]" />
+          <div className="h-[56px] skeleton-shimmer rounded-[8px]" />
+          <div className="h-[56px] w-2/3 skeleton-shimmer rounded-[8px]" />
         </div>
       ) : (
       <>
@@ -1970,22 +1996,22 @@ export default function App() {
           {/* Left: quote form */}
           <div className="flex-1 min-w-0 overflow-y-auto px-[40px] py-[40px]">
             {productLoading ? (
-              <div className="flex flex-col gap-[16px] animate-pulse">
-                <div className="h-[20px] w-[200px] bg-[#e9e9e9] rounded-[4px]" />
+              <div className="flex flex-col gap-[16px]">
+                <div className="h-[20px] w-[200px] skeleton-shimmer rounded-[4px]" />
                 <div className="flex gap-[8px]">
-                  <div className="h-[36px] w-[130px] bg-[#e9e9e9] rounded-[20px]" />
-                  <div className="h-[36px] w-[130px] bg-[#e9e9e9] rounded-[20px]" />
+                  <div className="h-[36px] w-[130px] skeleton-shimmer rounded-[20px]" />
+                  <div className="h-[36px] w-[130px] skeleton-shimmer rounded-[20px]" />
                 </div>
                 <div className="h-[1px] bg-[#e9e9e9] mx-[-40px]" />
-                <div className="h-[20px] w-[140px] bg-[#e9e9e9] rounded-[4px]" />
-                <div className="h-[56px] bg-[#e9e9e9] rounded-[8px]" />
-                <div className="h-[56px] bg-[#e9e9e9] rounded-[8px]" />
-                <div className="h-[56px] bg-[#e9e9e9] rounded-[8px]" />
-                <div className="h-[56px] w-2/3 bg-[#e9e9e9] rounded-[8px]" />
-                <div className="h-[20px] w-[120px] bg-[#e9e9e9] rounded-[4px] mt-[8px]" />
-                <div className="h-[56px] bg-[#e9e9e9] rounded-[8px]" />
-                <div className="h-[56px] bg-[#e9e9e9] rounded-[8px]" />
-                <div className="h-[56px] w-1/2 bg-[#e9e9e9] rounded-[8px]" />
+                <div className="h-[20px] w-[140px] skeleton-shimmer rounded-[4px]" />
+                <div className="h-[56px] skeleton-shimmer rounded-[8px]" />
+                <div className="h-[56px] skeleton-shimmer rounded-[8px]" />
+                <div className="h-[56px] skeleton-shimmer rounded-[8px]" />
+                <div className="h-[56px] w-2/3 skeleton-shimmer rounded-[8px]" />
+                <div className="h-[20px] w-[120px] skeleton-shimmer rounded-[4px] mt-[8px]" />
+                <div className="h-[56px] skeleton-shimmer rounded-[8px]" />
+                <div className="h-[56px] skeleton-shimmer rounded-[8px]" />
+                <div className="h-[56px] w-1/2 skeleton-shimmer rounded-[8px]" />
               </div>
             ) : (
               <QuoteForm

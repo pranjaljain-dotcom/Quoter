@@ -42,3 +42,14 @@ html, body, #root {
   margin: 0;
   padding: 0;
 }
+
+/* Horizontal shimmer sweep for skeleton loaders, in place of a flat pulse */
+@keyframes skeleton-shimmer-sweep {
+  0% { background-position: 150% 0; }
+  100% { background-position: -50% 0; }
+}
+.skeleton-shimmer {
+  background-image: linear-gradient(90deg, #e9e9e9 25%, #f4f4f4 50%, #e9e9e9 75%);
+  background-size: 200% 100%;
+  animation: skeleton-shimmer-sweep 1.5s ease-in-out infinite;
+}

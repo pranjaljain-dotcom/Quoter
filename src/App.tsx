@@ -1315,13 +1315,18 @@ function CompareIllustrationPanel({ open, onClose, currentQuote, healthClass }: 
                   </div>
                   {[
                     { label: "Coverage", competitor: COMPETITOR_QUOTE.coverage, ethos: fmtCoverage(currentQuote.coverage) },
-                    { label: "Premium", competitor: COMPETITOR_QUOTE.premium, ethos: fmtPremium(currentQuote.premium) },
-                    { label: "Term", competitor: COMPETITOR_QUOTE.term, ethos: "—" },
+                    {
+                      label: "Premium",
+                      competitor: COMPETITOR_QUOTE.premium,
+                      ethos: fmtPremium(currentQuote.premium),
+                      ethosSubtext: `$${((currentQuote.premium / currentQuote.coverage) * 1000).toFixed(2)} per $1,000 coverage`,
+                    },
+                    { label: "Term", competitor: COMPETITOR_QUOTE.term, ethos: "—", ethosHighlight: true },
                     { label: "Medical Exam", competitor: COMPETITOR_QUOTE.medicalExam, ethos: "Not required", ethosHighlight: true },
-                    { label: "Decision Time", competitor: COMPETITOR_QUOTE.decisionTime, ethos: "Within 10 minutes" },
-                    { label: "Health Class", competitor: COMPETITOR_QUOTE.healthClass, ethos: healthClass || "—" },
-                    { label: "Rider", competitor: "Not specified", ethos: "Accelerated Death Benefit Option (ADBO/ABO) — No Cost" },
-                    { label: "Perks", competitor: "Not specified", ethos: "Estate planning, Wills & trust, +3 additional perks" },
+                    { label: "Decision Time", competitor: COMPETITOR_QUOTE.decisionTime, ethos: "Within 10 minutes", ethosHighlight: true },
+                    { label: "Health Class", competitor: COMPETITOR_QUOTE.healthClass, ethos: healthClass || "—", ethosHighlight: true },
+                    { label: "Rider", competitor: "Not specified", ethos: "Accelerated Death Benefit Option (ADBO/ABO) — No Cost", ethosHighlight: true },
+                    { label: "Perks", competitor: "Not specified", ethos: "Estate planning, Wills & trust, +3 additional perks", ethosHighlight: true },
                   ].map((row, i) => (
                     <div
                       key={row.label}
@@ -1333,12 +1338,22 @@ function CompareIllustrationPanel({ open, onClose, currentQuote, healthClass }: 
                       <span className="font-['Theinhardt:Regular',sans-serif] text-[#272727] text-[14px] leading-[20px]" style={{ fontFeatureSettings: '"case" 1' }}>
                         {row.competitor}
                       </span>
-                      <span
-                        className={`font-['Theinhardt:Medium',sans-serif] text-[14px] leading-[20px] ${row.ethosHighlight ? "text-[#056257]" : "text-[#272727]"}`}
-                        style={{ fontFeatureSettings: '"case" 1' }}
-                      >
-                        {row.ethos}
-                      </span>
+                      <div className="flex flex-col gap-[2px]">
+                        <span
+                          className={`font-['Theinhardt:Medium',sans-serif] text-[14px] leading-[20px] ${row.ethosHighlight ? "text-[#056257]" : "text-[#272727]"}`}
+                          style={{ fontFeatureSettings: '"case" 1' }}
+                        >
+                          {row.ethos}
+                        </span>
+                        {row.ethosSubtext && (
+                          <span
+                            className="font-['Theinhardt:Regular',sans-serif] text-[#7e7e7e] text-[12px] leading-[16px]"
+                            style={{ fontFeatureSettings: '"case" 1' }}
+                          >
+                            {row.ethosSubtext}
+                          </span>
+                        )}
+                      </div>
                     </div>
                   ))}
                 </div>

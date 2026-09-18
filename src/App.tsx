@@ -748,6 +748,20 @@ function QuotePanel({
 type ProductEntry = { id: string; name: React.ReactNode; provider: React.ReactNode; maxCoverage?: string };
 type ProductGroup = { category: string; products: ProductEntry[] };
 
+/* TruStage's ® mark should appear as a superscript wherever the brand name is
+   written — pass any string that may contain "TruStage" through this. */
+function withTrustageTrademark(text: string, supClassName: string = "text-[10px]"): React.ReactNode {
+  const idx = text.indexOf("TruStage");
+  if (idx === -1) return text;
+  return (
+    <>
+      {text.slice(0, idx)}
+      TruStage<sup className={supClassName}>®</sup>
+      {text.slice(idx + "TruStage".length)}
+    </>
+  );
+}
+
 const PRODUCT_GROUPS: ProductGroup[] = [
   {
     category: "TERM LIFE",
@@ -756,8 +770,8 @@ const PRODUCT_GROUPS: ProductGroup[] = [
       { id: "Term Life Insurance - Choice", name: "Term Life Insurance - Choice", provider: "Ameritas", maxCoverage: "$1M" },
       {
         id: "TruStage Term Life",
-        name: <><span>TruStage</span><sup className="text-[10px]">®</sup><span> Term Life</span></>,
-        provider: <><span>TruStage</span><sup className="text-[9px]">®</sup></>,
+        name: withTrustageTrademark("TruStage Term Life"),
+        provider: withTrustageTrademark("TruStage", "text-[9px]"),
         maxCoverage: "$300K",
       },
       { id: "Return of Premium Term Life", name: "Return of Premium Term Life", provider: "John Hancock", maxCoverage: "$500K" },
@@ -774,7 +788,12 @@ const PRODUCT_GROUPS: ProductGroup[] = [
   {
     category: "WHOLE LIFE",
     products: [
-      { id: "TruStage Final Expense", name: "TruStage Final Expense", provider: "TruStage®", maxCoverage: "$50K" },
+      {
+        id: "TruStage Final Expense",
+        name: withTrustageTrademark("TruStage Final Expense"),
+        provider: withTrustageTrademark("TruStage", "text-[9px]"),
+        maxCoverage: "$50K",
+      },
       { id: "Final Expense Whole Life", name: "Final Expense Whole Life", provider: "Banner Life", maxCoverage: "$50K" },
     ],
   },
@@ -1076,7 +1095,7 @@ function ShareEstimatePanel({
                       className="font-['Theinhardt:Medium',sans-serif] text-[#272727] text-[16px] leading-[22px]"
                       style={{ fontFeatureSettings: '"case" 1' }}
                     >
-                      {quote.product}
+                      {withTrustageTrademark(quote.product)}
                     </p>
                   </div>
                   {quotes.length > 1 && (
@@ -1412,7 +1431,7 @@ function CompareIllustrationPanel({ open, onClose, currentQuote, healthClass, cl
                         Your Ethos Quote
                       </span>
                       <span className="font-['Theinhardt:Regular',sans-serif] text-[#7e7e7e] text-[12px] leading-[16px]" style={{ fontFeatureSettings: '"case" 1' }}>
-                        {currentQuote.product}
+                        {withTrustageTrademark(currentQuote.product)}
                       </span>
                     </div>
                   </div>
@@ -1664,7 +1683,7 @@ function QuoteForm({
             className="font-['Theinhardt:Medium',sans-serif] text-[#272727] text-[20px] leading-[28px]"
             style={{ fontFeatureSettings: '"case" 1' }}
           >
-            {selectedProduct}
+            {withTrustageTrademark(selectedProduct)}
           </p>
         </div>
         <button
@@ -1697,7 +1716,7 @@ function QuoteForm({
               } ${activeProduct === i ? "text-[#056257]" : "text-[#525252] hover:text-[#272727]"}`}
               style={{ fontFeatureSettings: '"case" 1', letterSpacing: "-0.14px" }}
             >
-              {name}
+              {withTrustageTrademark(name)}
             </button>
           ))}
         </div>
@@ -2114,7 +2133,7 @@ export default function App() {
                 className="font-['Theinhardt:Medium',sans-serif] text-[#272727] text-[18px] leading-[26px]"
                 style={{ fontFeatureSettings: '"case" 1' }}
               >
-                {selectedProduct} Estimate
+                {withTrustageTrademark(selectedProduct)} Estimate
               </p>
               <button
                 type="button"

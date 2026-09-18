@@ -1269,7 +1269,7 @@ function CompareIllustrationPanel({ open, onClose, currentQuote, healthClass }: 
               </p>
             </label>
           ) : (
-            <div className="grid grid-cols-2 gap-[24px] h-full">
+            <div className="flex flex-col gap-[24px]">
               <div className="flex flex-col gap-[12px] min-h-0">
                 <div className="flex items-center justify-between gap-[8px]">
                   <p
@@ -1287,7 +1287,7 @@ function CompareIllustrationPanel({ open, onClose, currentQuote, healthClass }: 
                     Replace
                   </button>
                 </div>
-                <div className="flex-1 min-h-[400px] border border-[#e9e9e9] rounded-[8px] overflow-hidden bg-[#f4f4f4]">
+                <div className="h-[400px] border border-[#e9e9e9] rounded-[8px] overflow-hidden bg-[#f4f4f4]">
                   {file.type === "application/pdf" ? (
                     <iframe src={previewUrl ?? undefined} title="Uploaded illustration" className="w-full h-full border-none" />
                   ) : (
@@ -1320,6 +1320,8 @@ function CompareIllustrationPanel({ open, onClose, currentQuote, healthClass }: 
                     { label: "Medical Exam", competitor: COMPETITOR_QUOTE.medicalExam, ethos: "Not required", ethosHighlight: true },
                     { label: "Decision Time", competitor: COMPETITOR_QUOTE.decisionTime, ethos: "Within 10 minutes" },
                     { label: "Health Class", competitor: COMPETITOR_QUOTE.healthClass, ethos: healthClass || "—" },
+                    { label: "Rider", competitor: "Not specified", ethos: "Accelerated Death Benefit Option (ADBO/ABO) — No Cost" },
+                    { label: "Perks", competitor: "Not specified", ethos: "Estate planning, Wills & trust, +3 additional perks" },
                   ].map((row, i) => (
                     <div
                       key={row.label}

@@ -1317,8 +1317,8 @@ function CompareIllustrationPanel({ open, onClose, currentQuote, healthClass }: 
                     { label: "Coverage", competitor: COMPETITOR_QUOTE.coverage, ethos: fmtCoverage(currentQuote.coverage) },
                     { label: "Premium", competitor: COMPETITOR_QUOTE.premium, ethos: fmtPremium(currentQuote.premium) },
                     { label: "Term", competitor: COMPETITOR_QUOTE.term, ethos: "—" },
-                    { label: "Medical Exam", competitor: COMPETITOR_QUOTE.medicalExam, ethos: "—" },
-                    { label: "Decision Time", competitor: COMPETITOR_QUOTE.decisionTime, ethos: "—" },
+                    { label: "Medical Exam", competitor: COMPETITOR_QUOTE.medicalExam, ethos: "Not required", ethosHighlight: true },
+                    { label: "Decision Time", competitor: COMPETITOR_QUOTE.decisionTime, ethos: "Within 10 minutes" },
                     { label: "Health Class", competitor: COMPETITOR_QUOTE.healthClass, ethos: healthClass || "—" },
                   ].map((row, i) => (
                     <div
@@ -1331,7 +1331,10 @@ function CompareIllustrationPanel({ open, onClose, currentQuote, healthClass }: 
                       <span className="font-['Theinhardt:Regular',sans-serif] text-[#272727] text-[14px] leading-[20px]" style={{ fontFeatureSettings: '"case" 1' }}>
                         {row.competitor}
                       </span>
-                      <span className="font-['Theinhardt:Medium',sans-serif] text-[#272727] text-[14px] leading-[20px]" style={{ fontFeatureSettings: '"case" 1' }}>
+                      <span
+                        className={`font-['Theinhardt:Medium',sans-serif] text-[14px] leading-[20px] ${row.ethosHighlight ? "text-[#056257]" : "text-[#272727]"}`}
+                        style={{ fontFeatureSettings: '"case" 1' }}
+                      >
                         {row.ethos}
                       </span>
                     </div>

@@ -1688,7 +1688,7 @@ function KnockoutCard({
       </button>
       <div className={`transition-all duration-300 overflow-hidden ${expanded ? "max-h-[600px] opacity-100" : "max-h-0 opacity-0"}`}>
       <p
-        className="font-['Theinhardt:Regular',sans-serif] text-[#7e7e7e] text-[16px] leading-[24px] pb-[4px]"
+        className="font-['Theinhardt:Regular',sans-serif] text-[#7e7e7e] text-[16px] leading-[24px] pb-[12px]"
         style={{ fontFeatureSettings: '"case" 1' }}
       >
         Check the category if any condition applies.

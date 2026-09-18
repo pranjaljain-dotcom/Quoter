@@ -1187,7 +1187,8 @@ const COMPETITOR_QUOTE = {
 function CompareIllustrationPanel({ open, onClose, currentQuote, healthClass, clientFirstName }: { open: boolean; onClose: () => void; currentQuote: QuotePreview; healthClass: string; clientFirstName: string }) {
   const [file, setFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [analysisLoading, setAnalysisLoading] = useState(false);
+  const [uploadingFile, setUploadingFile] = useState<File | null>(null);
+  const [uploadProgress, setUploadProgress] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -1205,11 +1206,21 @@ function CompareIllustrationPanel({ open, onClose, currentQuote, healthClass, cl
 
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const f = e.target.files?.[0];
-    if (f) {
+    if (!f) return;
+
+    setUploadingFile(f);
+    setUploadProgress(0);
+    // Defer to the next two frames so the browser paints the 0% bar before
+    // animating to 100% — setting it in the same tick as mount skips the
+    // transition entirely.
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => setUploadProgress(100));
+    });
+
+    setTimeout(() => {
+      setUploadingFile(null);
       setFile(f);
-      setAnalysisLoading(true);
-      setTimeout(() => setAnalysisLoading(false), 700);
-    }
+    }, 3000);
   }
 
   // Display the file under a predictable Name-Product.pdf name (derived from the
@@ -1258,7 +1269,29 @@ function CompareIllustrationPanel({ open, onClose, currentQuote, healthClass, cl
 
         {/* Body */}
         <div className="flex-1 overflow-y-auto px-[24px] py-[20px]">
-          {!file ? (
+          {uploadingFile ? (
+            <div className="flex flex-col items-center justify-center gap-[12px] border-2 border-dashed border-[#d4d4d4] rounded-[8px] py-[64px] px-[24px]">
+              <UploadCloudIcon />
+              <p
+                className="font-['Theinhardt:Medium',sans-serif] text-[#272727] text-[16px] leading-[24px] truncate max-w-full"
+                style={{ fontFeatureSettings: '"case" 1' }}
+              >
+                {uploadingFile.name}
+              </p>
+              <div className="w-full max-w-[320px] h-[8px] bg-[#e9e9e9] rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-[#056257] rounded-full transition-[width] duration-[3000ms] ease-linear"
+                  style={{ width: `${uploadProgress}%` }}
+                />
+              </div>
+              <p
+                className="font-['Theinhardt:Regular',sans-serif] text-[#7e7e7e] text-[14px] leading-[20px] text-center"
+                style={{ fontFeatureSettings: '"case" 1' }}
+              >
+                Uploading competitor illustration and analyzing with Ethos quote
+              </p>
+            </div>
+          ) : !file ? (
             <label className="flex flex-col items-center justify-center gap-[12px] border-2 border-dashed border-[#d4d4d4] rounded-[8px] py-[64px] cursor-pointer hover:bg-[#f9fafb] transition-colors">
               <input
                 ref={fileInputRef}
@@ -1281,29 +1314,6 @@ function CompareIllustrationPanel({ open, onClose, currentQuote, healthClass, cl
                 PDF or image
               </p>
             </label>
-          ) : analysisLoading ? (
-            <div className="flex flex-col gap-[24px] animate-pulse">
-              <div className="flex flex-col gap-[12px]">
-                <div className="flex items-center justify-between gap-[8px]">
-                  <div className="h-[20px] w-[220px] bg-[#e9e9e9] rounded-[4px]" />
-                  <div className="h-[16px] w-[60px] bg-[#e9e9e9] rounded-[4px]" />
-                </div>
-                <div className="h-[400px] bg-[#e9e9e9] rounded-[8px]" />
-              </div>
-              <div className="flex flex-col gap-[12px]">
-                <div className="h-[20px] w-[180px] bg-[#e9e9e9] rounded-[4px]" />
-                <div className="border border-[#e9e9e9] rounded-[8px] overflow-hidden">
-                  <div className="h-[38px] bg-[#f4f4f4]" />
-                  {[...Array(8)].map((_, i) => (
-                    <div key={i} className="h-[44px] border-t border-[#f4f4f4] px-[16px] flex items-center gap-[16px]">
-                      <div className="h-[14px] w-[80px] shrink-0 bg-[#e9e9e9] rounded-[4px]" />
-                      <div className="h-[14px] flex-1 bg-[#e9e9e9] rounded-[4px]" />
-                      <div className="h-[14px] flex-1 bg-[#e9e9e9] rounded-[4px]" />
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
           ) : (
             <div className="flex flex-col gap-[24px]">
               <div className="flex flex-col gap-[12px] min-h-0">

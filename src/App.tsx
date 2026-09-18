@@ -748,8 +748,6 @@ function QuotePanel({
 type ProductEntry = { id: string; name: React.ReactNode; provider: React.ReactNode; maxCoverage?: string };
 type ProductGroup = { category: string; products: ProductEntry[] };
 
-const PRODUCTS_WITH_TABS = ["Final Expense Whole Life", "TruStage Final Expense"];
-
 const PRODUCT_GROUPS: ProductGroup[] = [
   {
     category: "TERM LIFE",
@@ -1491,11 +1489,6 @@ function CompareIllustrationPanel({ open, onClose, currentQuote, healthClass, cl
 
 /* ─── Main content: Quote form ──────────────────────────────── */
 
-const PRODUCTS = [
-  "Banner Life Simplified Issue Whole Life",
-  "Banner Life Simplified Issue Whole Life — Plus",
-];
-
 /* Resource links shown under the product header. For products with sub-product
    tabs, the set shown updates with the active tab since guides usually differ
    per variant; products without tabs fall back to DEFAULT_RESOURCE_LINKS. */
@@ -1505,17 +1498,38 @@ const DEFAULT_RESOURCE_LINKS = [
   { label: "Rx Red Flags", href: "https://online.flippingbook.com/view/257941078/" },
 ];
 
-const RESOURCE_LINKS_BY_TAB: Record<number, { label: string; href: string }[]> = {
-  0: [
-    { label: "Underwriting & Product Guidelines", href: "https://online.flippingbook.com/view/406249855/" },
-    { label: "Product Knockout Guide", href: "https://online.flippingbook.com/view/318795893/" },
-    { label: "Rx Red Flags", href: "https://online.flippingbook.com/view/257941078/" },
-  ],
-  1: [
-    { label: "Underwriting & Product Guidelines", href: "https://online.flippingbook.com/view/406249855/" },
-    { label: "Plus Plan Knockout Guide", href: "https://online.flippingbook.com/view/318795893/" },
-    { label: "Rx Red Flags", href: "https://online.flippingbook.com/view/257941078/" },
-  ],
+type SubProductTabConfig = {
+  tabs: string[];
+  resourceLinksByTab?: Record<number, { label: string; href: string }[]>;
+};
+
+/* Sub-product tabs are specific to each top-level product — every product in
+   PRODUCT_GROUPS that has variants gets its own entry here. */
+const SUB_PRODUCT_TABS: Record<string, SubProductTabConfig> = {
+  "Final Expense Whole Life": {
+    tabs: [
+      "Banner Life Simplified Issue Whole Life",
+      "Banner Life Simplified Issue Whole Life — Plus",
+    ],
+    resourceLinksByTab: {
+      0: [
+        { label: "Underwriting & Product Guidelines", href: "https://online.flippingbook.com/view/406249855/" },
+        { label: "Product Knockout Guide", href: "https://online.flippingbook.com/view/318795893/" },
+        { label: "Rx Red Flags", href: "https://online.flippingbook.com/view/257941078/" },
+      ],
+      1: [
+        { label: "Underwriting & Product Guidelines", href: "https://online.flippingbook.com/view/406249855/" },
+        { label: "Plus Plan Knockout Guide", href: "https://online.flippingbook.com/view/318795893/" },
+        { label: "Rx Red Flags", href: "https://online.flippingbook.com/view/257941078/" },
+      ],
+    },
+  },
+  "TruStage Final Expense": {
+    tabs: [
+      "TruStage Advantage Whole Life",
+      "TruStage Guaranteed Acceptable Whole Life",
+    ],
+  },
 };
 
 function ExternalLinkIcon({ size = 24 }: { size?: number }) {
@@ -1615,7 +1629,9 @@ function QuoteForm({
     setTimeout(() => setTabLoading(false), 500);
   }
 
-  const hasTabs = PRODUCTS_WITH_TABS.includes(selectedProduct);
+  const subProductTabConfig = SUB_PRODUCT_TABS[selectedProduct];
+  const hasTabs = !!subProductTabConfig;
+  const tabs = subProductTabConfig?.tabs ?? [];
   const config = getProductConfig(selectedProduct);
   const heightInInvalid = formState.heightIn.trim() !== "" && Number(formState.heightIn) > 11;
 
@@ -1671,7 +1687,7 @@ function QuoteForm({
             className="absolute top-[4px] bottom-[4px] left-[4px] rounded-full bg-white shadow-[0px_1px_2px_0px_rgba(16,24,40,0.08)] transition-transform duration-300 ease-in-out"
             style={{ width: "calc(50% - 4px)", transform: `translateX(${activeProduct * 100}%)` }}
           />
-          {PRODUCTS.map((name, i) => (
+          {tabs.map((name, i) => (
             <button
               key={i}
               onClick={() => !locked && handleTabChange(i)}
@@ -1688,7 +1704,7 @@ function QuoteForm({
       )}
 
       {/* Resource links — reflect the active sub-product tab when present */}
-      <ResourceLinksRow links={hasTabs ? (RESOURCE_LINKS_BY_TAB[activeProduct] ?? DEFAULT_RESOURCE_LINKS) : DEFAULT_RESOURCE_LINKS} />
+      <ResourceLinksRow links={hasTabs ? (subProductTabConfig?.resourceLinksByTab?.[activeProduct] ?? DEFAULT_RESOURCE_LINKS) : DEFAULT_RESOURCE_LINKS} />
 
       {/* Divider */}
       <div className="h-px bg-[#F4F4F4] mx-[-40px]" />
@@ -1956,6 +1972,7 @@ export default function App() {
       }));
     }
     setSelectedProduct(name);
+    setActiveProduct(0);
     setShowChangeProduct(false);
     setProductLoading(true);
     setQuoteGenerated(false);

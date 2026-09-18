@@ -2366,16 +2366,16 @@ export default function App() {
             {/* Action buttons */}
             <div className="sticky bottom-0 shrink-0 bg-white border-t border-[#e9e9e9] px-[24px] py-[20px] flex gap-[20px]">
               <button
-                disabled={!isFormFilled}
+                disabled={!quoteGenerated}
                 onClick={handleOpenShareEstimate}
-                className={`flex-1 bg-white rounded-[8px] border px-[16px] py-[8px] font-['Theinhardt:Medium',sans-serif] text-[16px] leading-[24px] transition-colors ${isFormFilled ? "border-[#525252] text-[#272727] cursor-pointer hover:bg-gray-50" : "border-[#d4d4d4] text-[#d4d4d4] cursor-not-allowed"}`}
+                className={`flex-1 bg-white rounded-[8px] border px-[16px] py-[8px] font-['Theinhardt:Medium',sans-serif] text-[16px] leading-[24px] transition-colors ${quoteGenerated ? "border-[#525252] text-[#272727] cursor-pointer hover:bg-gray-50" : "border-[#d4d4d4] text-[#d4d4d4] cursor-not-allowed"}`}
                 style={{ fontFeatureSettings: '"case" 1' }}
               >
                 Share estimate
               </button>
               <button
-                disabled={!isFormFilled}
-                className={`flex-1 rounded-[8px] border px-[16px] py-[8px] font-['Theinhardt:Medium',sans-serif] text-[16px] leading-[24px] transition-colors ${isFormFilled ? "bg-[#000000] border-[#000000] text-white cursor-pointer hover:bg-[#1a1a1a]" : "bg-[#d4d4d4] border-[#d4d4d4] text-white cursor-not-allowed"}`}
+                disabled={!quoteGenerated}
+                className={`flex-1 rounded-[8px] border px-[16px] py-[8px] font-['Theinhardt:Medium',sans-serif] text-[16px] leading-[24px] transition-colors ${quoteGenerated ? "bg-[#000000] border-[#000000] text-white cursor-pointer hover:bg-[#1a1a1a]" : "bg-[#d4d4d4] border-[#d4d4d4] text-white cursor-not-allowed"}`}
                 style={{ fontFeatureSettings: '"case" 1' }}
               >
                 Start application

@@ -776,6 +776,7 @@ const PRODUCT_GROUPS: ProductGroup[] = [
       },
       { id: "Return of Premium Term Life", name: "Return of Premium Term Life", provider: "John Hancock", maxCoverage: "$500K" },
       { id: "Ethos Term Life - Prime Pros", name: "Ethos Term Life - Prime Pros", provider: "Banner Life", maxCoverage: "$3M" },
+      { id: "Term with Living Benefits", name: "Term with Living Benefits", provider: "Ameritas", maxCoverage: "$1M" },
     ],
   },
   {
@@ -1591,6 +1592,7 @@ type ProductFieldConfig = {
   smokingLocked?: boolean;
   healthClassPrefill?: string;
   healthClassLocked?: boolean;
+  showKnockoutQuestions?: boolean;
 };
 
 const PRODUCT_FIELD_CONFIG: Record<string, ProductFieldConfig> = {
@@ -1606,10 +1608,118 @@ const PRODUCT_FIELD_CONFIG: Record<string, ProductFieldConfig> = {
     healthClassPrefill: "Standard",
     healthClassLocked: true,
   },
+  "Term with Living Benefits": { showHealthCredit: true, showBMI: true, showKnockoutQuestions: true },
 };
 
 function getProductConfig(product: string): ProductFieldConfig {
   return PRODUCT_FIELD_CONFIG[product] ?? { showHealthCredit: true, showBMI: true };
+}
+
+type KnockoutItem = { label: string; detail?: string };
+
+const HEALTH_KNOCKOUT_ITEMS: KnockoutItem[] = [
+  { label: "Disability" },
+  {
+    label: "Severe mental condition",
+    detail: "(incl. Mental health conditions resulting in Hospitalization requiring in-patient treatment, attempted suicide, suicidal thoughts in the last 5-10 years or involving psychosis)",
+  },
+  { label: "Diagnosed with or tested positive for HIV/AIDS" },
+];
+
+const CRIMINAL_KNOCKOUT_ITEMS: KnockoutItem[] = [
+  {
+    label: "Major moving violation",
+    detail: "(DUI, DWI, hit-and-run, or reckless driving) or suspended/revoked driver’s license (last 5 years).",
+  },
+  {
+    label: "Major criminal history",
+    detail: "(charged with or convicted of felony, currently in jail in past 10 years).",
+  },
+  { label: "Illegal drug use, drug or alcohol abuse in the last 5 years" },
+];
+
+function KnockoutCard({
+  title,
+  items,
+  checked,
+  onChange,
+  disabled,
+}: {
+  title: string;
+  items: KnockoutItem[];
+  checked: boolean;
+  onChange: (checked: boolean) => void;
+  disabled?: boolean;
+}) {
+  return (
+    <div className="flex flex-col gap-[4px]">
+      <p
+        className="font-['Theinhardt:Medium',sans-serif] text-[#272727] text-[18px] leading-[26px]"
+        style={{ fontFeatureSettings: '"case" 1' }}
+      >
+        {title}
+      </p>
+      <p
+        className="font-['Theinhardt:Regular',sans-serif] text-[#7e7e7e] text-[16px] leading-[24px]"
+        style={{ fontFeatureSettings: '"case" 1' }}
+      >
+        Check the category if any condition applies.
+      </p>
+      <div className="mt-[4px] border border-[#e9e9e9] rounded-[8px] overflow-hidden">
+        <button
+          type="button"
+          role="checkbox"
+          aria-checked={checked}
+          disabled={disabled}
+          onClick={() => onChange(!checked)}
+          className={`w-full flex items-center gap-[12px] px-[16px] py-[14px] text-left border-none bg-white transition-colors ${
+            disabled ? "cursor-not-allowed" : "cursor-pointer hover:bg-[#f9fafb]"
+          }`}
+        >
+          <span
+            className={`shrink-0 size-[20px] rounded-[4px] border flex items-center justify-center transition-colors ${
+              checked ? "bg-[#056257] border-[#056257]" : "bg-white border-[#d4d4d4]"
+            }`}
+          >
+            {checked && (
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                <path d="M2.5 6.5L4.5 8.5L9.5 3.5" stroke="white" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            )}
+          </span>
+          <span
+            className="font-['Theinhardt:Regular',sans-serif] text-[#272727] text-[16px] leading-[24px]"
+            style={{ fontFeatureSettings: '"case" 1' }}
+          >
+            Do any of the following apply?
+          </span>
+        </button>
+        <div className="border-t border-[#e9e9e9] px-[16px] py-[14px] flex flex-col gap-[12px]">
+          {items.map((item, i) => (
+            <div key={i} className="flex gap-[8px]">
+              <span className="shrink-0 text-[#272727] leading-[22px]">•</span>
+              <div className="flex flex-col gap-[2px]">
+                <p
+                  className="font-['Theinhardt:Regular',sans-serif] text-[#272727] text-[16px] leading-[22px]"
+                  style={{ fontFeatureSettings: '"case" 1' }}
+                >
+                  {item.label}
+                </p>
+                {item.detail && (
+                  <p
+                    className="font-['Theinhardt:Regular',sans-serif] text-[#7e7e7e] text-[14px] leading-[20px]"
+                    style={{ fontFeatureSettings: '"case" 1' }}
+                  >
+                    {item.detail}
+                  </p>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
 }
 
 function QuoteForm({
@@ -1625,6 +1735,10 @@ function QuoteForm({
   onShowCreditInfo,
   locked,
   onCancelLock,
+  knockoutHealth,
+  knockoutCriminal,
+  onKnockoutHealthChange,
+  onKnockoutCriminalChange,
 }: {
   activeProduct: number;
   onProductChange: (i: number) => void;
@@ -1638,6 +1752,10 @@ function QuoteForm({
   onShowCreditInfo: () => void;
   locked: boolean;
   onCancelLock: () => void;
+  knockoutHealth: boolean;
+  knockoutCriminal: boolean;
+  onKnockoutHealthChange: (checked: boolean) => void;
+  onKnockoutCriminalChange: (checked: boolean) => void;
 }) {
   const [tabLoading, setTabLoading] = useState(false);
 
@@ -1653,6 +1771,7 @@ function QuoteForm({
   const tabs = subProductTabConfig?.tabs ?? [];
   const config = getProductConfig(selectedProduct);
   const heightInInvalid = formState.heightIn.trim() !== "" && Number(formState.heightIn) > 11;
+  const isKnockedOut = config.showKnockoutQuestions === true && (knockoutHealth || knockoutCriminal);
 
   return (
     <div className="flex flex-col gap-[20px]">
@@ -1919,28 +2038,71 @@ function QuoteForm({
         </>
       )}
 
-      <button
-        onClick={onGenerateQuote}
-        disabled={!isAllFilled || isLoading}
-        className={`w-full mt-[12px] rounded-[8px] border px-[16px] py-[12px] font-['Theinhardt:Medium',sans-serif] text-[16px] leading-[24px] transition-colors flex items-center justify-center gap-[8px] ${
-          isAllFilled && !isLoading
-            ? "bg-[#000000] border-[#000000] text-white cursor-pointer hover:bg-[#1a1a1a]"
-            : "bg-[#d4d4d4] border-[#d4d4d4] text-white cursor-not-allowed"
-        }`}
-        style={{ fontFeatureSettings: '"case" 1' }}
-      >
-        {isLoading ? (
-          <>
-            <svg className="animate-spin shrink-0" fill="none" height="16" viewBox="0 0 16 16" width="16">
-              <circle className="opacity-25" cx="8" cy="8" r="6" stroke="white" strokeWidth="2" />
-              <path className="opacity-75" d="M8 2a6 6 0 0 1 6 6" stroke="white" strokeLinecap="round" strokeWidth="2" />
-            </svg>
-            Generating Quote...
-          </>
-        ) : (
-          "Generate Quote"
-        )}
-      </button>
+      {config.showKnockoutQuestions && (
+        <>
+          {/* Divider */}
+          <div className="h-px bg-[#F4F4F4]" />
+
+          <KnockoutCard
+            title="Health"
+            items={HEALTH_KNOCKOUT_ITEMS}
+            checked={knockoutHealth}
+            onChange={onKnockoutHealthChange}
+            disabled={locked}
+          />
+
+          <KnockoutCard
+            title="Criminal history"
+            items={CRIMINAL_KNOCKOUT_ITEMS}
+            checked={knockoutCriminal}
+            onChange={onKnockoutCriminalChange}
+            disabled={locked}
+          />
+        </>
+      )}
+
+      {isKnockedOut ? (
+        <div className="flex items-start gap-[8px] mt-[12px] bg-[#fdeceb] border border-[#f44b40] rounded-[8px] px-[16px] py-[12px]">
+          <p
+            className="font-['Theinhardt:Regular',sans-serif] text-[#272727] text-[14px] leading-[20px]"
+            style={{ fontFeatureSettings: '"case" 1' }}
+          >
+            The applicant does not meet the eligibility requirements for the selected product. You can try{" "}
+            <button
+              type="button"
+              onClick={onChangeProduct}
+              className="font-['Theinhardt:Medium',sans-serif] text-[#865323] underline decoration-dotted underline-offset-2 cursor-pointer bg-transparent border-none p-0"
+              style={{ fontFeatureSettings: '"case" 1' }}
+            >
+              Whole Life
+            </button>
+            .
+          </p>
+        </div>
+      ) : (
+        <button
+          onClick={onGenerateQuote}
+          disabled={!isAllFilled || isLoading}
+          className={`w-full mt-[12px] rounded-[8px] border px-[16px] py-[12px] font-['Theinhardt:Medium',sans-serif] text-[16px] leading-[24px] transition-colors flex items-center justify-center gap-[8px] ${
+            isAllFilled && !isLoading
+              ? "bg-[#000000] border-[#000000] text-white cursor-pointer hover:bg-[#1a1a1a]"
+              : "bg-[#d4d4d4] border-[#d4d4d4] text-white cursor-not-allowed"
+          }`}
+          style={{ fontFeatureSettings: '"case" 1' }}
+        >
+          {isLoading ? (
+            <>
+              <svg className="animate-spin shrink-0" fill="none" height="16" viewBox="0 0 16 16" width="16">
+                <circle className="opacity-25" cx="8" cy="8" r="6" stroke="white" strokeWidth="2" />
+                <path className="opacity-75" d="M8 2a6 6 0 0 1 6 6" stroke="white" strokeLinecap="round" strokeWidth="2" />
+              </svg>
+              Generating Quote...
+            </>
+          ) : (
+            "Generate Quote"
+          )}
+        </button>
+      )}
       </>
       )}
     </div>
@@ -1980,6 +2142,8 @@ export default function App() {
   const [clientEmail, setClientEmail] = useState("");
   const [clientFirstName, setClientFirstName] = useState("");
   const [clientLastName, setClientLastName] = useState("");
+  const [knockoutHealth, setKnockoutHealth] = useState(false);
+  const [knockoutCriminal, setKnockoutCriminal] = useState(false);
 
   const handleProductSelect = (name: string) => {
     const cfg = getProductConfig(name);
@@ -1996,7 +2160,21 @@ export default function App() {
     setProductLoading(true);
     setQuoteGenerated(false);
     setQuoteLoading(false);
+    setKnockoutHealth(false);
+    setKnockoutCriminal(false);
     setTimeout(() => setProductLoading(false), 700);
+  };
+
+  const handleKnockoutHealthChange = (checked: boolean) => {
+    setKnockoutHealth(checked);
+    setQuoteGenerated(false);
+    setQuoteLoading(false);
+  };
+
+  const handleKnockoutCriminalChange = (checked: boolean) => {
+    setKnockoutCriminal(checked);
+    setQuoteGenerated(false);
+    setQuoteLoading(false);
   };
 
   const handleFormChange = (key: string, value: string) => {
@@ -2021,7 +2199,8 @@ export default function App() {
     formState.smoking !== "" &&
     formState.residence !== "" &&
     (!activeConfig.showHealthCredit || (formState.rateClass !== "" && (activeConfig.showCreditEstimate === false || formState.credit !== ""))) &&
-    (!activeConfig.showBMI || (formState.heightFt.trim() !== "" && formState.heightIn.trim() !== "" && formState.weight.trim() !== ""));
+    (!activeConfig.showBMI || (formState.heightFt.trim() !== "" && formState.heightIn.trim() !== "" && formState.weight.trim() !== "")) &&
+    (!activeConfig.showKnockoutQuestions || (!knockoutHealth && !knockoutCriminal));
 
   const previewAdActive = adEnabled && adMultiplier != null;
   const previewBasePremium = Math.round((coverage / 150000) * 60 * 100) / 100;
@@ -2121,6 +2300,10 @@ export default function App() {
                 onShowCreditInfo={() => setShowCreditInfo(true)}
                 locked={lockedForAdditionalQuote}
                 onCancelLock={() => setLockedForAdditionalQuote(false)}
+                knockoutHealth={knockoutHealth}
+                knockoutCriminal={knockoutCriminal}
+                onKnockoutHealthChange={handleKnockoutHealthChange}
+                onKnockoutCriminalChange={handleKnockoutCriminalChange}
               />
             )}
           </div>

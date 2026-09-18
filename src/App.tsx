@@ -513,7 +513,7 @@ function QuotePanel({
         </div>
 
         {/* Divider */}
-        <div className="h-px bg-[#e9e9e9]" />
+        <div className="h-px bg-[#e9e9e9] shrink-0" />
 
         {/* Row 2 — Premium */}
         <div className="flex items-center justify-between gap-[16px]">
@@ -1093,7 +1093,7 @@ function ShareEstimatePanel({
                     </p>
                   </div>
                 )}
-                {quote.adEnabled && <div className="h-px bg-[#e9e9e9]" />}
+                {quote.adEnabled && <div className="h-px bg-[#e9e9e9] shrink-0" />}
                 {quote.adEnabled && (
                   <div className="flex items-center justify-between">
                     <p className="font-['Theinhardt:Medium',sans-serif] text-[#272727] text-[14px] leading-[20px]" style={{ fontFeatureSettings: '"case" 1' }}>
@@ -1125,7 +1125,7 @@ function ShareEstimatePanel({
             + Add another quote
           </button>
 
-          <div className="h-px bg-[#f4f4f4]" />
+          <div className="h-px bg-[#f4f4f4] shrink-0" />
 
           <TextField
             label="Client's email address (required)"

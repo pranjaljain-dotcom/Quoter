@@ -1162,6 +1162,182 @@ function ShareEstimatePanel({
   );
 }
 
+/* ─── Compare Illustration Panel ─────────────────────────────── */
+
+function UploadCloudIcon() {
+  return (
+    <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
+      <path d="M7 18a4 4 0 0 1-1-7.874A5 5 0 0 1 15.9 8.001 4.5 4.5 0 0 1 17 17H7z" stroke="#7e7e7e" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M12 12v6m0-6-2.5 2.5M12 12l2.5 2.5" stroke="#7e7e7e" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function CompareIllustrationPanel({ open, onClose, currentQuote }: { open: boolean; onClose: () => void; currentQuote: QuotePreview }) {
+  const [file, setFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (!file) {
+      setPreviewUrl(null);
+      return;
+    }
+    const url = URL.createObjectURL(file);
+    setPreviewUrl(url);
+    return () => URL.revokeObjectURL(url);
+  }, [file]);
+
+  const fmtCoverage = (n: number) => "$" + n.toLocaleString("en-US");
+  const fmtPremium = (n: number) => "$" + n.toFixed(2) + "/mo";
+
+  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const f = e.target.files?.[0];
+    if (f) setFile(f);
+  }
+
+  return (
+    <>
+      {/* Backdrop */}
+      <div
+        className={`fixed inset-0 z-40 bg-black transition-opacity duration-300 ${open ? "opacity-40 pointer-events-auto" : "opacity-0 pointer-events-none"}`}
+        onClick={onClose}
+      />
+      {/* Sliding panel */}
+      <div
+        className={`fixed top-0 right-0 h-full z-50 bg-white flex flex-col shadow-[0px_4px_6px_-2px_rgba(16,24,40,0.03),0px_12px_16px_-4px_rgba(16,24,40,0.08)] transition-transform duration-300 ease-in-out ${open ? "translate-x-0" : "translate-x-full"}`}
+        style={{ width: "900px" }}
+      >
+        {/* Header */}
+        <div className="flex items-start justify-between gap-[16px] px-[24px] py-[20px] border-b border-[#f4f4f4] shrink-0">
+          <div className="flex flex-col gap-[4px]">
+            <p
+              className="font-['Theinhardt:Medium',sans-serif] text-[#272727] text-[18px] leading-[26px]"
+              style={{ fontFeatureSettings: '"case" 1' }}
+            >
+              Compare Illustration
+            </p>
+            <p
+              className="font-['Theinhardt:Regular',sans-serif] text-[#7e7e7e] text-[14px] leading-[20px]"
+              style={{ fontFeatureSettings: '"case" 1' }}
+            >
+              Upload the carrier's illustration to compare it side-by-side with your Ethos quote.
+            </p>
+          </div>
+          <button
+            onClick={onClose}
+            className="shrink-0 size-[32px] flex items-center justify-center rounded-[6px] hover:bg-[#f4f4f4] border-none bg-transparent cursor-pointer transition-colors"
+          >
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M15 5L5 15M5 5l10 10" stroke="#525252" strokeWidth="1.5" strokeLinecap="round"/>
+            </svg>
+          </button>
+        </div>
+
+        {/* Body */}
+        <div className="flex-1 overflow-y-auto px-[24px] py-[20px]">
+          {!file ? (
+            <label className="flex flex-col items-center justify-center gap-[12px] border-2 border-dashed border-[#d4d4d4] rounded-[8px] py-[64px] cursor-pointer hover:bg-[#f9fafb] transition-colors">
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="application/pdf,image/*"
+                onChange={handleFileChange}
+                className="hidden"
+              />
+              <UploadCloudIcon />
+              <p
+                className="font-['Theinhardt:Medium',sans-serif] text-[#272727] text-[16px] leading-[24px]"
+                style={{ fontFeatureSettings: '"case" 1' }}
+              >
+                Click to upload illustration
+              </p>
+              <p
+                className="font-['Theinhardt:Regular',sans-serif] text-[#7e7e7e] text-[14px] leading-[20px]"
+                style={{ fontFeatureSettings: '"case" 1' }}
+              >
+                PDF or image
+              </p>
+            </label>
+          ) : (
+            <div className="grid grid-cols-2 gap-[24px] h-full">
+              <div className="flex flex-col gap-[12px] min-h-0">
+                <div className="flex items-center justify-between gap-[8px]">
+                  <p
+                    className="font-['Theinhardt:Medium',sans-serif] text-[#272727] text-[16px] leading-[24px] truncate"
+                    style={{ fontFeatureSettings: '"case" 1' }}
+                  >
+                    {file.name}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => setFile(null)}
+                    className="shrink-0 font-['Theinhardt:Medium',sans-serif] text-[#865323] text-[14px] leading-[20px] underline decoration-dotted underline-offset-2 cursor-pointer bg-transparent border-none p-0"
+                    style={{ fontFeatureSettings: '"case" 1' }}
+                  >
+                    Replace
+                  </button>
+                </div>
+                <div className="flex-1 min-h-[400px] border border-[#e9e9e9] rounded-[8px] overflow-hidden bg-[#f4f4f4]">
+                  {file.type === "application/pdf" ? (
+                    <iframe src={previewUrl ?? undefined} title="Uploaded illustration" className="w-full h-full border-none" />
+                  ) : (
+                    <img src={previewUrl ?? undefined} alt="Uploaded illustration" className="w-full h-full object-contain" />
+                  )}
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-[12px] min-h-0">
+                <p
+                  className="font-['Theinhardt:Medium',sans-serif] text-[#272727] text-[16px] leading-[24px]"
+                  style={{ fontFeatureSettings: '"case" 1' }}
+                >
+                  Your Ethos Quote
+                </p>
+                <div className="bg-[#f3f7f7] border border-[#e9e9e9] rounded-[8px] p-[20px] flex flex-col gap-[16px]">
+                  <p
+                    className="font-['Theinhardt:Medium',sans-serif] text-[#272727] text-[18px] leading-[26px]"
+                    style={{ fontFeatureSettings: '"case" 1' }}
+                  >
+                    {currentQuote.product}
+                  </p>
+                  <div className="h-px bg-[#e9e9e9] shrink-0" />
+                  <div className="flex items-center justify-between">
+                    <p className="font-['Theinhardt:Regular',sans-serif] text-[#525252] text-[16px] leading-[24px]" style={{ fontFeatureSettings: '"case" 1' }}>
+                      Coverage
+                    </p>
+                    <p className="font-['Theinhardt:Medium',sans-serif] text-[#272727] text-[18px] leading-[26px]" style={{ fontFeatureSettings: '"case" 1' }}>
+                      {fmtCoverage(currentQuote.coverage)}
+                    </p>
+                  </div>
+                  {currentQuote.adEnabled && (
+                    <div className="flex items-center justify-between">
+                      <p className="font-['Theinhardt:Regular',sans-serif] text-[#525252] text-[16px] leading-[24px]" style={{ fontFeatureSettings: '"case" 1' }}>
+                        AD Coverage ({currentQuote.adMultiplier}x)
+                      </p>
+                      <p className="font-['Theinhardt:Medium',sans-serif] text-[#272727] text-[18px] leading-[26px]" style={{ fontFeatureSettings: '"case" 1' }}>
+                        +{fmtCoverage(currentQuote.adCoverage)}
+                      </p>
+                    </div>
+                  )}
+                  <div className="flex items-center justify-between">
+                    <p className="font-['Theinhardt:Regular',sans-serif] text-[#525252] text-[16px] leading-[24px]" style={{ fontFeatureSettings: '"case" 1' }}>
+                      Premium
+                    </p>
+                    <p className="font-['Theinhardt:Medium',sans-serif] text-[#272727] text-[18px] leading-[26px]" style={{ fontFeatureSettings: '"case" 1' }}>
+                      {fmtPremium(currentQuote.premium)}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </>
+  );
+}
+
 /* ─── Main content: Quote form ──────────────────────────────── */
 
 const PRODUCTS = [
@@ -1581,6 +1757,7 @@ export default function App() {
   const [showChangeProduct, setShowChangeProduct] = useState(false);
   const [showCreditInfo, setShowCreditInfo] = useState(false);
   const [showShareEstimate, setShowShareEstimate] = useState(false);
+  const [showCompareIllustration, setShowCompareIllustration] = useState(false);
   const [productLoading, setProductLoading] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState("Term Life Insurance");
   const [pendingQuotes, setPendingQuotes] = useState<QuoteEntry[]>([]);
@@ -1740,6 +1917,7 @@ export default function App() {
               </p>
               <button
                 type="button"
+                onClick={() => setShowCompareIllustration(true)}
                 className="font-['Theinhardt:Medium',sans-serif] text-[#865323] text-[16px] leading-[24px] underline decoration-dotted underline-offset-2 cursor-pointer"
                 style={{ fontFeatureSettings: '"case" 1' }}
               >
@@ -1817,6 +1995,11 @@ export default function App() {
         onFirstNameChange={setClientFirstName}
         lastName={clientLastName}
         onLastNameChange={setClientLastName}
+      />
+      <CompareIllustrationPanel
+        open={showCompareIllustration}
+        onClose={() => setShowCompareIllustration(false)}
+        currentQuote={currentQuote}
       />
     </div>
   );

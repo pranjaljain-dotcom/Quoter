@@ -1601,6 +1601,7 @@ function QuoteForm({
 
   const hasTabs = PRODUCTS_WITH_TABS.includes(selectedProduct);
   const config = getProductConfig(selectedProduct);
+  const heightInInvalid = formState.heightIn.trim() !== "" && Number(formState.heightIn) > 11;
 
   return (
     <div className="flex flex-col gap-[20px]">
@@ -1820,7 +1821,11 @@ function QuoteForm({
                     ft
                   </span>
                 </div>
-                <div className={`relative rounded-[8px] border flex-1 h-[56px] flex items-center px-[14px] ${locked ? "bg-[#f4f4f4] border-[#e9e9e9]" : "bg-white border-[#d4d4d4]"}`}>
+                <div
+                  className={`relative rounded-[8px] border flex-1 h-[56px] flex items-center px-[14px] ${
+                    locked ? "bg-[#f4f4f4] border-[#e9e9e9]" : heightInInvalid ? "bg-white border-[#f44b40]" : "bg-white border-[#d4d4d4]"
+                  }`}
+                >
                   <input
                     type="text"
                     value={formState.heightIn}
@@ -1838,6 +1843,14 @@ function QuoteForm({
                   </span>
                 </div>
               </div>
+              {heightInInvalid && (
+                <p
+                  className="font-['Theinhardt:Regular',sans-serif] text-[#f44b40] text-[13px] leading-[18px]"
+                  style={{ fontFeatureSettings: '"case" 1' }}
+                >
+                  Inches can't be greater than 11
+                </p>
+              )}
             </div>
             <div className="flex-1">
               <TextField

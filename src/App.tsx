@@ -1205,18 +1205,6 @@ function ShareEstimatePanel({
           >
             Start Application
           </button>
-
-          <div className="flex items-start gap-[12px] bg-[#fdf6e3] border border-[#e8ab1f] rounded-[8px] px-[16px] py-[12px]">
-            <svg className="shrink-0 mt-[1px]" width="20" height="20" viewBox="0 0 24 24" fill="none">
-              <path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-4 10.472V16h8v-2.528A6 6 0 0 0 12 3Z" stroke="#865323" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-            <p
-              className="font-['Theinhardt:Regular',sans-serif] text-[#865323] text-[13px] leading-[19px]"
-              style={{ fontFeatureSettings: '"case" 1' }}
-            >
-              Please remember to use the client's correct email address when filling out the application to avoid any issues with coverage. Using a different email address may result in declined or canceled coverage, and email addresses cannot be changed once the application is initiated.
-            </p>
-          </div>
         </div>
       </div>
     </>

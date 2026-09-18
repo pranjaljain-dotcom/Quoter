@@ -2234,11 +2234,13 @@ export default function App() {
     (!activeConfig.showBMI || (formState.heightFt.trim() !== "" && formState.heightIn.trim() !== "" && formState.weight.trim() !== "")) &&
     (!activeConfig.showKnockoutQuestions || (!knockoutHealth && !knockoutCriminal));
 
+  const activeSubProductName = SUB_PRODUCT_TABS[selectedProduct]?.tabs[activeProduct] ?? selectedProduct;
+
   const previewAdActive = adEnabled && adMultiplier != null;
   const previewBasePremium = Math.round((coverage / 150000) * 60 * 100) / 100;
   const previewAdPremium = previewAdActive ? Math.round(previewBasePremium * adMultiplier * 100) / 100 : 0;
   const currentQuote: QuotePreview = {
-    product: selectedProduct,
+    product: activeSubProductName,
     coverage,
     premium: previewBasePremium + previewAdPremium,
     adEnabled: previewAdActive,
@@ -2347,7 +2349,7 @@ export default function App() {
                 className="font-['Theinhardt:Medium',sans-serif] text-[#272727] text-[18px] leading-[26px]"
                 style={{ fontFeatureSettings: '"case" 1' }}
               >
-                {withTrustageTrademark(selectedProduct)} Estimate
+                {withTrustageTrademark(activeSubProductName)} Estimate
               </p>
               <button
                 type="button"

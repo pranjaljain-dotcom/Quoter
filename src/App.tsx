@@ -1644,28 +1644,56 @@ function KnockoutCard({
   checked,
   onChange,
   disabled,
+  expanded,
+  onToggleExpanded,
 }: {
   title: string;
   items: KnockoutItem[];
   checked: boolean;
   onChange: (checked: boolean) => void;
   disabled?: boolean;
+  expanded: boolean;
+  onToggleExpanded: () => void;
 }) {
   return (
     <div className="flex flex-col gap-[4px]">
-      <p
-        className="font-['Theinhardt:Medium',sans-serif] text-[#272727] text-[18px] leading-[26px]"
-        style={{ fontFeatureSettings: '"case" 1' }}
+      <button
+        type="button"
+        onClick={onToggleExpanded}
+        className="w-full flex items-center justify-between gap-[8px] text-left bg-transparent border-none p-0 cursor-pointer"
       >
-        {title}
-      </p>
+        <div className="flex items-center gap-[8px]">
+          <p
+            className="font-['Theinhardt:Medium',sans-serif] text-[#272727] text-[18px] leading-[26px]"
+            style={{ fontFeatureSettings: '"case" 1' }}
+          >
+            {title}
+          </p>
+          {checked && (
+            <span
+              className="shrink-0 rounded-full bg-[#fdeceb] text-[#c0392b] px-[8px] py-[2px] font-['Theinhardt:Medium',sans-serif] text-[12px] leading-[16px]"
+              style={{ fontFeatureSettings: '"case" 1' }}
+            >
+              Flagged
+            </span>
+          )}
+        </div>
+        <img
+          alt=""
+          src="assets/d0a41.svg"
+          width="20"
+          height="20"
+          className={`shrink-0 transition-transform duration-200 ${expanded ? "rotate-180" : ""}`}
+        />
+      </button>
+      <div className={`transition-all duration-300 overflow-hidden ${expanded ? "max-h-[600px] opacity-100" : "max-h-0 opacity-0"}`}>
       <p
-        className="font-['Theinhardt:Regular',sans-serif] text-[#7e7e7e] text-[16px] leading-[24px]"
+        className="font-['Theinhardt:Regular',sans-serif] text-[#7e7e7e] text-[16px] leading-[24px] pb-[4px]"
         style={{ fontFeatureSettings: '"case" 1' }}
       >
         Check the category if any condition applies.
       </p>
-      <div className="mt-[4px] border border-[#e9e9e9] rounded-[8px] overflow-hidden">
+      <div className="border border-[#e9e9e9] rounded-[8px] overflow-hidden">
         <button
           type="button"
           role="checkbox"
@@ -1718,6 +1746,7 @@ function KnockoutCard({
           ))}
         </div>
       </div>
+      </div>
     </div>
   );
 }
@@ -1758,6 +1787,8 @@ function QuoteForm({
   onKnockoutCriminalChange: (checked: boolean) => void;
 }) {
   const [tabLoading, setTabLoading] = useState(false);
+  const [healthExpanded, setHealthExpanded] = useState(false);
+  const [criminalExpanded, setCriminalExpanded] = useState(false);
 
   function handleTabChange(i: number) {
     if (i === activeProduct) return;
@@ -2049,7 +2080,12 @@ function QuoteForm({
             checked={knockoutHealth}
             onChange={onKnockoutHealthChange}
             disabled={locked}
+            expanded={healthExpanded}
+            onToggleExpanded={() => setHealthExpanded((v) => !v)}
           />
+
+          {/* Divider */}
+          <div className="h-px bg-[#F4F4F4]" />
 
           <KnockoutCard
             title="Criminal history"
@@ -2057,6 +2093,8 @@ function QuoteForm({
             checked={knockoutCriminal}
             onChange={onKnockoutCriminalChange}
             disabled={locked}
+            expanded={criminalExpanded}
+            onToggleExpanded={() => setCriminalExpanded((v) => !v)}
           />
         </>
       )}

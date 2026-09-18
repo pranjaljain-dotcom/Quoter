@@ -1552,13 +1552,27 @@ function ResourceLinksRow({ links }: { links: { label: string; href: string }[] 
 
 type ProductFieldConfig = {
   showHealthCredit: boolean;
+  showCreditEstimate?: boolean;
   showBMI: boolean;
   smokingPrefill?: string;
+  smokingLocked?: boolean;
+  healthClassPrefill?: string;
+  healthClassLocked?: boolean;
 };
 
 const PRODUCT_FIELD_CONFIG: Record<string, ProductFieldConfig> = {
   "Final Expense Whole Life":  { showHealthCredit: false, showBMI: false, smokingPrefill: "Non-smoker" },
   "TruStage Final Expense":    { showHealthCredit: false, showBMI: false, smokingPrefill: "Non-smoker" },
+  "TruStage Term Life":        { showHealthCredit: false, showBMI: false },
+  "Return of Premium Term Life": {
+    showHealthCredit: true,
+    showCreditEstimate: false,
+    showBMI: false,
+    smokingPrefill: "Non-smoker",
+    smokingLocked: true,
+    healthClassPrefill: "Standard",
+    healthClassLocked: true,
+  },
 };
 
 function getProductConfig(product: string): ProductFieldConfig {
@@ -1729,7 +1743,7 @@ function QuoteForm({
             options={["Non-smoker", "Smoker"]}
             onChange={(v) => onFormChange("smoking", v)}
             placeholder="Smoker or non-smoker?"
-            disabled={locked}
+            disabled={locked || config.smokingLocked}
           />
         </div>
         <div className="flex-1">
@@ -1759,20 +1773,22 @@ function QuoteForm({
               ]}
               onChange={(v) => onFormChange("rateClass", v)}
               placeholder="Select health class"
-              disabled={locked}
+              disabled={locked || config.healthClassLocked}
             />
           </div>
-          <div className="flex-1">
-            <SelectField
-              label="Credit estimate"
-              value={formState.credit}
-              options={["Strong", "Average", "Building Credit History"]}
-              onChange={(v) => onFormChange("credit", v)}
-              placeholder="Estimate credit score"
-              labelLink={{ text: "How it works", onClick: onShowCreditInfo }}
-              disabled={locked}
-            />
-          </div>
+          {config.showCreditEstimate !== false && (
+            <div className="flex-1">
+              <SelectField
+                label="Credit estimate"
+                value={formState.credit}
+                options={["Strong", "Average", "Building Credit History"]}
+                onChange={(v) => onFormChange("credit", v)}
+                placeholder="Estimate credit score"
+                labelLink={{ text: "How it works", onClick: onShowCreditInfo }}
+                disabled={locked}
+              />
+            </div>
+          )}
         </div>
       )}
 
@@ -1932,8 +1948,12 @@ export default function App() {
 
   const handleProductSelect = (name: string) => {
     const cfg = getProductConfig(name);
-    if (cfg.smokingPrefill) {
-      setFormState((prev) => ({ ...prev, smoking: cfg.smokingPrefill! }));
+    if (cfg.smokingPrefill || cfg.healthClassPrefill) {
+      setFormState((prev) => ({
+        ...prev,
+        ...(cfg.smokingPrefill ? { smoking: cfg.smokingPrefill! } : {}),
+        ...(cfg.healthClassPrefill ? { rateClass: cfg.healthClassPrefill! } : {}),
+      }));
     }
     setSelectedProduct(name);
     setShowChangeProduct(false);
@@ -1964,7 +1984,7 @@ export default function App() {
     formState.birthdate.trim() !== "" &&
     formState.smoking !== "" &&
     formState.residence !== "" &&
-    (!activeConfig.showHealthCredit || (formState.rateClass !== "" && formState.credit !== "")) &&
+    (!activeConfig.showHealthCredit || (formState.rateClass !== "" && (activeConfig.showCreditEstimate === false || formState.credit !== ""))) &&
     (!activeConfig.showBMI || (formState.heightFt.trim() !== "" && formState.heightIn.trim() !== "" && formState.weight.trim() !== ""));
 
   const previewAdActive = adEnabled && adMultiplier != null;

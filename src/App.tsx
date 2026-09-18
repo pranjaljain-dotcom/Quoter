@@ -1310,10 +1310,10 @@ function CompareIllustrationPanel({ open, onClose, currentQuote, healthClass }: 
                     <span />
                     <div className="flex flex-col gap-[2px]">
                       <span className="font-['Theinhardt:Medium',sans-serif] text-[#525252] text-[13px] leading-[18px]" style={{ fontFeatureSettings: '"case" 1' }}>
-                        Competitor
+                        {COMPETITOR_QUOTE.company}
                       </span>
                       <span className="font-['Theinhardt:Regular',sans-serif] text-[#7e7e7e] text-[12px] leading-[16px]" style={{ fontFeatureSettings: '"case" 1' }}>
-                        {COMPETITOR_QUOTE.company}: {COMPETITOR_QUOTE.product}
+                        {COMPETITOR_QUOTE.product}
                       </span>
                     </div>
                     <div className="flex flex-col gap-[2px]">

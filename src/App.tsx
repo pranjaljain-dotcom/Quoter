@@ -762,6 +762,7 @@ const PRODUCT_GROUPS: ProductGroup[] = [
         provider: <><span>TruStage</span><sup className="text-[9px]">®</sup></>,
       },
       { id: "Return of Premium Term Life", name: "Return of Premium Term Life", provider: "John Hancock" },
+      { id: "Ethos Term Life - Prime Pros", name: "Ethos Term Life - Prime Pros", provider: "Banner Life" },
     ],
   },
   {

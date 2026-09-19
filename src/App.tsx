@@ -2734,7 +2734,7 @@ export default function App() {
               {subProductQuoteLoading ? (
                 <div className="flex flex-col items-center justify-center h-full min-h-[400px] gap-[24px] text-center px-[24px]">
                   <img
-                    src="assets/generating-quote-illustration.gif"
+                    src="assets/generating-quote-illustration.png"
                     alt=""
                     className="w-[260px] h-auto"
                   />

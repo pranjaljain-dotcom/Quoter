@@ -1129,7 +1129,7 @@ function ShareEstimatePanel({
                 className="flex items-center gap-[4px] font-['Theinhardt:Medium',sans-serif] text-[#865323] text-[14px] leading-none underline decoration-dotted underline-offset-2 bg-transparent border-none p-0 cursor-pointer"
                 style={{ fontFeatureSettings: '"case" 1' }}
               >
-                <svg className="shrink-0" width="11" height="11" viewBox="0 0 24 24" fill="none">
+                <svg className="shrink-0" width="14" height="14" viewBox="0 0 24 24" fill="none">
                   <path d="M12 3v12m0 0-4-4m4 4 4-4M5 21h14" stroke="#865323" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
                 <span>Download</span>

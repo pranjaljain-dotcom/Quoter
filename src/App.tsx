@@ -814,7 +814,15 @@ const PRODUCT_GROUPS: ProductGroup[] = [
   },
 ];
 
-const STATE_OPTIONS = ["Arizona", "California", "Texas", "Florida", "New York"];
+const STATE_OPTIONS = [
+  "Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut", "Delaware",
+  "Florida", "Georgia", "Hawaii", "Idaho", "Illinois", "Indiana", "Iowa", "Kansas", "Kentucky",
+  "Louisiana", "Maine", "Maryland", "Massachusetts", "Michigan", "Minnesota", "Mississippi",
+  "Missouri", "Montana", "Nebraska", "Nevada", "New Hampshire", "New Jersey", "New Mexico",
+  "New York", "North Carolina", "North Dakota", "Ohio", "Oklahoma", "Oregon", "Pennsylvania",
+  "Rhode Island", "South Carolina", "South Dakota", "Tennessee", "Texas", "Utah", "Vermont",
+  "Virginia", "Washington", "West Virginia", "Wisconsin", "Wyoming",
+];
 
 const PRODUCT_CATEGORY_BY_ID: Record<string, string> = {};
 for (const group of PRODUCT_GROUPS) {
@@ -1872,11 +1880,15 @@ const PRODUCT_FIELD_CONFIG: Record<string, ProductFieldConfig> = {
     healthClassPrefill: "Standard",
     healthClassLocked: true,
   },
-  "Term with Living Benefits": { showHealthCredit: true, showBMI: true, showKnockoutQuestions: true, excludedStates: ["New York"] },
+  "Term with Living Benefits": { showHealthCredit: true, showBMI: true, showKnockoutQuestions: true },
 };
 
+// New York isn't available for any product right now.
+const UNIVERSALLY_EXCLUDED_STATES = ["New York"];
+
 function getProductConfig(product: string): ProductFieldConfig {
-  return PRODUCT_FIELD_CONFIG[product] ?? { showHealthCredit: true, showBMI: true };
+  const base = PRODUCT_FIELD_CONFIG[product] ?? { showHealthCredit: true, showBMI: true };
+  return { ...base, excludedStates: [...new Set([...(base.excludedStates ?? []), ...UNIVERSALLY_EXCLUDED_STATES])] };
 }
 
 type KnockoutItem = { label: string; detail?: string };

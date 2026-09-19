@@ -1885,6 +1885,35 @@ function fmtPremiumLabel(n: number): string {
   return `$${Number.isInteger(n) ? n.toString() : n.toFixed(2)}/mo`;
 }
 
+/* Design system tooltip — bottom-center arrow, per
+   https://www.figma.com/design/hjcUZpQqHgKWxuimFS7SOo/Partnership-Design-system?node-id=40093-70432 */
+function Tooltip({ label, children }: { label: string; children: React.ReactNode }) {
+  const [visible, setVisible] = useState(false);
+
+  return (
+    <span
+      className="relative inline-flex min-w-0 w-full"
+      onMouseEnter={() => setVisible(true)}
+      onMouseLeave={() => setVisible(false)}
+    >
+      {children}
+      {visible && (
+        <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-[6px] z-50 flex flex-col items-center drop-shadow-[0px_4px_6px_-2px_rgba(16,24,40,0.03),0px_12px_16px_-4px_rgba(16,24,40,0.08)] pointer-events-none">
+          <span
+            className="bg-white rounded-[8px] p-[12px] whitespace-nowrap font-['Theinhardt:Medium',sans-serif] text-[#272727] text-[14px] leading-[20px] text-center"
+            style={{ fontFeatureSettings: '"case" 1', letterSpacing: "-0.14px" }}
+          >
+            {label}
+          </span>
+          <svg width="16" height="7" viewBox="0 0 16 8.51471" fill="none" className="-mt-px shrink-0">
+            <path d="M14.0711 0C14.962 0 15.4081 1.07714 14.7782 1.70711L8.70711 7.77818C8.31658 8.16871 7.68342 8.16871 7.29289 7.77818L1.22183 1.70711C0.591867 1.07714 1.03803 0 1.92894 0H14.0711Z" fill="white" />
+          </svg>
+        </span>
+      )}
+    </span>
+  );
+}
+
 function ExternalLinkIcon({ size = 24 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className="shrink-0">
@@ -2195,18 +2224,18 @@ function QuoteForm({
             style={{ width: "calc(50% - 4px)", transform: `translateX(${activeProduct * 100}%)` }}
           />
           {tabs.map((name, i) => (
-            <button
-              key={i}
-              onClick={() => !locked && handleTabChange(i)}
-              disabled={locked}
-              title={name}
-              className={`relative z-10 h-[40px] rounded-full px-[16px] text-center border-none bg-transparent transition-colors font-['Theinhardt:Medium',sans-serif] text-[14px] leading-[20px] truncate ${
-                locked ? "cursor-not-allowed" : "cursor-pointer"
-              } ${activeProduct === i ? "text-[#056257]" : "text-[#525252] hover:text-[#272727]"}`}
-              style={{ fontFeatureSettings: '"case" 1', letterSpacing: "-0.14px" }}
-            >
-              {withTrustageTrademark(name)}
-            </button>
+            <Tooltip key={i} label={name}>
+              <button
+                onClick={() => !locked && handleTabChange(i)}
+                disabled={locked}
+                className={`relative z-10 w-full h-[40px] rounded-full px-[16px] text-center border-none bg-transparent transition-colors font-['Theinhardt:Medium',sans-serif] text-[14px] leading-[20px] truncate ${
+                  locked ? "cursor-not-allowed" : "cursor-pointer"
+                } ${activeProduct === i ? "text-[#056257]" : "text-[#525252] hover:text-[#272727]"}`}
+                style={{ fontFeatureSettings: '"case" 1', letterSpacing: "-0.14px" }}
+              >
+                {withTrustageTrademark(name)}
+              </button>
+            </Tooltip>
           ))}
         </div>
       )}

@@ -2733,13 +2733,11 @@ export default function App() {
             <div className="flex-1 px-[24px] py-[32px]">
               {subProductQuoteLoading ? (
                 <div className="flex flex-col items-center justify-center h-full min-h-[400px] gap-[24px] text-center px-[24px]">
-                  <div className="bg-white rounded-[16px] shadow-[0px_4px_6px_-2px_rgba(16,24,40,0.03),0px_12px_16px_-4px_rgba(16,24,40,0.08)] p-[16px] overflow-hidden">
-                    <img
-                      src="assets/generating-quote-illustration.gif"
-                      alt=""
-                      className="w-[240px] h-auto"
-                    />
-                  </div>
+                  <img
+                    src="assets/generating-quote-illustration.gif"
+                    alt=""
+                    className="w-[260px] h-auto"
+                  />
                   <div className="w-full max-w-[290px] h-[8px] bg-[#c0d8d5] rounded-[6px] overflow-hidden">
                     <div
                       className="h-full bg-[#054742] rounded-[6px] transition-[width] duration-[1000ms] ease-linear"

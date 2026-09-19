@@ -2736,9 +2736,9 @@ export default function App() {
                   <img
                     src="assets/generating-quote-illustration.png"
                     alt=""
-                    className="w-[260px] h-auto"
+                    className="w-[390px] h-auto"
                   />
-                  <div className="w-full max-w-[290px] h-[8px] bg-[#c0d8d5] rounded-[6px] overflow-hidden">
+                  <div className="w-full max-w-[363px] h-[8px] bg-[#c0d8d5] rounded-[6px] overflow-hidden">
                     <div
                       className="h-full bg-[#054742] rounded-[6px] transition-[width] duration-[1000ms] ease-linear"
                       style={{ width: `${subProductQuoteProgress}%` }}
@@ -2769,11 +2769,11 @@ export default function App() {
                 />
               ) : (
                 <div className="flex flex-col items-center justify-center h-full min-h-[400px] gap-[12px] text-center px-[24px]">
-                  <div className="size-[48px] rounded-full bg-[#d4d4d4] flex items-center justify-center mb-[8px]">
-                    <svg fill="none" height="24" viewBox="0 0 24 24" width="24">
-                      <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" stroke="#7e7e7e" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" />
-                    </svg>
-                  </div>
+                  <img
+                    src="assets/generating-quote-illustration.png"
+                    alt=""
+                    className="w-[390px] h-auto mb-[8px]"
+                  />
                   <p
                     className="font-['Theinhardt:Medium',sans-serif] text-[#272727] text-[16px] leading-[24px]"
                     style={{ fontFeatureSettings: '"case" 1' }}

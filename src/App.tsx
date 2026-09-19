@@ -2742,7 +2742,7 @@ export default function App() {
           </div>
 
           {/* Right: quote visualizer */}
-          <div className={`shrink-0 bg-[#e9e9e9] border-l border-[#d4d4d4] overflow-y-scroll flex flex-col transition-[width] duration-500 ease-in-out ${quoteGenerated || subProductQuoteLoading ? "w-[clamp(600px,47vw,900px)]" : "w-[clamp(480px,calc(25vw_+_160px),640px)]"}`}>
+          <div className={`shrink-0 bg-[#E6EFEE] border-l border-[#d4d4d4] overflow-y-scroll flex flex-col transition-[width] duration-500 ease-in-out ${quoteGenerated || subProductQuoteLoading ? "w-[clamp(600px,47vw,900px)]" : "w-[clamp(480px,calc(25vw_+_160px),640px)]"}`}>
             {/* Panel header */}
             <div className="sticky top-0 z-10 shrink-0 bg-white px-[24px] py-[16px] flex items-center justify-between gap-[32px] border-b border-[#e9e9e9]">
               <p
@@ -2762,18 +2762,23 @@ export default function App() {
             </div>
             <div className="flex-1 px-[24px] py-[32px]">
               {subProductQuoteLoading ? (
-                <div className="flex flex-col items-center justify-center h-full min-h-[400px] gap-[12px] text-center px-[24px]">
-                  <div className="w-full max-w-[320px] h-[8px] bg-[#e9e9e9] rounded-full overflow-hidden">
+                <div className="flex flex-col items-center justify-center h-full min-h-[400px] gap-[24px] text-center px-[24px]">
+                  <img
+                    src="assets/generating-quote-illustration.png"
+                    alt=""
+                    className="w-[220px] h-auto"
+                  />
+                  <div className="w-full max-w-[290px] h-[8px] bg-[#c0d8d5] rounded-[6px] overflow-hidden">
                     <div
-                      className="h-full bg-[#056257] rounded-full transition-[width] duration-[1000ms] ease-linear"
+                      className="h-full bg-[#054742] rounded-[6px] transition-[width] duration-[1000ms] ease-linear"
                       style={{ width: `${subProductQuoteProgress}%` }}
                     />
                   </div>
                   <p
-                    className="font-['Theinhardt:Medium',sans-serif] text-[#272727] text-[16px] leading-[24px]"
+                    className="font-['Theinhardt:Medium',sans-serif] text-[#04463e] text-[20px] leading-[28px] max-w-[331px]"
                     style={{ fontFeatureSettings: '"case" 1' }}
                   >
-                    Generating quote
+                    Sit tight as we are generating your client&rsquo;s estimate...
                   </p>
                 </div>
               ) : quoteGenerated ? (

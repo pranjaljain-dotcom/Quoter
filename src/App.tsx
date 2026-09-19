@@ -2199,6 +2199,7 @@ function QuoteForm({
               key={i}
               onClick={() => !locked && handleTabChange(i)}
               disabled={locked}
+              title={name}
               className={`relative z-10 h-[40px] rounded-full px-[16px] text-center border-none bg-transparent transition-colors font-['Theinhardt:Medium',sans-serif] text-[14px] leading-[20px] truncate ${
                 locked ? "cursor-not-allowed" : "cursor-pointer"
               } ${activeProduct === i ? "text-[#056257]" : "text-[#525252] hover:text-[#272727]"}`}

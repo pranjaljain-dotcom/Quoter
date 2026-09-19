@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { jsPDF } from "jspdf";
 import svgPaths from "../imports/svg-3az64qcjni";
 
 /* ─── Agent Portal Dashboard ────────────────────────────────── */
@@ -189,7 +190,7 @@ function Sidebar({ activeNav, onNavChange }: { activeNav: string; onNavChange: (
 
 /* ─── Form fields ───────────────────────────────────────────── */
 
-type SelectOption = string | { value: string; health: string; bmi?: string };
+type SelectOption = string | { value: string; health?: string; bmi?: string; disabled?: boolean; note?: string };
 
 function SelectField({ label, value, options, onChange, placeholder, labelLink, disabled }: {
   label: string;
@@ -274,32 +275,36 @@ function SelectField({ label, value, options, onChange, placeholder, labelLink, 
         </button>
         {open && (
           <div className="absolute z-50 left-0 right-0 top-full mt-[4px] bg-white border border-[#d4d4d4] rounded-[8px] shadow-[0px_4px_6px_-2px_rgba(16,24,40,0.03),0px_12px_16px_-4px_rgba(16,24,40,0.08)] max-h-[320px] overflow-y-auto">
-            {options.map((o, i) => (
-              <div key={optValue(o)}>
-                {i > 0 && <div className="h-px bg-[#f4f4f4]" />}
-                <div
-                  className="flex items-center min-h-[48px] px-[6px] py-[2px] cursor-pointer hover:bg-[#f3f7f7]"
-                  onClick={() => { onChange(optValue(o)); setOpen(false); }}
-                >
-                  <div className="flex-1 pl-[8px] pr-[10px] py-[10px] rounded-[6px]">
-                    <p
-                      className={`${typeof o !== "string" ? "font-['Theinhardt:Medium',sans-serif]" : "font-['Theinhardt:Regular',sans-serif]"} text-[#272727] text-[16px] leading-[24px]`}
-                      style={{ fontFeatureSettings: '"case" 1' }}
-                    >
-                      {optValue(o)}
-                    </p>
-                    {typeof o !== "string" && (
+            {options.map((o, i) => {
+              const isDisabledOpt = typeof o !== "string" && o.disabled === true;
+              return (
+                <div key={optValue(o)}>
+                  {i > 0 && <div className="h-px bg-[#f4f4f4]" />}
+                  <div
+                    className={`flex items-center min-h-[48px] px-[6px] py-[2px] ${isDisabledOpt ? "cursor-not-allowed" : "cursor-pointer hover:bg-[#f3f7f7]"}`}
+                    onClick={() => { if (isDisabledOpt) return; onChange(optValue(o)); setOpen(false); }}
+                  >
+                    <div className="flex-1 pl-[8px] pr-[10px] py-[10px] rounded-[6px]">
                       <p
-                        className="font-['Theinhardt:Regular',sans-serif] text-[#7e7e7e] text-[13px] leading-[18px] mt-[2px]"
+                        className={`${typeof o !== "string" && !isDisabledOpt ? "font-['Theinhardt:Medium',sans-serif]" : "font-['Theinhardt:Regular',sans-serif]"} ${isDisabledOpt ? "text-[#b0b0b0]" : "text-[#272727]"} text-[16px] leading-[24px]`}
                         style={{ fontFeatureSettings: '"case" 1' }}
                       >
-                        {o.health}{o.bmi ? <> &middot; BMI: {o.bmi}</> : null}
+                        {optValue(o)}
+                        {isDisabledOpt && typeof o !== "string" && o.note && ` ${o.note}`}
                       </p>
-                    )}
+                      {typeof o !== "string" && !isDisabledOpt && (o.health || o.bmi) && (
+                        <p
+                          className="font-['Theinhardt:Regular',sans-serif] text-[#7e7e7e] text-[13px] leading-[18px] mt-[2px]"
+                          style={{ fontFeatureSettings: '"case" 1' }}
+                        >
+                          {o.health}{o.bmi ? <> &middot; BMI: {o.bmi}</> : null}
+                        </p>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>
@@ -648,7 +653,7 @@ function QuotePanel({
       <div className="bg-white rounded-[8px] border border-[#e9e9e9] p-[24px] flex flex-col gap-[16px]">
         <div className="flex items-center justify-between">
           <p
-            className="font-['Theinhardt:Bold',sans-serif] text-[#272727] text-[18px] leading-[28px]"
+            className="font-['Theinhardt:Medium',sans-serif] text-[#272727] text-[18px] leading-[28px]"
             style={{ fontFeatureSettings: '"case" 1' }}
           >
             Estimated Coverage
@@ -662,7 +667,7 @@ function QuotePanel({
         </div>
         <div className="flex items-start justify-between gap-[12px]">
           <p
-            className="font-['Theinhardt:Bold',sans-serif] text-[#272727] text-[18px] leading-[28px]"
+            className="font-['Theinhardt:Medium',sans-serif] text-[#272727] text-[18px] leading-[28px]"
             style={{ fontFeatureSettings: '"case" 1' }}
           >
             Estimated Premium
@@ -808,6 +813,8 @@ const PRODUCT_GROUPS: ProductGroup[] = [
     ],
   },
 ];
+
+const STATE_OPTIONS = ["Arizona", "California", "Texas", "Florida", "New York"];
 
 const PRODUCT_CATEGORY_BY_ID: Record<string, string> = {};
 for (const group of PRODUCT_GROUPS) {
@@ -1054,25 +1061,201 @@ function ShareEstimatePanel({
   const fmtPremium = (n: number) => "$" + n.toFixed(2) + "/mo";
 
   const handleDownload = () => {
-    const lines: string[] = [];
-    quotes.forEach((quote, i) => {
-      if (quotes.length > 1) lines.push(`Quote ${i + 1}`);
-      lines.push(quote.product);
-      lines.push(`Coverage: ${fmtCoverage(quote.coverage)}`);
-      if (quote.adEnabled) {
-        lines.push(`AD Coverage (${quote.adMultiplier}x): +${fmtCoverage(quote.adCoverage)}`);
-        lines.push(`Total Coverage: ${fmtCoverage(quote.coverage + quote.adCoverage)}`);
-      }
-      lines.push(`Premium: ${fmtPremium(quote.premium)}`);
-      lines.push("");
+    const AGENCY_NAME = "Century Insurance Co.";
+    const AGENT_NAME = "Pranjal Jain";
+    const TEAL: [number, number, number] = [5, 98, 87];
+    const DARK: [number, number, number] = [39, 39, 39];
+    const GRAY: [number, number, number] = [126, 126, 126];
+    const CARD_BG: [number, number, number] = [228, 221, 211];
+    const TESTIMONIAL_BG: [number, number, number] = [234, 242, 251];
+    const DIVIDER: [number, number, number] = [212, 212, 212];
+
+    const doc = new jsPDF({ unit: "pt", format: "letter" });
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const marginX = 48;
+    const contentWidth = pageWidth - marginX * 2;
+    let y = 56;
+
+    const wrap = (text: string, x: number, width: number, lineHeight: number) => {
+      const lines = doc.splitTextToSize(text, width);
+      doc.text(lines, x, y);
+      y += lines.length * lineHeight;
+    };
+
+    const clientDisplayName = name.trim() || "Your Quote";
+
+    // Wordmark
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(13);
+    doc.setTextColor(...DARK);
+    doc.text("ETHOS", marginX, y, { charSpace: 1.5 });
+    y += 36;
+
+    // Headline
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(20);
+    doc.setTextColor(...DARK);
+    wrap(`${AGENCY_NAME} has partnered with Ethos to protect the ones you love.`, marginX, contentWidth, 25);
+    y += 8;
+
+    // Subtext
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(11);
+    doc.setTextColor(...DARK);
+    wrap(
+      `${AGENCY_NAME} has invited ${clientDisplayName} to apply with Ethos to protect you and your family. Based on the information provided, the following coverage option was created to fit your needs.`,
+      marginX,
+      contentWidth,
+      16
+    );
+    y += 20;
+
+    // Quote card — jsPDF has no z-order, so the card's background fill has to be
+    // sized before it's drawn. Run the content pass twice: once dry (to measure
+    // the final height) and once for real once the fill rect is in place.
+    const cardX = marginX;
+    const cardPad = 20;
+    const cardTop = y;
+    const cardInnerWidth = contentWidth - cardPad * 2;
+
+    const drawCardContent = (startY: number) => {
+      let cy = startY + cardPad;
+
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(14);
+      doc.setTextColor(...DARK);
+      doc.text(clientDisplayName, cardX + cardPad, cy + 12);
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(9);
+      doc.text("Powered by ETHOS", cardX + cardPad + cardInnerWidth, cy + 11, { align: "right", charSpace: 0.6 });
+      cy += 28;
+
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(9.5);
+      doc.setTextColor(...GRAY);
+      doc.text(`Quoted by ${AGENT_NAME}, ${AGENCY_NAME}`, cardX + cardPad, cy);
+      cy += 22;
+
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(10);
+      doc.setTextColor(...DARK);
+      doc.text("Product Highlights:", cardX + cardPad, cy);
+      cy += 20;
+
+      quotes.forEach((quote, i) => {
+        if (quotes.length > 1) {
+          doc.setFont("helvetica", "bold");
+          doc.setFontSize(10);
+          doc.setTextColor(...DARK);
+          doc.text(`Quote ${i + 1}`, cardX + cardPad, cy);
+          cy += 18;
+        }
+
+        const basePremium = quote.coverage / 2500;
+        const adPremiumAmt = quote.premium - basePremium;
+        const totalCoverage = quote.coverage + (quote.adEnabled ? quote.adCoverage : 0);
+
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(16);
+        doc.setTextColor(...TEAL);
+        doc.text(`${fmtCoverage(totalCoverage)} coverage`, cardX + cardPad, cy);
+        cy += 16;
+
+        doc.setDrawColor(...DIVIDER);
+        doc.line(cardX + cardPad, cy, cardX + cardPad + cardInnerWidth, cy);
+        cy += 18;
+
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(10.5);
+        doc.setTextColor(...DARK);
+        doc.text(quote.product, cardX + cardPad, cy);
+        doc.text(`${fmtPremium(basePremium)}`, cardX + cardPad + cardInnerWidth, cy, { align: "right" });
+        cy += 18;
+
+        if (quote.adEnabled) {
+          doc.text("Accidental Death Benefit Rider", cardX + cardPad, cy);
+          doc.text(`${fmtPremium(adPremiumAmt)}`, cardX + cardPad + cardInnerWidth, cy, { align: "right" });
+          cy += 18;
+        }
+
+        cy += 6;
+      });
+
+      return cy;
+    };
+
+    const cardBottom = drawCardContent(cardTop);
+    doc.setFillColor(...CARD_BG);
+    doc.roundedRect(cardX, cardTop, contentWidth, cardBottom - cardTop, 8, 8, "F");
+    drawCardContent(cardTop);
+
+    y = cardBottom + 36;
+
+    // Why life insurance?
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(16);
+    doc.setTextColor(...DARK);
+    doc.text("Why life insurance?", marginX, y);
+    y += 22;
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10.5);
+    doc.setTextColor(...DARK);
+    wrap(
+      "Life insurance helps provide financial security for your loved ones if they were to lose you. It can give you peace of mind knowing your family won't be left struggling to pay the mortgage, tuition, or other debts.",
+      marginX,
+      contentWidth,
+      15
+    );
+    y += 20;
+
+    // Why Ethos?
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(14);
+    doc.setTextColor(...DARK);
+    doc.text("Why Ethos?", marginX, y);
+    y += 22;
+
+    const bullets: { title: string; body: string }[] = [
+      { title: "Fast and simple", body: "With Ethos, you can apply 100% online in just about 10 minutes, usually even without a medical exam. What traditionally took weeks can now be done in minutes, so you can focus on what matters." },
+      { title: "Flexible, affordable options", body: "We match you to a policy that fits your needs with a price that works for you." },
+      { title: "Coverage you can trust", body: "Our policies are insured by established life insurance companies like Banner Life Insurance Company, Ameritas Life Insurance Corp., Senior Life Insurance Company, Principal, and TruStage®." },
+    ];
+
+    bullets.forEach((b) => {
+      doc.setFillColor(...TEAL);
+      doc.circle(marginX + 3, y - 4, 3, "F");
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(11);
+      doc.setTextColor(...DARK);
+      doc.text(b.title, marginX + 14, y);
+      y += 15;
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(9.5);
+      doc.setTextColor(...GRAY);
+      wrap(b.body, marginX + 14, contentWidth - 14, 13);
+      y += 14;
     });
-    const blob = new Blob([lines.join("\n")], { type: "text/plain" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "estimate.txt";
-    a.click();
-    URL.revokeObjectURL(url);
+
+    // Testimonial
+    const testimonialText = doc.splitTextToSize(
+      "The Ethos process couldn't be easier and my rates were very competitive. I would highly recommend Ethos Life.",
+      contentWidth - 40
+    );
+    const testimonialHeight = testimonialText.length * 14 + 50;
+    doc.setFillColor(...TESTIMONIAL_BG);
+    doc.roundedRect(marginX, y, contentWidth, testimonialHeight, 8, 8, "F");
+    doc.setFont("helvetica", "italic");
+    doc.setFontSize(11);
+    doc.setTextColor(...DARK);
+    doc.text(testimonialText, marginX + 20, y + 24);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
+    doc.setTextColor(...TEAL);
+    doc.text("*****  Leslie via Trustpilot", marginX + 20, y + 24 + testimonialText.length * 14 + 12);
+
+    const fileName = `${clientDisplayName.trim().split(/\s+/)[0]}-Ethos-Quote.pdf`;
+    doc.save(fileName);
   };
 
   return (
@@ -1673,6 +1856,7 @@ type ProductFieldConfig = {
   healthClassPrefill?: string;
   healthClassLocked?: boolean;
   showKnockoutQuestions?: boolean;
+  excludedStates?: string[];
 };
 
 const PRODUCT_FIELD_CONFIG: Record<string, ProductFieldConfig> = {
@@ -1688,7 +1872,7 @@ const PRODUCT_FIELD_CONFIG: Record<string, ProductFieldConfig> = {
     healthClassPrefill: "Standard",
     healthClassLocked: true,
   },
-  "Term with Living Benefits": { showHealthCredit: true, showBMI: true, showKnockoutQuestions: true },
+  "Term with Living Benefits": { showHealthCredit: true, showBMI: true, showKnockoutQuestions: true, excludedStates: ["New York"] },
 };
 
 function getProductConfig(product: string): ProductFieldConfig {
@@ -2015,7 +2199,9 @@ function QuoteForm({
           <SelectField
             label="Residence"
             value={formState.residence}
-            options={["Arizona", "California", "Texas", "Florida", "New York"]}
+            options={STATE_OPTIONS.map((s) =>
+              config.excludedStates?.includes(s) ? { value: s, disabled: true, note: "(Not applicable for this product)" } : s
+            )}
             onChange={(v) => onFormChange("residence", v)}
             placeholder="Select state"
             disabled={locked}
@@ -2266,11 +2452,12 @@ export default function App() {
 
   const handleProductSelect = (name: string) => {
     const cfg = getProductConfig(name);
-    if (cfg.smokingPrefill || cfg.healthClassPrefill) {
+    if (cfg.smokingPrefill || cfg.healthClassPrefill || cfg.excludedStates) {
       setFormState((prev) => ({
         ...prev,
         ...(cfg.smokingPrefill ? { smoking: cfg.smokingPrefill! } : {}),
         ...(cfg.healthClassPrefill ? { rateClass: cfg.healthClassPrefill! } : {}),
+        ...(cfg.excludedStates?.includes(prev.residence) ? { residence: "" } : {}),
       }));
     }
     setSelectedProduct(name);

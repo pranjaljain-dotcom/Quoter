@@ -2417,9 +2417,9 @@ export default function App() {
           {/* Right: quote visualizer */}
           <div className={`shrink-0 bg-[#e9e9e9] border-l border-[#d4d4d4] overflow-y-scroll flex flex-col transition-[width] duration-500 ease-in-out ${quoteGenerated || subProductQuoteLoading ? "w-[clamp(600px,47vw,900px)]" : "w-[clamp(480px,calc(25vw_+_160px),640px)]"}`}>
             {/* Panel header */}
-            <div className="sticky top-0 z-10 shrink-0 bg-white px-[24px] py-[16px] flex items-center justify-between border-b border-[#e9e9e9]">
+            <div className="sticky top-0 z-10 shrink-0 bg-white px-[24px] py-[16px] flex items-center justify-between gap-[32px] border-b border-[#e9e9e9]">
               <p
-                className="font-['Theinhardt:Medium',sans-serif] text-[#272727] text-[18px] leading-[26px]"
+                className="min-w-0 flex-1 font-['Theinhardt:Medium',sans-serif] text-[#272727] text-[18px] leading-[26px]"
                 style={{ fontFeatureSettings: '"case" 1' }}
               >
                 {withTrustageTrademark(activeSubProductName)} Estimate
@@ -2427,7 +2427,7 @@ export default function App() {
               <button
                 type="button"
                 onClick={() => setShowCompareIllustration(true)}
-                className="font-['Theinhardt:Medium',sans-serif] text-[#865323] text-[16px] leading-[24px] underline decoration-dotted underline-offset-2 cursor-pointer"
+                className="shrink-0 whitespace-nowrap font-['Theinhardt:Medium',sans-serif] text-[#865323] text-[16px] leading-[24px] underline decoration-dotted underline-offset-2 cursor-pointer"
                 style={{ fontFeatureSettings: '"case" 1' }}
               >
                 Compare Illustration

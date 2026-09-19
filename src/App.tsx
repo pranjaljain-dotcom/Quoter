@@ -2734,9 +2734,9 @@ export default function App() {
               {subProductQuoteLoading ? (
                 <div className="flex flex-col items-center justify-center h-full min-h-[400px] gap-[24px] text-center px-[24px]">
                   <img
-                    src="assets/generating-quote-illustration.png"
+                    src="assets/generating-quote-illustration.gif"
                     alt=""
-                    className="w-[220px] h-auto"
+                    className="w-[260px] h-auto mix-blend-multiply"
                   />
                   <div className="w-full max-w-[290px] h-[8px] bg-[#c0d8d5] rounded-[6px] overflow-hidden">
                     <div

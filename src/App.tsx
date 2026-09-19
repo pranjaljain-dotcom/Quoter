@@ -192,7 +192,7 @@ function Sidebar({ activeNav, onNavChange }: { activeNav: string; onNavChange: (
 
 type SelectOption = string | { value: string; health?: string; bmi?: string; disabled?: boolean; note?: string };
 
-function SelectField({ label, value, options, onChange, placeholder, labelLink, disabled }: {
+function SelectField({ label, value, options, onChange, placeholder, labelLink, disabled, searchable }: {
   label: string;
   value: string;
   options: SelectOption[];
@@ -200,19 +200,31 @@ function SelectField({ label, value, options, onChange, placeholder, labelLink, 
   placeholder?: string;
   labelLink?: { text: string; href?: string; onClick?: () => void };
   disabled?: boolean;
+  searchable?: boolean;
 }) {
   const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState("");
+  const [hasTyped, setHasTyped] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     function handle(e: MouseEvent) {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setOpen(false);
+        setQuery("");
+        setHasTyped(false);
+      }
     }
     document.addEventListener("mousedown", handle);
     return () => document.removeEventListener("mousedown", handle);
   }, []);
 
   function optValue(o: SelectOption) { return typeof o === "string" ? o : o.value; }
+
+  const visibleOptions = searchable && hasTyped && query.trim() !== ""
+    ? options.filter((o) => optValue(o).toLowerCase().includes(query.trim().toLowerCase()))
+    : options;
 
   return (
     <div className="flex flex-col gap-[4px] items-start relative w-full" ref={ref}>
@@ -251,38 +263,87 @@ function SelectField({ label, value, options, onChange, placeholder, labelLink, 
         ))}
       </div>
       <div className="relative w-full">
-        <button
-          type="button"
-          disabled={disabled}
-          onClick={() => setOpen((v) => !v)}
-          className={`rounded-[8px] border w-full h-[56px] flex items-center px-[14px] gap-[8px] transition-shadow ${
-            disabled ? "bg-[#f4f4f4] border-[#e9e9e9] cursor-not-allowed" : open ? "bg-white border-[#056257] shadow-[0px_0px_0px_2px_#dae7e6]" : "bg-white border-[#d4d4d4]"
-          }`}
-        >
-          <span
-            className={`flex-1 text-left font-['Theinhardt:Regular',sans-serif] text-[16px] leading-[24px] ${value ? "text-[#272727]" : "text-[#7e7e7e]"}`}
-            style={{ fontFeatureSettings: '"case" 1' }}
+        {searchable ? (
+          <div
+            className={`rounded-[8px] border w-full h-[56px] flex items-center px-[14px] gap-[8px] transition-shadow ${
+              disabled ? "bg-[#f4f4f4] border-[#e9e9e9]" : open ? "bg-white border-[#056257] shadow-[0px_0px_0px_2px_#dae7e6]" : "bg-white border-[#d4d4d4]"
+            }`}
           >
-            {value || placeholder || "Select"}
-          </span>
-          <img
-            src="assets/d0a41.svg"
-            alt=""
-            width="24"
-            height="24"
-            className={`shrink-0 transition-transform duration-200 ${open ? "rotate-180" : ""}`}
-          />
-        </button>
+            <input
+              ref={inputRef}
+              type="text"
+              disabled={disabled}
+              value={open ? query : value}
+              onFocus={(e) => { setOpen(true); setQuery(value); setHasTyped(false); e.target.select(); }}
+              onChange={(e) => { setQuery(e.target.value); setHasTyped(true); if (!open) setOpen(true); }}
+              placeholder={placeholder || "Select"}
+              className={`flex-1 w-0 bg-transparent outline-none cursor-text font-['Theinhardt:Regular',sans-serif] text-[16px] leading-[24px] placeholder:text-[#7e7e7e] ${
+                disabled ? "cursor-not-allowed text-[#7e7e7e]" : "text-[#272727]"
+              }`}
+              style={{ fontFeatureSettings: '"case" 1' }}
+            />
+            <img
+              src="assets/d0a41.svg"
+              alt=""
+              width="24"
+              height="24"
+              onClick={() => {
+                if (disabled) return;
+                if (open) {
+                  setOpen(false);
+                  setQuery("");
+                  setHasTyped(false);
+                  inputRef.current?.blur();
+                } else {
+                  inputRef.current?.focus();
+                }
+              }}
+              className={`shrink-0 transition-transform duration-200 cursor-pointer ${open ? "rotate-180" : ""}`}
+            />
+          </div>
+        ) : (
+          <button
+            type="button"
+            disabled={disabled}
+            onClick={() => setOpen((v) => !v)}
+            className={`rounded-[8px] border w-full h-[56px] flex items-center px-[14px] gap-[8px] transition-shadow ${
+              disabled ? "bg-[#f4f4f4] border-[#e9e9e9] cursor-not-allowed" : open ? "bg-white border-[#056257] shadow-[0px_0px_0px_2px_#dae7e6]" : "bg-white border-[#d4d4d4]"
+            }`}
+          >
+            <span
+              className={`flex-1 text-left font-['Theinhardt:Regular',sans-serif] text-[16px] leading-[24px] ${value ? "text-[#272727]" : "text-[#7e7e7e]"}`}
+              style={{ fontFeatureSettings: '"case" 1' }}
+            >
+              {value || placeholder || "Select"}
+            </span>
+            <img
+              src="assets/d0a41.svg"
+              alt=""
+              width="24"
+              height="24"
+              className={`shrink-0 transition-transform duration-200 ${open ? "rotate-180" : ""}`}
+            />
+          </button>
+        )}
         {open && (
-          <div className="absolute z-50 left-0 right-0 top-full mt-[4px] bg-white border border-[#d4d4d4] rounded-[8px] shadow-[0px_4px_6px_-2px_rgba(16,24,40,0.03),0px_12px_16px_-4px_rgba(16,24,40,0.08)] max-h-[320px] overflow-y-auto">
-            {options.map((o, i) => {
+          <div className="absolute z-50 left-0 right-0 top-full mt-[4px] bg-white border border-[#d4d4d4] rounded-[8px] shadow-[0px_4px_6px_-2px_rgba(16,24,40,0.03),0px_12px_16px_-4px_rgba(16,24,40,0.08)] max-h-[320px] flex flex-col overflow-hidden">
+            <div className="overflow-y-auto">
+            {visibleOptions.length === 0 && (
+              <p
+                className="font-['Theinhardt:Regular',sans-serif] text-[#7e7e7e] text-[14px] leading-[20px] px-[14px] py-[12px]"
+                style={{ fontFeatureSettings: '"case" 1' }}
+              >
+                No matches
+              </p>
+            )}
+            {visibleOptions.map((o, i) => {
               const isDisabledOpt = typeof o !== "string" && o.disabled === true;
               return (
                 <div key={optValue(o)}>
                   {i > 0 && <div className="h-px bg-[#f4f4f4]" />}
                   <div
                     className={`flex items-center min-h-[48px] px-[6px] py-[2px] ${isDisabledOpt ? "cursor-not-allowed" : "cursor-pointer hover:bg-[#f3f7f7]"}`}
-                    onClick={() => { if (isDisabledOpt) return; onChange(optValue(o)); setOpen(false); }}
+                    onClick={() => { if (isDisabledOpt) return; onChange(optValue(o)); setOpen(false); setQuery(""); setHasTyped(false); }}
                   >
                     <div className="flex-1 pl-[8px] pr-[10px] py-[10px] rounded-[6px]">
                       <p
@@ -305,6 +366,7 @@ function SelectField({ label, value, options, onChange, placeholder, labelLink, 
                 </div>
               );
             })}
+            </div>
           </div>
         )}
       </div>
@@ -2217,6 +2279,7 @@ function QuoteForm({
             onChange={(v) => onFormChange("residence", v)}
             placeholder="Select state"
             disabled={locked}
+            searchable
           />
         </div>
       </div>

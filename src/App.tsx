@@ -1053,6 +1053,28 @@ function ShareEstimatePanel({
   const fmtCoverage = (n: number) => "$" + n.toLocaleString("en-US");
   const fmtPremium = (n: number) => "$" + n.toFixed(2) + "/mo";
 
+  const handleDownload = () => {
+    const lines: string[] = [];
+    quotes.forEach((quote, i) => {
+      if (quotes.length > 1) lines.push(`Quote ${i + 1}`);
+      lines.push(quote.product);
+      lines.push(`Coverage: ${fmtCoverage(quote.coverage)}`);
+      if (quote.adEnabled) {
+        lines.push(`AD Coverage (${quote.adMultiplier}x): +${fmtCoverage(quote.adCoverage)}`);
+        lines.push(`Total Coverage: ${fmtCoverage(quote.coverage + quote.adCoverage)}`);
+      }
+      lines.push(`Premium: ${fmtPremium(quote.premium)}`);
+      lines.push("");
+    });
+    const blob = new Blob([lines.join("\n")], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "estimate.txt";
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <>
       {/* Backdrop */}
@@ -1094,12 +1116,25 @@ function ShareEstimatePanel({
         <div className="flex-1 overflow-y-auto px-[24px] py-[20px] flex flex-col gap-[20px]">
           {/* Quote preview(s) */}
           <div className="flex flex-col gap-[8px]">
-            <p
-              className="font-['Theinhardt:Medium',sans-serif] text-[#272727] text-[16px] leading-[24px]"
-              style={{ fontFeatureSettings: '"case" 1' }}
-            >
-              {quotes.length > 1 ? "Quotes" : "Quote"}
-            </p>
+            <div className="flex items-center justify-between gap-[8px]">
+              <p
+                className="font-['Theinhardt:Medium',sans-serif] text-[#272727] text-[16px] leading-[24px]"
+                style={{ fontFeatureSettings: '"case" 1' }}
+              >
+                {quotes.length > 1 ? "Quotes" : "Quote"}
+              </p>
+              <button
+                type="button"
+                onClick={handleDownload}
+                className="flex items-center gap-[4px] font-['Theinhardt:Medium',sans-serif] text-[#865323] text-[14px] leading-[20px] underline decoration-dotted underline-offset-2 bg-transparent border-none p-0 cursor-pointer"
+                style={{ fontFeatureSettings: '"case" 1' }}
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                  <path d="M12 3v12m0 0-4-4m4 4 4-4M5 21h14" stroke="#865323" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+                Download
+              </button>
+            </div>
             {quotes.map((quote, i) => (
               <div key={quote.id} className="bg-[#f3f7f7] border border-[#e9e9e9] rounded-[8px] p-[16px] flex flex-col gap-[8px]">
                 <div className="flex items-center justify-between gap-[8px]">

@@ -2587,8 +2587,13 @@ export default function App() {
   const handleGenerateQuote = () => {
     setQuoteLoading(true);
     setQuoteGenerated(false);
+    setSubProductQuoteLoading(true);
+    setSubProductQuoteProgress(0);
+    requestAnimationFrame(() => requestAnimationFrame(() => setSubProductQuoteProgress(100)));
     setTimeout(() => {
       setQuoteLoading(false);
+      setSubProductQuoteLoading(false);
+      setSubProductQuoteProgress(0);
       setQuoteGenerated(true);
     }, 1000);
   };

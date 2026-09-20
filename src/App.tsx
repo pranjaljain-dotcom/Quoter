@@ -2786,7 +2786,7 @@ export default function App() {
                     Your quote will appear here
                   </p>
                   <p
-                    className="font-['Theinhardt:Regular',sans-serif] text-[#04463e] text-[14px] leading-[20px]"
+                    className="font-['Theinhardt:Regular',sans-serif] text-[#272727] text-[14px] leading-[20px]"
                     style={{ fontFeatureSettings: '"case" 1' }}
                   >
                     Fill in the basic information on the left to generate a quote estimate.

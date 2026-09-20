@@ -2780,13 +2780,13 @@ export default function App() {
                     className="w-[390px] h-auto mb-[8px]"
                   />
                   <p
-                    className="font-['Theinhardt:Medium',sans-serif] text-[#272727] text-[16px] leading-[24px]"
+                    className="font-['Theinhardt:Medium',sans-serif] text-[#04463e] text-[16px] leading-[24px]"
                     style={{ fontFeatureSettings: '"case" 1' }}
                   >
                     Your quote will appear here
                   </p>
                   <p
-                    className="font-['Theinhardt:Regular',sans-serif] text-[#7e7e7e] text-[14px] leading-[20px]"
+                    className="font-['Theinhardt:Regular',sans-serif] text-[#04463e] text-[14px] leading-[20px]"
                     style={{ fontFeatureSettings: '"case" 1' }}
                   >
                     Fill in the basic information on the left to generate a quote estimate.

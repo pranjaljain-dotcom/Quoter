@@ -1963,6 +1963,83 @@ function ResourceLinksRow({ links }: { links: { label: string; href: string }[] 
   );
 }
 
+function DocumentIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="shrink-0">
+      <path d="M7 3h7l5 5v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Z" stroke="#336cc3" strokeWidth="1.6" strokeLinejoin="round" />
+      <path d="M14 3v5h5" stroke="#336cc3" strokeWidth="1.6" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function ProductResourcesPanel({ open, onClose, links }: { open: boolean; onClose: () => void; links: { label: string; href: string }[] }) {
+  return (
+    <>
+      {/* Backdrop */}
+      <div
+        className={`fixed inset-0 z-40 bg-black transition-opacity duration-300 ${open ? "opacity-40 pointer-events-auto" : "opacity-0 pointer-events-none"}`}
+        onClick={onClose}
+      />
+      {/* Sliding panel */}
+      <div
+        className={`fixed top-0 right-0 h-full z-50 bg-white flex flex-col shadow-[0px_4px_6px_-2px_rgba(16,24,40,0.03),0px_12px_16px_-4px_rgba(16,24,40,0.08)] transition-transform duration-300 ease-in-out ${open ? "translate-x-0" : "translate-x-full"}`}
+        style={{ width: "440px" }}
+      >
+        {/* Header */}
+        <div className="flex items-start justify-between gap-[16px] px-[24px] py-[20px] border-b border-[#f4f4f4] shrink-0">
+          <div className="flex flex-col gap-[4px]">
+            <p
+              className="font-['Theinhardt:Medium',sans-serif] text-[#272727] text-[18px] leading-[26px]"
+              style={{ fontFeatureSettings: '"case" 1' }}
+            >
+              Product resources
+            </p>
+            <p
+              className="font-['Theinhardt:Regular',sans-serif] text-[#7e7e7e] text-[14px] leading-[20px]"
+              style={{ fontFeatureSettings: '"case" 1' }}
+            >
+              Guides and reference material for this product.
+            </p>
+          </div>
+          <button
+            onClick={onClose}
+            className="shrink-0 size-[32px] flex items-center justify-center rounded-[6px] hover:bg-[#f4f4f4] border-none bg-transparent cursor-pointer transition-colors"
+          >
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M15 5L5 15M5 5l10 10" stroke="#525252" strokeWidth="1.5" strokeLinecap="round"/>
+            </svg>
+          </button>
+        </div>
+        {/* Resource cards */}
+        <div className="flex-1 overflow-y-auto px-[24px] py-[20px] flex flex-col gap-[12px]">
+          {links.map((link) => (
+            <a
+              key={link.label}
+              href={link.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-between gap-[12px] bg-white border border-[#e9e9e9] rounded-[8px] px-[16px] py-[14px] no-underline cursor-pointer transition-colors hover:bg-[#f9fafb] hover:border-[#d4d4d4]"
+            >
+              <div className="flex items-center gap-[12px] min-w-0">
+                <div className="shrink-0 size-[36px] rounded-[8px] bg-[#f5f8fc] flex items-center justify-center">
+                  <DocumentIcon />
+                </div>
+                <p
+                  className="font-['Theinhardt:Medium',sans-serif] text-[#272727] text-[14px] leading-[20px] truncate"
+                  style={{ fontFeatureSettings: '"case" 1' }}
+                >
+                  {link.label}
+                </p>
+              </div>
+              <ExternalLinkIcon size={18} />
+            </a>
+          ))}
+        </div>
+      </div>
+    </>
+  );
+}
+
 type ProductFieldConfig = {
   showHealthCredit: boolean;
   showCreditEstimate?: boolean;
@@ -2173,7 +2250,7 @@ function QuoteForm({
   const [tabLoading, setTabLoading] = useState(false);
   const [healthExpanded, setHealthExpanded] = useState(false);
   const [criminalExpanded, setCriminalExpanded] = useState(false);
-  const [resourcesExpanded, setResourcesExpanded] = useState(false);
+  const [productResourcesOpen, setProductResourcesOpen] = useState(false);
 
   function handleTabChange(i: number) {
     if (i === activeProduct) return;
@@ -2188,8 +2265,10 @@ function QuoteForm({
   const config = getProductConfig(selectedProduct);
   const heightInInvalid = formState.heightIn.trim() !== "" && Number(formState.heightIn) > 11;
   const isKnockedOut = config.showKnockoutQuestions === true && (knockoutHealth || knockoutCriminal);
+  const activeResourceLinks = hasTabs ? (subProductTabConfig?.resourceLinksByTab?.[activeProduct] ?? DEFAULT_RESOURCE_LINKS) : DEFAULT_RESOURCE_LINKS;
 
   return (
+    <>
     <div className="flex flex-col gap-[20px]">
       {/* Locked banner — shown while configuring an additional quote for the same product */}
       {locked && (
@@ -2258,35 +2337,24 @@ function QuoteForm({
       )}
 
       {/* Resource links — reflect the active sub-product tab when present.
-          Collapsed behind an accordion for Term Life Insurance - Choice, as a
-          pilot for an alternate resource-links treatment. */}
+          Term Life Insurance - Choice opens them in a side panel instead of
+          the inline row, as a pilot for an alternate resource-links treatment. */}
       {selectedProduct === "Term Life Insurance - Choice" ? (
-        <div className="flex flex-col gap-[8px]">
-          <button
-            type="button"
-            onClick={() => setResourcesExpanded((v) => !v)}
-            className="flex items-center gap-[6px] bg-transparent border-none p-0 cursor-pointer self-start"
+        <button
+          type="button"
+          onClick={() => setProductResourcesOpen(true)}
+          className="flex items-center gap-[6px] bg-transparent border-none p-0 cursor-pointer self-start"
+        >
+          <DocumentIcon />
+          <p
+            className="font-['Theinhardt:Medium',sans-serif] text-[#336cc3] text-[14px] leading-[20px]"
+            style={{ fontFeatureSettings: '"case" 1' }}
           >
-            <p
-              className="font-['Theinhardt:Medium',sans-serif] text-[#272727] text-[14px] leading-[20px]"
-              style={{ fontFeatureSettings: '"case" 1' }}
-            >
-              Product resources
-            </p>
-            <img
-              src="assets/d0a41.svg"
-              alt=""
-              width="18"
-              height="18"
-              className={`shrink-0 transition-transform duration-200 ${resourcesExpanded ? "rotate-180" : ""}`}
-            />
-          </button>
-          {resourcesExpanded && (
-            <ResourceLinksRow links={hasTabs ? (subProductTabConfig?.resourceLinksByTab?.[activeProduct] ?? DEFAULT_RESOURCE_LINKS) : DEFAULT_RESOURCE_LINKS} />
-          )}
-        </div>
+            Product resources
+          </p>
+        </button>
       ) : (
-        <ResourceLinksRow links={hasTabs ? (subProductTabConfig?.resourceLinksByTab?.[activeProduct] ?? DEFAULT_RESOURCE_LINKS) : DEFAULT_RESOURCE_LINKS} />
+        <ResourceLinksRow links={activeResourceLinks} />
       )}
 
       {/* Divider */}
@@ -2561,6 +2629,12 @@ function QuoteForm({
       </>
       )}
     </div>
+    <ProductResourcesPanel
+      open={productResourcesOpen}
+      onClose={() => setProductResourcesOpen(false)}
+      links={activeResourceLinks}
+    />
+    </>
   );
 }
 

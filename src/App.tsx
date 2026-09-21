@@ -1963,9 +1963,9 @@ function ResourceLinksRow({ links }: { links: { label: string; href: string }[] 
   );
 }
 
-function DocumentIcon() {
+function DocumentIcon({ size = 18 }: { size?: number }) {
   return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="shrink-0">
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className="shrink-0">
       <path d="M7 3h7l5 5v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Z" stroke="#336cc3" strokeWidth="1.6" strokeLinejoin="round" />
       <path d="M14 3v5h5" stroke="#336cc3" strokeWidth="1.6" strokeLinejoin="round" />
     </svg>
@@ -2343,15 +2343,15 @@ function QuoteForm({
         <button
           type="button"
           onClick={() => setProductResourcesOpen(true)}
-          className="flex items-center gap-[6px] bg-transparent border-none p-0 cursor-pointer self-start"
+          className="bg-[#f5f8fc] flex gap-[6px] items-center px-[12px] py-[6px] rounded-[6px] cursor-pointer border-none transition-colors hover:bg-[#eaf1fa] self-start"
         >
-          <DocumentIcon />
           <p
-            className="font-['Theinhardt:Medium',sans-serif] text-[#336cc3] text-[14px] leading-[20px]"
+            className="font-['Theinhardt:Medium',sans-serif] text-[#336cc3] text-[13px] tracking-[-0.13px] leading-[18px] whitespace-nowrap"
             style={{ fontFeatureSettings: '"case" 1' }}
           >
             Product resources
           </p>
+          <DocumentIcon size={16} />
         </button>
       ) : (
         <ResourceLinksRow links={activeResourceLinks} />

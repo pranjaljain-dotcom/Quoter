@@ -517,6 +517,8 @@ function QuotePanel({
   onAdMultiplierChange: (v: number) => void;
 }) {
   const [coverageMode, setCoverageMode] = useState<"coverage" | "premium">("coverage");
+  const [policyTerm, setPolicyTerm] = useState("10 yrs");
+  const isTermLife = PRODUCT_CATEGORY_BY_ID[selectedProduct] === "TERM LIFE";
 
   const COVERAGE_MIN = coverageMin;
   const COVERAGE_MAX = coverageMax;
@@ -638,6 +640,38 @@ function QuotePanel({
             </div>
           </div>
         </div>
+
+        {isTermLife && (
+          <>
+            {/* Divider */}
+            <div className="h-px bg-[#e9e9e9] shrink-0" />
+
+            {/* Policy Term */}
+            <div className="flex flex-col gap-[16px]">
+              <p
+                className="font-['Theinhardt:Medium',sans-serif] text-[#272727] text-[18px] leading-[26px]"
+                style={{ fontFeatureSettings: '"case" 1' }}
+              >
+                Policy Term
+              </p>
+              <div className="flex gap-[16px] flex-wrap">
+                {POLICY_TERM_OPTIONS.map((term) => (
+                  <button
+                    key={term}
+                    type="button"
+                    onClick={() => setPolicyTerm(term)}
+                    className={`px-[20px] py-[8px] rounded-[8px] border transition-colors cursor-pointer font-['Theinhardt:Medium',sans-serif] text-[#272727] text-[18px] leading-[28px] ${
+                      policyTerm === term ? "bg-[#dae7e6] border-[#056257]" : "bg-[#f3f7f7] border-[#d4d4d4] hover:bg-[#eaf1f0]"
+                    }`}
+                    style={{ fontFeatureSettings: '"case" 1' }}
+                  >
+                    {term}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </>
+        )}
       </div>
 
       {/* AD coverage card */}
@@ -885,6 +919,8 @@ const STATE_OPTIONS = [
   "Rhode Island", "South Carolina", "South Dakota", "Tennessee", "Texas", "Utah", "Vermont",
   "Virginia", "Washington", "West Virginia", "Wisconsin", "Wyoming",
 ];
+
+const POLICY_TERM_OPTIONS = ["10 yrs", "15 yrs", "20 yrs", "25 yrs", "30 yrs"];
 
 const PRODUCT_CATEGORY_BY_ID: Record<string, string> = {};
 for (const group of PRODUCT_GROUPS) {

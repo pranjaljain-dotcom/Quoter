@@ -2076,7 +2076,9 @@ const UNIVERSALLY_EXCLUDED_STATES = ["New York"];
 
 function getProductConfig(product: string): ProductFieldConfig {
   const base = PRODUCT_FIELD_CONFIG[product] ?? { showHealthCredit: true, showBMI: true };
-  return { ...base, excludedStates: [...new Set([...(base.excludedStates ?? []), ...UNIVERSALLY_EXCLUDED_STATES])] };
+  // IUL products don't collect BMI.
+  const showBMI = PRODUCT_CATEGORY_BY_ID[product] === "IUL" ? false : base.showBMI;
+  return { ...base, showBMI, excludedStates: [...new Set([...(base.excludedStates ?? []), ...UNIVERSALLY_EXCLUDED_STATES])] };
 }
 
 type KnockoutItem = { label: string; detail?: string };

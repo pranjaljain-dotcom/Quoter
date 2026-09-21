@@ -650,8 +650,8 @@ function QuotePanel({
             {/* Policy Term */}
             <div className="flex flex-col gap-[16px]">
               <p
-                className="font-['Theinhardt:Medium',sans-serif] text-[#272727] text-[18px] leading-[26px]"
-                style={{ fontFeatureSettings: '"case" 1' }}
+                className="font-['Theinhardt:Medium',sans-serif] text-[#a9a9a9] text-[12px] leading-[18px] uppercase"
+                style={{ fontFeatureSettings: '"case" 1', letterSpacing: "0.96px" }}
               >
                 Policy Term
               </p>

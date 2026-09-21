@@ -1964,14 +1964,13 @@ function ResourceLinksRow({ links }: { links: { label: string; href: string }[] 
 }
 
 function ProductResourcesIcon({ size = 18 }: { size?: number }) {
-  const width = Math.round(size * (46.4945 / 59.7116) * 10) / 10;
+  const width = Math.round(size * (47.3548 / 59.7231) * 10) / 10;
   return (
-    <svg width={width} height={size} viewBox="0 0 46.4945 59.7116" fill="none" className="shrink-0">
-      <path d="M1.02102 54.421H1.01525V8.16907C1.01525 4.21715 4.09602 1.01525 7.90371 1.01525H9.85948V49.8575" stroke="#336cc3" strokeWidth="2.01923" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M5.43462 49.8578H45.4788V54.4905C45.4788 56.8155 43.5923 58.702 41.2673 58.702H5.43462C2.99423 58.702 1.00962 56.7174 1.00962 54.277C1.00962 51.8366 2.98846 49.852 5.43462 49.852V49.8578Z" stroke="#336cc3" strokeWidth="2.01923" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M43.4137 1.00962C44.556 1.00962 45.4849 1.93844 45.4849 3.08075V49.7942H9.91756V1.00962H43.4137Z" stroke="#336cc3" strokeWidth="2.01923" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M36.9288 10.8635H17.4346C17.2849 10.8635 17.1635 10.9849 17.1635 11.1346V17.2731C17.1635 17.4229 17.2849 17.5443 17.4346 17.5443H36.9288C37.0786 17.5443 37.2 17.4229 37.2 17.2731V11.1346C37.2 10.9849 37.0786 10.8635 36.9288 10.8635Z" stroke="#336cc3" strokeWidth="2.01923" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M6.54222 54.4212H44.3884" stroke="#336cc3" strokeWidth="2.01923" strokeLinecap="round" strokeLinejoin="round" />
+    <svg width={width} height={size} viewBox="0 0 47.3548 59.7231" fill="none" className="shrink-0">
+      <path d="M24.8135 1.01536H4.10192C2.39423 1.01536 1.00962 2.4 1.00962 4.10769V55.6211C1.00962 57.3288 2.39423 58.7134 4.10192 58.7134H43.2519C44.9596 58.7134 46.3442 57.3288 46.3442 55.6211V22.5231" stroke="#336cc3" strokeWidth="2.01923" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M11.3131 39.2595H36.04" stroke="#336cc3" strokeWidth="2.01923" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M11.3131 31.9212H36.04" stroke="#336cc3" strokeWidth="2.01923" strokeLinecap="round" strokeLinejoin="round" />
+      <path fillRule="evenodd" clipRule="evenodd" d="M46.3451 22.8577H27.6701C25.9624 22.8577 24.5778 21.473 24.5778 19.7654V1.00962H24.8836L46.3394 22.4654V22.8519L46.3451 22.8577Z" stroke="#336cc3" strokeWidth="2.01923" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }

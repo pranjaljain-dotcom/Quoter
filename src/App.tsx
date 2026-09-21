@@ -648,12 +648,12 @@ function QuotePanel({
             <div className="h-px bg-[#e9e9e9] shrink-0 mx-[-24px]" />
 
             {/* Policy Term */}
-            <div className="flex flex-col gap-[16px]">
+            <div className="flex flex-col gap-[16px] mt-[8px]">
               <p
                 className="font-['Theinhardt:Medium',sans-serif] text-[#a9a9a9] text-[12px] leading-[18px] uppercase"
                 style={{ fontFeatureSettings: '"case" 1', letterSpacing: "0.96px" }}
               >
-                Policy Term
+                Term Length
               </p>
               <div className="flex gap-[16px] flex-wrap">
                 {POLICY_TERM_OPTIONS.map((term) => (

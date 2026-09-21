@@ -518,17 +518,23 @@ function QuotePanel({
 }) {
   const [coverageMode, setCoverageMode] = useState<"coverage" | "premium">("coverage");
   const [policyTerm, setPolicyTerm] = useState("10 yrs");
+  const [premiumPaymentYears, setPremiumPaymentYears] = useState("7");
+  const [deathBenefit, setDeathBenefit] = useState("Level");
   const isTermLife = PRODUCT_CATEGORY_BY_ID[selectedProduct] === "TERM LIFE";
+  const isIUL = PRODUCT_CATEGORY_BY_ID[selectedProduct] === "IUL";
   const termMultiplier = isTermLife ? POLICY_TERM_PREMIUM_MULTIPLIERS[policyTerm] : 1;
+  const premiumYearsMultiplier = isIUL ? PREMIUM_PAYMENT_YEARS_MULTIPLIERS[premiumPaymentYears] : 1;
+  const deathBenefitMultiplier = isIUL ? DEATH_BENEFIT_PREMIUM_MULTIPLIERS[deathBenefit] : 1;
+  const planMultiplier = termMultiplier * premiumYearsMultiplier * deathBenefitMultiplier;
 
   const COVERAGE_MIN = coverageMin;
   const COVERAGE_MAX = coverageMax;
   const COVERAGE_PER_PREMIUM_DOLLAR = 2500;
-  const PREMIUM_MIN = (COVERAGE_MIN / COVERAGE_PER_PREMIUM_DOLLAR) * termMultiplier;
-  const PREMIUM_MAX = (COVERAGE_MAX / COVERAGE_PER_PREMIUM_DOLLAR) * termMultiplier;
+  const PREMIUM_MIN = (COVERAGE_MIN / COVERAGE_PER_PREMIUM_DOLLAR) * planMultiplier;
+  const PREMIUM_MAX = (COVERAGE_MAX / COVERAGE_PER_PREMIUM_DOLLAR) * planMultiplier;
 
   const adActive = !isTermLife && adEnabled && adMultiplier != null;
-  const basePremium = Math.round((coverage / 150000) * 60 * termMultiplier * 100) / 100;
+  const basePremium = Math.round((coverage / 150000) * 60 * planMultiplier * 100) / 100;
   const adPremium = adActive ? Math.round(basePremium * adMultiplier * 100) / 100 : 0;
   const totalPremium = basePremium + adPremium;
   const totalCoverage = adActive ? coverage + coverage * adMultiplier : coverage;
@@ -636,7 +642,7 @@ function QuotePanel({
                 step={1}
                 minLabel={fmtPremiumLabel(PREMIUM_MIN)}
                 maxLabel={fmtPremiumLabel(PREMIUM_MAX)}
-                onChange={(premium) => onCoverageChange((premium / termMultiplier) * COVERAGE_PER_PREMIUM_DOLLAR)}
+                onChange={(premium) => onCoverageChange((premium / planMultiplier) * COVERAGE_PER_PREMIUM_DOLLAR)}
               />
             </div>
           </div>
@@ -667,6 +673,73 @@ function QuotePanel({
                     style={{ fontFeatureSettings: '"case" 1' }}
                   >
                     {term}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </>
+        )}
+
+        {isIUL && (
+          <>
+            {/* Divider */}
+            <div className="h-px bg-[#e9e9e9] shrink-0 mx-[-24px]" />
+
+            {/* Premium Payment Years */}
+            <div className="flex flex-col gap-[16px] mt-[8px]">
+              <p
+                className="font-['Theinhardt:Medium',sans-serif] text-[#a9a9a9] text-[12px] leading-[18px] uppercase"
+                style={{ fontFeatureSettings: '"case" 1', letterSpacing: "0.96px" }}
+              >
+                Premium Payment Years
+              </p>
+              <div className="grid grid-cols-3 gap-[12px]">
+                {PREMIUM_PAYMENT_YEARS_OPTIONS.map((opt) => (
+                  <button
+                    key={opt.label}
+                    type="button"
+                    onClick={() => setPremiumPaymentYears(opt.label)}
+                    className={`flex flex-col gap-[4px] p-[12px] rounded-[8px] border text-left transition-colors cursor-pointer ${
+                      premiumPaymentYears === opt.label ? "bg-[#dae7e6] border-[#056257]" : "bg-white border-[#e9e9e9] hover:bg-[#f3f7f7]"
+                    }`}
+                  >
+                    <p
+                      className="font-['Theinhardt:Medium',sans-serif] text-[#272727] text-[16px] leading-[22px]"
+                      style={{ fontFeatureSettings: '"case" 1' }}
+                    >
+                      {opt.label}
+                    </p>
+                    <p
+                      className="font-['Theinhardt:Regular',sans-serif] text-[#7e7e7e] text-[12px] leading-[16px]"
+                      style={{ fontFeatureSettings: '"case" 1' }}
+                    >
+                      {opt.sublabel}
+                    </p>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Death Benefit */}
+            <div className="flex flex-col gap-[16px]">
+              <p
+                className="font-['Theinhardt:Medium',sans-serif] text-[#a9a9a9] text-[12px] leading-[18px] uppercase"
+                style={{ fontFeatureSettings: '"case" 1', letterSpacing: "0.96px" }}
+              >
+                Death Benefit
+              </p>
+              <div className="flex gap-[16px] flex-wrap">
+                {DEATH_BENEFIT_OPTIONS.map((option) => (
+                  <button
+                    key={option}
+                    type="button"
+                    onClick={() => setDeathBenefit(option)}
+                    className={`px-[20px] py-[8px] rounded-[8px] border transition-colors cursor-pointer font-['Theinhardt:Medium',sans-serif] text-[#272727] text-[18px] leading-[28px] ${
+                      deathBenefit === option ? "bg-[#dae7e6] border-[#056257]" : "bg-white border-[#e9e9e9] hover:bg-[#f3f7f7]"
+                    }`}
+                    style={{ fontFeatureSettings: '"case" 1' }}
+                  >
+                    {option}
                   </button>
                 ))}
               </div>
@@ -933,6 +1006,30 @@ const POLICY_TERM_PREMIUM_MULTIPLIERS: Record<string, number> = {
 };
 
 const IUL_STRATEGY_TABS = ["Smart Solve™", "Maximize Cash Value", "Maximize Retirement Income"];
+
+const PREMIUM_PAYMENT_YEARS_OPTIONS: { label: string; sublabel: string }[] = [
+  { label: "7", sublabel: "7 premium payment years" },
+  { label: "10", sublabel: "10 premium payment years" },
+  { label: "15", sublabel: "15 premium payment years" },
+  { label: "20", sublabel: "20 premium payment years" },
+  { label: "Pay till age 65", sublabel: "21 premium payment years" },
+  { label: "Pay for Life", sublabel: "77 premium payment years" },
+];
+const PREMIUM_PAYMENT_YEARS_MULTIPLIERS: Record<string, number> = {
+  "7": 1.8,
+  "10": 1.5,
+  "15": 1.25,
+  "20": 1.1,
+  "Pay till age 65": 1.05,
+  "Pay for Life": 1,
+};
+
+const DEATH_BENEFIT_OPTIONS = ["Level", "Increasing", "Increasing → Switch"];
+const DEATH_BENEFIT_PREMIUM_MULTIPLIERS: Record<string, number> = {
+  "Level": 1,
+  "Increasing": 1.25,
+  "Increasing → Switch": 1.12,
+};
 
 const PRODUCT_CATEGORY_BY_ID: Record<string, string> = {};
 for (const group of PRODUCT_GROUPS) {

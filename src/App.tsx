@@ -2127,6 +2127,7 @@ function QuoteForm({
   const [tabLoading, setTabLoading] = useState(false);
   const [healthExpanded, setHealthExpanded] = useState(false);
   const [criminalExpanded, setCriminalExpanded] = useState(false);
+  const [resourcesExpanded, setResourcesExpanded] = useState(false);
 
   function handleTabChange(i: number) {
     if (i === activeProduct) return;
@@ -2210,8 +2211,37 @@ function QuoteForm({
         </div>
       )}
 
-      {/* Resource links — reflect the active sub-product tab when present */}
-      <ResourceLinksRow links={hasTabs ? (subProductTabConfig?.resourceLinksByTab?.[activeProduct] ?? DEFAULT_RESOURCE_LINKS) : DEFAULT_RESOURCE_LINKS} />
+      {/* Resource links — reflect the active sub-product tab when present.
+          Collapsed behind an accordion for Term Life Insurance - Choice, as a
+          pilot for an alternate resource-links treatment. */}
+      {selectedProduct === "Term Life Insurance - Choice" ? (
+        <div className="flex flex-col gap-[8px]">
+          <button
+            type="button"
+            onClick={() => setResourcesExpanded((v) => !v)}
+            className="flex items-center gap-[6px] bg-transparent border-none p-0 cursor-pointer self-start"
+          >
+            <p
+              className="font-['Theinhardt:Medium',sans-serif] text-[#272727] text-[14px] leading-[20px]"
+              style={{ fontFeatureSettings: '"case" 1' }}
+            >
+              Product resources
+            </p>
+            <img
+              src="assets/d0a41.svg"
+              alt=""
+              width="18"
+              height="18"
+              className={`shrink-0 transition-transform duration-200 ${resourcesExpanded ? "rotate-180" : ""}`}
+            />
+          </button>
+          {resourcesExpanded && (
+            <ResourceLinksRow links={hasTabs ? (subProductTabConfig?.resourceLinksByTab?.[activeProduct] ?? DEFAULT_RESOURCE_LINKS) : DEFAULT_RESOURCE_LINKS} />
+          )}
+        </div>
+      ) : (
+        <ResourceLinksRow links={hasTabs ? (subProductTabConfig?.resourceLinksByTab?.[activeProduct] ?? DEFAULT_RESOURCE_LINKS) : DEFAULT_RESOURCE_LINKS} />
+      )}
 
       {/* Divider */}
       <div className="h-px bg-[#F4F4F4] mx-[-40px]" />

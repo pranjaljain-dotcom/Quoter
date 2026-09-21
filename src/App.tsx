@@ -519,15 +519,16 @@ function QuotePanel({
   const [coverageMode, setCoverageMode] = useState<"coverage" | "premium">("coverage");
   const [policyTerm, setPolicyTerm] = useState("10 yrs");
   const isTermLife = PRODUCT_CATEGORY_BY_ID[selectedProduct] === "TERM LIFE";
+  const termMultiplier = isTermLife ? POLICY_TERM_PREMIUM_MULTIPLIERS[policyTerm] : 1;
 
   const COVERAGE_MIN = coverageMin;
   const COVERAGE_MAX = coverageMax;
   const COVERAGE_PER_PREMIUM_DOLLAR = 2500;
-  const PREMIUM_MIN = COVERAGE_MIN / COVERAGE_PER_PREMIUM_DOLLAR;
-  const PREMIUM_MAX = COVERAGE_MAX / COVERAGE_PER_PREMIUM_DOLLAR;
+  const PREMIUM_MIN = (COVERAGE_MIN / COVERAGE_PER_PREMIUM_DOLLAR) * termMultiplier;
+  const PREMIUM_MAX = (COVERAGE_MAX / COVERAGE_PER_PREMIUM_DOLLAR) * termMultiplier;
 
   const adActive = adEnabled && adMultiplier != null;
-  const basePremium = Math.round((coverage / 150000) * 60 * 100) / 100;
+  const basePremium = Math.round((coverage / 150000) * 60 * termMultiplier * 100) / 100;
   const adPremium = adActive ? Math.round(basePremium * adMultiplier * 100) / 100 : 0;
   const totalPremium = basePremium + adPremium;
   const totalCoverage = adActive ? coverage + coverage * adMultiplier : coverage;
@@ -635,7 +636,7 @@ function QuotePanel({
                 step={1}
                 minLabel={fmtPremiumLabel(PREMIUM_MIN)}
                 maxLabel={fmtPremiumLabel(PREMIUM_MAX)}
-                onChange={(premium) => onCoverageChange(premium * COVERAGE_PER_PREMIUM_DOLLAR)}
+                onChange={(premium) => onCoverageChange((premium / termMultiplier) * COVERAGE_PER_PREMIUM_DOLLAR)}
               />
             </div>
           </div>
@@ -644,7 +645,7 @@ function QuotePanel({
         {isTermLife && (
           <>
             {/* Divider */}
-            <div className="h-px bg-[#e9e9e9] shrink-0" />
+            <div className="h-px bg-[#e9e9e9] shrink-0 mx-[-24px]" />
 
             {/* Policy Term */}
             <div className="flex flex-col gap-[16px]">
@@ -661,7 +662,7 @@ function QuotePanel({
                     type="button"
                     onClick={() => setPolicyTerm(term)}
                     className={`px-[20px] py-[8px] rounded-[8px] border transition-colors cursor-pointer font-['Theinhardt:Medium',sans-serif] text-[#272727] text-[18px] leading-[28px] ${
-                      policyTerm === term ? "bg-[#dae7e6] border-[#056257]" : "bg-[#f3f7f7] border-[#d4d4d4] hover:bg-[#eaf1f0]"
+                      policyTerm === term ? "bg-[#dae7e6] border-[#056257]" : "bg-white border-[#e9e9e9] hover:bg-[#f3f7f7]"
                     }`}
                     style={{ fontFeatureSettings: '"case" 1' }}
                   >
@@ -921,6 +922,13 @@ const STATE_OPTIONS = [
 ];
 
 const POLICY_TERM_OPTIONS = ["10 yrs", "15 yrs", "20 yrs", "25 yrs", "30 yrs"];
+const POLICY_TERM_PREMIUM_MULTIPLIERS: Record<string, number> = {
+  "10 yrs": 1,
+  "15 yrs": 1.15,
+  "20 yrs": 1.3,
+  "25 yrs": 1.45,
+  "30 yrs": 1.6,
+};
 
 const PRODUCT_CATEGORY_BY_ID: Record<string, string> = {};
 for (const group of PRODUCT_GROUPS) {

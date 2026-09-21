@@ -1963,11 +1963,15 @@ function ResourceLinksRow({ links }: { links: { label: string; href: string }[] 
   );
 }
 
-function DocumentIcon({ size = 18 }: { size?: number }) {
+function ProductResourcesIcon({ size = 18 }: { size?: number }) {
+  const width = Math.round(size * (46.4945 / 59.7116) * 10) / 10;
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className="shrink-0">
-      <path d="M7 3h7l5 5v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Z" stroke="#336cc3" strokeWidth="1.6" strokeLinejoin="round" />
-      <path d="M14 3v5h5" stroke="#336cc3" strokeWidth="1.6" strokeLinejoin="round" />
+    <svg width={width} height={size} viewBox="0 0 46.4945 59.7116" fill="none" className="shrink-0">
+      <path d="M1.02102 54.421H1.01525V8.16907C1.01525 4.21715 4.09602 1.01525 7.90371 1.01525H9.85948V49.8575" stroke="#336cc3" strokeWidth="2.01923" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M5.43462 49.8578H45.4788V54.4905C45.4788 56.8155 43.5923 58.702 41.2673 58.702H5.43462C2.99423 58.702 1.00962 56.7174 1.00962 54.277C1.00962 51.8366 2.98846 49.852 5.43462 49.852V49.8578Z" stroke="#336cc3" strokeWidth="2.01923" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M43.4137 1.00962C44.556 1.00962 45.4849 1.93844 45.4849 3.08075V49.7942H9.91756V1.00962H43.4137Z" stroke="#336cc3" strokeWidth="2.01923" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M36.9288 10.8635H17.4346C17.2849 10.8635 17.1635 10.9849 17.1635 11.1346V17.2731C17.1635 17.4229 17.2849 17.5443 17.4346 17.5443H36.9288C37.0786 17.5443 37.2 17.4229 37.2 17.2731V11.1346C37.2 10.9849 37.0786 10.8635 36.9288 10.8635Z" stroke="#336cc3" strokeWidth="2.01923" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M6.54222 54.4212H44.3884" stroke="#336cc3" strokeWidth="2.01923" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
@@ -2022,7 +2026,7 @@ function ProductResourcesPanel({ open, onClose, links }: { open: boolean; onClos
             >
               <div className="flex items-center gap-[12px] min-w-0">
                 <div className="shrink-0 size-[36px] rounded-[8px] bg-[#f5f8fc] flex items-center justify-center">
-                  <DocumentIcon />
+                  <ProductResourcesIcon size={16} />
                 </div>
                 <p
                   className="font-['Theinhardt:Medium',sans-serif] text-[#272727] text-[14px] leading-[20px] truncate"
@@ -2351,7 +2355,7 @@ function QuoteForm({
           >
             Product resources
           </p>
-          <DocumentIcon size={16} />
+          <ProductResourcesIcon size={16} />
         </button>
       ) : (
         <ResourceLinksRow links={activeResourceLinks} />

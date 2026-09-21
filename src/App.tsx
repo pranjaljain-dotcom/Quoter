@@ -932,6 +932,8 @@ const POLICY_TERM_PREMIUM_MULTIPLIERS: Record<string, number> = {
   "30 yrs": 1.6,
 };
 
+const IUL_STRATEGY_TABS = ["Smart Solve™", "Maximize Cash Value", "Maximize Retirement Income"];
+
 const PRODUCT_CATEGORY_BY_ID: Record<string, string> = {};
 for (const group of PRODUCT_GROUPS) {
   for (const product of group.products) {
@@ -2679,6 +2681,7 @@ export default function App() {
   const [clientName, setClientName] = useState("");
   const [knockoutHealth, setKnockoutHealth] = useState(false);
   const [knockoutCriminal, setKnockoutCriminal] = useState(false);
+  const [iulStrategyTab, setIulStrategyTab] = useState(0);
 
   const handleProductSelect = (name: string) => {
     const cfg = getProductConfig(name);
@@ -2702,6 +2705,7 @@ export default function App() {
     setKnockoutCriminal(false);
     setAdEnabled(false);
     setAdMultiplier(null);
+    setIulStrategyTab(0);
     setTimeout(() => setProductLoading(false), 700);
   };
 
@@ -2876,21 +2880,46 @@ export default function App() {
           {/* Right: quote visualizer */}
           <div className={`shrink-0 bg-[#E6EFEE] border-l border-[#d4d4d4] overflow-y-scroll flex flex-col transition-[width] duration-500 ease-in-out ${quoteGenerated || subProductQuoteLoading ? "w-[clamp(600px,47vw,900px)]" : "w-[clamp(480px,calc(25vw_+_160px),640px)]"}`}>
             {/* Panel header */}
-            <div className="sticky top-0 z-10 shrink-0 bg-white px-[24px] py-[16px] flex items-center justify-between gap-[32px] border-b border-[#e9e9e9]">
-              <p
-                className="min-w-0 flex-1 font-['Theinhardt:Medium',sans-serif] text-[#272727] text-[18px] leading-[26px]"
-                style={{ fontFeatureSettings: '"case" 1' }}
-              >
-                {withTrustageTrademark(activeSubProductName)} Estimate
-              </p>
-              <button
-                type="button"
-                onClick={() => setShowCompareIllustration(true)}
-                className="shrink-0 whitespace-nowrap font-['Theinhardt:Medium',sans-serif] text-[#865323] text-[16px] leading-[24px] underline decoration-dotted underline-offset-2 cursor-pointer"
-                style={{ fontFeatureSettings: '"case" 1' }}
-              >
-                Compare Illustration
-              </button>
+            <div className="sticky top-0 z-10 shrink-0 bg-white flex flex-col border-b border-[#e9e9e9]">
+              <div className="px-[24px] py-[16px] flex items-center justify-between gap-[32px]">
+                <p
+                  className="min-w-0 flex-1 font-['Theinhardt:Medium',sans-serif] text-[#272727] text-[18px] leading-[26px]"
+                  style={{ fontFeatureSettings: '"case" 1' }}
+                >
+                  {withTrustageTrademark(activeSubProductName)} Estimate
+                </p>
+                <button
+                  type="button"
+                  onClick={() => setShowCompareIllustration(true)}
+                  className="shrink-0 whitespace-nowrap font-['Theinhardt:Medium',sans-serif] text-[#865323] text-[16px] leading-[24px] underline decoration-dotted underline-offset-2 cursor-pointer"
+                  style={{ fontFeatureSettings: '"case" 1' }}
+                >
+                  Compare Illustration
+                </button>
+              </div>
+              {PRODUCT_CATEGORY_BY_ID[selectedProduct] === "IUL" && (quoteGenerated || subProductQuoteLoading) && (
+                <div className="px-[24px] pb-[16px]">
+                  <div className="relative grid grid-cols-3 bg-[#f3f7f7] rounded-full p-[4px]">
+                    <div
+                      className="absolute top-[4px] bottom-[4px] left-[4px] rounded-full bg-white shadow-[0px_1px_2px_0px_rgba(16,24,40,0.08)] transition-transform duration-300 ease-in-out"
+                      style={{ width: "calc(33.333% - 2.667px)", transform: `translateX(${iulStrategyTab * 100}%)` }}
+                    />
+                    {IUL_STRATEGY_TABS.map((label, i) => (
+                      <button
+                        key={label}
+                        type="button"
+                        onClick={() => setIulStrategyTab(i)}
+                        className={`relative z-10 w-full h-[36px] rounded-full px-[12px] text-center border-none bg-transparent transition-colors cursor-pointer font-['Theinhardt:Medium',sans-serif] text-[13px] leading-[18px] truncate ${
+                          iulStrategyTab === i ? "text-[#056257]" : "text-[#525252] hover:text-[#272727]"
+                        }`}
+                        style={{ fontFeatureSettings: '"case" 1', letterSpacing: "-0.13px" }}
+                      >
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
             <div className="flex-1 px-[24px] py-[32px]">
               {subProductQuoteLoading ? (

@@ -349,11 +349,11 @@ function SelectField({ label, value, options, onChange, placeholder, labelLink, 
                   >
                     <div className="flex-1 pl-[8px] pr-[10px] py-[10px] rounded-[6px]">
                       <p
-                        className={`${typeof o !== "string" && !isDisabledOpt ? "font-['Theinhardt:Medium',sans-serif]" : "font-['Theinhardt:Regular',sans-serif]"} ${isDisabledOpt ? "text-[#b0b0b0]" : "text-[#272727]"} text-[16px] leading-[24px]`}
+                        className={`${typeof o !== "string" && !isDisabledOpt && (o.health || o.bmi) ? "font-['Theinhardt:Medium',sans-serif]" : "font-['Theinhardt:Regular',sans-serif]"} ${isDisabledOpt ? "text-[#b0b0b0]" : "text-[#272727]"} text-[16px] leading-[24px]`}
                         style={{ fontFeatureSettings: '"case" 1' }}
                       >
                         {optValue(o)}
-                        {isDisabledOpt && typeof o !== "string" && o.note && ` ${o.note}`}
+                        {typeof o !== "string" && o.note && ` ${o.note}`}
                       </p>
                       {typeof o !== "string" && !isDisabledOpt && (o.health || o.bmi) && (
                         <p
@@ -400,12 +400,14 @@ function TextField({ label, value, placeholder, onChange, suffix, dateMask, type
 
   return (
     <div className="flex flex-col gap-[4px] items-start w-full">
-      <label
-        className="font-['Theinhardt:Medium',sans-serif] text-[#525252] text-[16px] leading-[24px]"
-        style={{ fontFeatureSettings: '"case" 1' }}
-      >
-        {label}
-      </label>
+      {label && (
+        <label
+          className="font-['Theinhardt:Medium',sans-serif] text-[#525252] text-[16px] leading-[24px]"
+          style={{ fontFeatureSettings: '"case" 1' }}
+        >
+          {label}
+        </label>
+      )}
       <div className={`relative rounded-[8px] border w-full h-[56px] flex items-center px-[14px] ${disabled ? "bg-[#f4f4f4] border-[#e9e9e9]" : "bg-white border-[#d4d4d4]"}`}>
         <input
           type={dateMask ? "text" : type}
@@ -661,7 +663,7 @@ function QuotePanel({
         {isTermLife && (
           <>
             {/* Divider */}
-            <div className="h-px bg-[#e9e9e9] shrink-0 mx-[-24px]" />
+            <div className="h-px bg-[#e9e9e9] shrink-0 mx-[-24px] mt-[8px]" />
 
             {/* Policy Term */}
             <div className="flex flex-col gap-[16px] mt-[8px]">
@@ -693,10 +695,10 @@ function QuotePanel({
         {isIUL && (
           <>
             {/* Divider */}
-            <div className="h-px bg-[#e9e9e9] shrink-0 mx-[-24px]" />
+            <div className="h-px bg-[#e9e9e9] shrink-0 mx-[-24px] mt-[8px]" />
 
             {/* Premium Payment Years */}
-            <div className="flex flex-col gap-[16px] mt-[8px]">
+            <div className="flex flex-col gap-[8px] mt-[8px]">
               <p
                 className="font-['Theinhardt:Medium',sans-serif] text-[#a9a9a9] text-[12px] leading-[18px] uppercase"
                 style={{ fontFeatureSettings: '"case" 1', letterSpacing: "0.96px" }}
@@ -707,7 +709,13 @@ function QuotePanel({
                 <SelectField
                   label=""
                   value={premiumPaymentYears}
-                  options={PREMIUM_PAYMENT_YEARS_OPTIONS.map((opt) => opt.label)}
+                  options={PREMIUM_PAYMENT_YEARS_OPTIONS.map((opt) =>
+                    opt.label === "Pay till age 65"
+                      ? { value: opt.label, note: "(18 premium years)" }
+                      : opt.label === "Pay for Life"
+                      ? { value: opt.label, note: "(77 premium years)" }
+                      : opt.label
+                  )}
                   onChange={setPremiumPaymentYears}
                 />
               ) : (
@@ -741,18 +749,30 @@ function QuotePanel({
 
             {isMaximizeRetirement && (
               <div className="flex gap-[16px]">
-                <div className="flex-1">
+                <div className="flex-1 flex flex-col gap-[8px]">
+                  <p
+                    className="font-['Theinhardt:Medium',sans-serif] text-[#a9a9a9] text-[12px] leading-[18px] uppercase"
+                    style={{ fontFeatureSettings: '"case" 1', letterSpacing: "0.96px" }}
+                  >
+                    Retirement Year
+                  </p>
                   <TextField
-                    label="Retirement Year"
+                    label=""
                     value={retirementYear}
                     onChange={setRetirementYear}
                     placeholder="e.g. 65"
                     type="number"
                   />
                 </div>
-                <div className="flex-1">
+                <div className="flex-1 flex flex-col gap-[8px]">
+                  <p
+                    className="font-['Theinhardt:Medium',sans-serif] text-[#a9a9a9] text-[12px] leading-[18px] uppercase"
+                    style={{ fontFeatureSettings: '"case" 1', letterSpacing: "0.96px" }}
+                  >
+                    Years to Withdraw Money
+                  </p>
                   <TextField
-                    label="Years to Withdraw Money"
+                    label=""
                     value={withdrawYears}
                     onChange={setWithdrawYears}
                     placeholder="e.g. 20"
@@ -1090,7 +1110,7 @@ const PREMIUM_PAYMENT_YEARS_OPTIONS: { label: string; sublabel: string }[] = [
   { label: "10", sublabel: "10 premium payment years" },
   { label: "15", sublabel: "15 premium payment years" },
   { label: "20", sublabel: "20 premium payment years" },
-  { label: "Pay till age 65", sublabel: "21 premium payment years" },
+  { label: "Pay till age 65", sublabel: "18 premium payment years" },
   { label: "Pay for Life", sublabel: "77 premium payment years" },
 ];
 const PREMIUM_PAYMENT_YEARS_MULTIPLIERS: Record<string, number> = {

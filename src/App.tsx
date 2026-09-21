@@ -935,6 +935,40 @@ function QuotePanel({
             {fmt(totalCoverage)}
           </p>
         </div>
+
+        {isIUL && (
+          <>
+            <div className="flex items-center justify-between gap-[12px]">
+              <p
+                className="font-['Theinhardt:Regular',sans-serif] text-[#7e7e7e] text-[14px] leading-[20px]"
+                style={{ fontFeatureSettings: '"case" 1' }}
+              >
+                Guaranteed Cash value at 77 yrs age
+              </p>
+              <p
+                className="font-['Theinhardt:Regular',sans-serif] text-[#7e7e7e] text-[14px] leading-[20px] shrink-0"
+                style={{ fontFeatureSettings: '"case" 1' }}
+              >
+                $0
+              </p>
+            </div>
+            <div className="flex items-center justify-between gap-[12px]">
+              <p
+                className="font-['Theinhardt:Regular',sans-serif] text-[#7e7e7e] text-[14px] leading-[20px]"
+                style={{ fontFeatureSettings: '"case" 1' }}
+              >
+                Non-guaranteed Cash value at 77 yrs age
+              </p>
+              <p
+                className="font-['Theinhardt:Regular',sans-serif] text-[#7e7e7e] text-[14px] leading-[20px] shrink-0"
+                style={{ fontFeatureSettings: '"case" 1' }}
+              >
+                {fmt(totalCoverage + 15000)}
+              </p>
+            </div>
+          </>
+        )}
+
         <div className="flex items-start justify-between gap-[12px]">
           <p
             className="font-['Theinhardt:Medium',sans-serif] text-[#272727] text-[18px] leading-[28px]"

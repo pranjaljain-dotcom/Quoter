@@ -228,6 +228,7 @@ function SelectField({ label, value, options, onChange, placeholder, labelLink, 
 
   return (
     <div className="flex flex-col gap-[4px] items-start relative w-full" ref={ref}>
+      {label && (
       <div className="flex items-center justify-between w-full gap-[8px]">
         <label
           className="font-['Theinhardt:Medium',sans-serif] text-[#525252] text-[16px] leading-[24px]"
@@ -262,6 +263,7 @@ function SelectField({ label, value, options, onChange, placeholder, labelLink, 
           </a>
         ))}
       </div>
+      )}
       <div className="relative w-full">
         {searchable ? (
           <div
@@ -504,6 +506,7 @@ function QuotePanel({
   onAdToggle,
   adMultiplier,
   onAdMultiplierChange,
+  iulStrategyTab,
 }: {
   coverage: number;
   onCoverageChange: (v: number) => void;
@@ -515,13 +518,20 @@ function QuotePanel({
   onAdToggle: () => void;
   adMultiplier: number | null;
   onAdMultiplierChange: (v: number) => void;
+  iulStrategyTab: number;
 }) {
   const [coverageMode, setCoverageMode] = useState<"coverage" | "premium">("coverage");
   const [policyTerm, setPolicyTerm] = useState("10 yrs");
   const [premiumPaymentYears, setPremiumPaymentYears] = useState("7");
   const [deathBenefit, setDeathBenefit] = useState("Level");
+  const [retirementYear, setRetirementYear] = useState("");
+  const [withdrawYears, setWithdrawYears] = useState("");
   const isTermLife = PRODUCT_CATEGORY_BY_ID[selectedProduct] === "TERM LIFE";
   const isIUL = PRODUCT_CATEGORY_BY_ID[selectedProduct] === "IUL";
+  const isMaximizeRetirement = isIUL && iulStrategyTab === 2;
+  // Smart Solve and Maximize Retirement Income share the dropdown + Death Benefit card layout;
+  // Maximize Cash Value keeps the original pills + AD-toggle layout.
+  const usesDeathBenefitCard = isIUL && (iulStrategyTab === 0 || iulStrategyTab === 2);
   const termMultiplier = isTermLife ? POLICY_TERM_PREMIUM_MULTIPLIERS[policyTerm] : 1;
   const premiumYearsMultiplier = isIUL ? PREMIUM_PAYMENT_YEARS_MULTIPLIERS[premiumPaymentYears] : 1;
   const deathBenefitMultiplier = isIUL ? DEATH_BENEFIT_PREMIUM_MULTIPLIERS[deathBenefit] : 1;
@@ -533,7 +543,7 @@ function QuotePanel({
   const PREMIUM_MIN = (COVERAGE_MIN / COVERAGE_PER_PREMIUM_DOLLAR) * planMultiplier;
   const PREMIUM_MAX = (COVERAGE_MAX / COVERAGE_PER_PREMIUM_DOLLAR) * planMultiplier;
 
-  const adActive = !isTermLife && adEnabled && adMultiplier != null;
+  const adActive = !isTermLife && !usesDeathBenefitCard && adEnabled && adMultiplier != null;
   const basePremium = Math.round((coverage / 150000) * 60 * planMultiplier * 100) / 100;
   const adPremium = adActive ? Math.round(basePremium * adMultiplier * 100) / 100 : 0;
   const totalPremium = basePremium + adPremium;
@@ -693,63 +703,131 @@ function QuotePanel({
               >
                 Premium Payment Years
               </p>
-              <div className="grid grid-cols-3 gap-[12px]">
-                {PREMIUM_PAYMENT_YEARS_OPTIONS.map((opt) => (
-                  <button
-                    key={opt.label}
-                    type="button"
-                    onClick={() => setPremiumPaymentYears(opt.label)}
-                    className={`flex flex-col gap-[4px] p-[12px] rounded-[8px] border text-left transition-colors cursor-pointer ${
-                      premiumPaymentYears === opt.label ? "bg-[#dae7e6] border-[#056257]" : "bg-white border-[#e9e9e9] hover:bg-[#f3f7f7]"
-                    }`}
-                  >
-                    <p
-                      className="font-['Theinhardt:Medium',sans-serif] text-[#272727] text-[16px] leading-[22px]"
-                      style={{ fontFeatureSettings: '"case" 1' }}
+              {usesDeathBenefitCard ? (
+                <SelectField
+                  label=""
+                  value={premiumPaymentYears}
+                  options={PREMIUM_PAYMENT_YEARS_OPTIONS.map((opt) => opt.label)}
+                  onChange={setPremiumPaymentYears}
+                />
+              ) : (
+                <div className="grid grid-cols-3 gap-[12px]">
+                  {PREMIUM_PAYMENT_YEARS_OPTIONS.map((opt) => (
+                    <button
+                      key={opt.label}
+                      type="button"
+                      onClick={() => setPremiumPaymentYears(opt.label)}
+                      className={`flex flex-col gap-[4px] p-[12px] rounded-[8px] border text-left transition-colors cursor-pointer ${
+                        premiumPaymentYears === opt.label ? "bg-[#dae7e6] border-[#056257]" : "bg-white border-[#e9e9e9] hover:bg-[#f3f7f7]"
+                      }`}
                     >
-                      {opt.label}
-                    </p>
-                    <p
-                      className="font-['Theinhardt:Regular',sans-serif] text-[#7e7e7e] text-[12px] leading-[16px]"
-                      style={{ fontFeatureSettings: '"case" 1' }}
-                    >
-                      {opt.sublabel}
-                    </p>
-                  </button>
-                ))}
-              </div>
+                      <p
+                        className="font-['Theinhardt:Medium',sans-serif] text-[#272727] text-[16px] leading-[22px]"
+                        style={{ fontFeatureSettings: '"case" 1' }}
+                      >
+                        {opt.label}
+                      </p>
+                      <p
+                        className="font-['Theinhardt:Regular',sans-serif] text-[#7e7e7e] text-[12px] leading-[16px]"
+                        style={{ fontFeatureSettings: '"case" 1' }}
+                      >
+                        {opt.sublabel}
+                      </p>
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
 
-            {/* Death Benefit */}
-            <div className="flex flex-col gap-[16px]">
-              <p
-                className="font-['Theinhardt:Medium',sans-serif] text-[#a9a9a9] text-[12px] leading-[18px] uppercase"
-                style={{ fontFeatureSettings: '"case" 1', letterSpacing: "0.96px" }}
-              >
-                Death Benefit
-              </p>
-              <div className="flex gap-[16px] flex-wrap">
-                {DEATH_BENEFIT_OPTIONS.map((option) => (
-                  <button
-                    key={option}
-                    type="button"
-                    onClick={() => setDeathBenefit(option)}
-                    className={`px-[20px] py-[8px] rounded-[8px] border transition-colors cursor-pointer font-['Theinhardt:Medium',sans-serif] text-[#272727] text-[18px] leading-[28px] ${
-                      deathBenefit === option ? "bg-[#dae7e6] border-[#056257]" : "bg-white border-[#e9e9e9] hover:bg-[#f3f7f7]"
-                    }`}
-                    style={{ fontFeatureSettings: '"case" 1' }}
-                  >
-                    {option}
-                  </button>
-                ))}
+            {isMaximizeRetirement && (
+              <div className="flex gap-[16px]">
+                <div className="flex-1">
+                  <TextField
+                    label="Retirement Year"
+                    value={retirementYear}
+                    onChange={setRetirementYear}
+                    placeholder="e.g. 65"
+                    type="number"
+                  />
+                </div>
+                <div className="flex-1">
+                  <TextField
+                    label="Years to Withdraw Money"
+                    value={withdrawYears}
+                    onChange={setWithdrawYears}
+                    placeholder="e.g. 20"
+                    type="number"
+                  />
+                </div>
               </div>
-            </div>
+            )}
+
+            {!usesDeathBenefitCard && (
+              <div className="flex flex-col gap-[16px]">
+                <p
+                  className="font-['Theinhardt:Medium',sans-serif] text-[#a9a9a9] text-[12px] leading-[18px] uppercase"
+                  style={{ fontFeatureSettings: '"case" 1', letterSpacing: "0.96px" }}
+                >
+                  Death Benefit
+                </p>
+                <div className="flex gap-[16px] flex-wrap">
+                  {DEATH_BENEFIT_OPTIONS.map((option) => (
+                    <button
+                      key={option}
+                      type="button"
+                      onClick={() => setDeathBenefit(option)}
+                      className={`px-[20px] py-[8px] rounded-[8px] border transition-colors cursor-pointer font-['Theinhardt:Medium',sans-serif] text-[#272727] text-[18px] leading-[28px] ${
+                        deathBenefit === option ? "bg-[#dae7e6] border-[#056257]" : "bg-white border-[#e9e9e9] hover:bg-[#f3f7f7]"
+                      }`}
+                      style={{ fontFeatureSettings: '"case" 1' }}
+                    >
+                      {option}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
           </>
         )}
       </div>
 
-      {/* AD coverage card — not offered on Term Life products */}
-      {!isTermLife && (
+      {/* Death Benefit card — Smart Solve and Maximize Retirement Income repurpose the AD card's slot, without the toggle */}
+      {usesDeathBenefitCard && (
+        <div className="bg-white rounded-[8px] border border-[#e9e9e9] p-[24px] flex flex-col gap-[16px]">
+          <div className="flex flex-col gap-[4px]">
+            <p
+              className="font-['Theinhardt:Medium',sans-serif] text-[#272727] text-[18px] leading-[26px]"
+              style={{ fontFeatureSettings: '"case" 1' }}
+            >
+              Death Benefit
+            </p>
+            <p
+              className="font-['Theinhardt:Regular',sans-serif] text-[#7e7e7e] text-[16px] leading-[24px]"
+              style={{ fontFeatureSettings: '"case" 1' }}
+            >
+              Choose how your client's death benefit changes over time.
+            </p>
+          </div>
+          <div className="flex gap-[16px] flex-wrap">
+            {DEATH_BENEFIT_OPTIONS.map((option) => (
+              <button
+                key={option}
+                type="button"
+                onClick={() => setDeathBenefit(option)}
+                className={`px-[20px] py-[8px] rounded-[8px] border transition-colors cursor-pointer font-['Theinhardt:Medium',sans-serif] text-[#272727] text-[18px] leading-[28px] ${
+                  deathBenefit === option ? "bg-[#dae7e6] border-[#056257]" : "bg-white border-[#e9e9e9] hover:bg-[#f3f7f7]"
+                }`}
+                style={{ fontFeatureSettings: '"case" 1' }}
+              >
+                {option}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* AD coverage card — not offered on Term Life products, or when the Death Benefit card above supersedes it */}
+      {!isTermLife && !usesDeathBenefitCard && (
         <div className="bg-white rounded-[8px] border border-[#e9e9e9] p-[24px] flex flex-col gap-[16px]">
           <div className="flex items-center justify-between gap-[16px]">
             <div className="flex flex-col gap-[4px]">
@@ -3054,6 +3132,7 @@ export default function App() {
                   }}
                   adMultiplier={adMultiplier}
                   onAdMultiplierChange={setAdMultiplier}
+                  iulStrategyTab={iulStrategyTab}
                 />
               ) : (
                 <div className="flex flex-col items-center justify-center h-full min-h-[400px] gap-[12px] text-center px-[24px]">

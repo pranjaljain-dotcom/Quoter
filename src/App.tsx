@@ -527,7 +527,7 @@ function QuotePanel({
   const PREMIUM_MIN = (COVERAGE_MIN / COVERAGE_PER_PREMIUM_DOLLAR) * termMultiplier;
   const PREMIUM_MAX = (COVERAGE_MAX / COVERAGE_PER_PREMIUM_DOLLAR) * termMultiplier;
 
-  const adActive = adEnabled && adMultiplier != null;
+  const adActive = !isTermLife && adEnabled && adMultiplier != null;
   const basePremium = Math.round((coverage / 150000) * 60 * termMultiplier * 100) / 100;
   const adPremium = adActive ? Math.round(basePremium * adMultiplier * 100) / 100 : 0;
   const totalPremium = basePremium + adPremium;
@@ -675,76 +675,78 @@ function QuotePanel({
         )}
       </div>
 
-      {/* AD coverage card */}
-      <div className="bg-white rounded-[8px] border border-[#e9e9e9] p-[24px] flex flex-col gap-[16px]">
-        <div className="flex items-center justify-between gap-[16px]">
-          <div className="flex flex-col gap-[4px]">
-            <p
-              className="font-['Theinhardt:Medium',sans-serif] text-[#272727] text-[18px] leading-[26px]"
-              style={{ fontFeatureSettings: '"case" 1' }}
-            >
-              Accidental Death (AD) coverage
-            </p>
-            <p
-              className="font-['Theinhardt:Regular',sans-serif] text-[#7e7e7e] text-[16px] leading-[24px]"
-              style={{ fontFeatureSettings: '"case" 1' }}
-            >
-              Multiply your client's cover in case of an accident.
-            </p>
-          </div>
-          <button
-            onClick={onAdToggle}
-            className={`relative shrink-0 w-[54px] h-[26px] rounded-[13px] transition-colors cursor-pointer border-none ${
-              adEnabled ? "bg-[#056257]" : "bg-[#d4d4d4]"
-            }`}
-          >
-            <div
-              className={`absolute top-[2px] size-[22px] rounded-full bg-white shadow-sm transition-transform ${
-                adEnabled ? "translate-x-[28px]" : "translate-x-[2px]"
+      {/* AD coverage card — not offered on Term Life products */}
+      {!isTermLife && (
+        <div className="bg-white rounded-[8px] border border-[#e9e9e9] p-[24px] flex flex-col gap-[16px]">
+          <div className="flex items-center justify-between gap-[16px]">
+            <div className="flex flex-col gap-[4px]">
+              <p
+                className="font-['Theinhardt:Medium',sans-serif] text-[#272727] text-[18px] leading-[26px]"
+                style={{ fontFeatureSettings: '"case" 1' }}
+              >
+                Accidental Death (AD) coverage
+              </p>
+              <p
+                className="font-['Theinhardt:Regular',sans-serif] text-[#7e7e7e] text-[16px] leading-[24px]"
+                style={{ fontFeatureSettings: '"case" 1' }}
+              >
+                Multiply your client's cover in case of an accident.
+              </p>
+            </div>
+            <button
+              onClick={onAdToggle}
+              className={`relative shrink-0 w-[54px] h-[26px] rounded-[13px] transition-colors cursor-pointer border-none ${
+                adEnabled ? "bg-[#056257]" : "bg-[#d4d4d4]"
               }`}
-            />
-          </button>
-        </div>
-        <div
-          className="grid transition-all duration-300 ease-in-out"
-          style={{
-            gridTemplateRows: adEnabled ? "1fr" : "0fr",
-            marginTop: adEnabled ? "0px" : "-16px",
-          }}
-        >
-          <div className="overflow-hidden">
-            <div className="flex gap-[8px] pt-[0px]">
-              {[1, 2, 3].map((multiplier) => {
-                const isSelected = multiplier === adMultiplier;
-                return (
-                  <button
-                    key={multiplier}
-                    onClick={() => onAdMultiplierChange(multiplier)}
-                    className={`flex-1 flex flex-col gap-[4px] p-[12px] rounded-[8px] border text-left cursor-pointer transition-colors ${
-                      isSelected
-                        ? "bg-[#dae7e6] border-[#056257]"
-                        : "bg-white border-[#e9e9e9] hover:bg-[#f3f7f7]"
-                    }`}
-                  >
-                    <p
-                      className="font-['Theinhardt:Regular',sans-serif] text-[#525252] text-[12px] leading-[16px]"
-                      style={{ fontFeatureSettings: '"case" 1' }}
+            >
+              <div
+                className={`absolute top-[2px] size-[22px] rounded-full bg-white shadow-sm transition-transform ${
+                  adEnabled ? "translate-x-[28px]" : "translate-x-[2px]"
+                }`}
+              />
+            </button>
+          </div>
+          <div
+            className="grid transition-all duration-300 ease-in-out"
+            style={{
+              gridTemplateRows: adEnabled ? "1fr" : "0fr",
+              marginTop: adEnabled ? "0px" : "-16px",
+            }}
+          >
+            <div className="overflow-hidden">
+              <div className="flex gap-[8px] pt-[0px]">
+                {[1, 2, 3].map((multiplier) => {
+                  const isSelected = multiplier === adMultiplier;
+                  return (
+                    <button
+                      key={multiplier}
+                      onClick={() => onAdMultiplierChange(multiplier)}
+                      className={`flex-1 flex flex-col gap-[4px] p-[12px] rounded-[8px] border text-left cursor-pointer transition-colors ${
+                        isSelected
+                          ? "bg-[#dae7e6] border-[#056257]"
+                          : "bg-white border-[#e9e9e9] hover:bg-[#f3f7f7]"
+                      }`}
                     >
-                      {multiplier}x of Term
-                    </p>
-                    <p
-                      className="font-['Theinhardt:Medium',sans-serif] text-[#272727] text-[18px] leading-[22px]"
-                      style={{ fontFeatureSettings: '"case" 1' }}
-                    >
-                      {adCoverageValue(multiplier)}
-                    </p>
-                  </button>
-                );
-              })}
+                      <p
+                        className="font-['Theinhardt:Regular',sans-serif] text-[#525252] text-[12px] leading-[16px]"
+                        style={{ fontFeatureSettings: '"case" 1' }}
+                      >
+                        {multiplier}x of Term
+                      </p>
+                      <p
+                        className="font-['Theinhardt:Medium',sans-serif] text-[#272727] text-[18px] leading-[22px]"
+                        style={{ fontFeatureSettings: '"case" 1' }}
+                      >
+                        {adCoverageValue(multiplier)}
+                      </p>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* Totals card */}
       <div className="bg-white rounded-[8px] border border-[#e9e9e9] p-[24px] flex flex-col gap-[16px]">
@@ -2619,6 +2621,8 @@ export default function App() {
     setQuoteLoading(false);
     setKnockoutHealth(false);
     setKnockoutCriminal(false);
+    setAdEnabled(false);
+    setAdMultiplier(null);
     setTimeout(() => setProductLoading(false), 700);
   };
 

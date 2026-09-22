@@ -2003,7 +2003,7 @@ function CompareIllustrationPanel({ open, onClose, currentQuote, healthClass, cl
                     Competitor Analysis
                   </p>
                   <a
-                    href="file:///Users/pranjal.jain/Downloads/ethos-agent-brief-jordan-avery%20(1).html"
+                    href="assets/ethos-agent-brief-jordan-avery.pdf"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="shrink-0 font-['Theinhardt:Medium',sans-serif] text-[#865323] text-[14px] leading-[20px] underline decoration-dotted underline-offset-2 cursor-pointer"

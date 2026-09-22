@@ -2338,7 +2338,49 @@ const CRIMINAL_KNOCKOUT_ITEMS: KnockoutItem[] = [
   { label: "Illegal drug use, drug or alcohol abuse in the last 5 years" },
 ];
 
-/* IUL advanced options — replaces the generic knockout sections for IUL products */
+/* IUL-specific knockout categories — used for IUL products other than Accumulation IUL
+   (Accumulation IUL uses the IUL Advanced Options accordions below instead). */
+const IUL_DIABETES_KNOCKOUT_ITEMS: KnockoutItem[] = [
+  { label: "Current age under 30" },
+  { label: "BMI over 41.49" },
+  { label: "A1C over 9.5, or no A1C testing within the last 12 months" },
+  { label: "Diabetic complications", detail: "(eyes, kidneys, neuropathy, heart, amputation, etc.)" },
+];
+
+const IUL_DRUG_ALCOHOL_KNOCKOUT_ITEMS: KnockoutItem[] = [
+  { label: "Illegal drug use", detail: "(other than marijuana), within the last 10 years" },
+  { label: "Drug or alcohol abuse or overuse", detail: "within the last 10 years" },
+  { label: "Advised by a medical professional to seek treatment or counseling", detail: "for alcohol or drug use, within the last 10 years" },
+  { label: "Treatment for alcohol or drug abuse/overuse", detail: "(inpatient or outpatient, illegal or prescription), within the last 10 years" },
+];
+
+const IUL_CRIMINAL_KNOCKOUT_ITEMS: KnockoutItem[] = [
+  { label: "Any criminal convictions", detail: "(felony or misdemeanor), within the last 10 years" },
+  { label: "Multiple felony, misdemeanor, or violent crime convictions", detail: "in the last 20 years" },
+  { label: "Felony or misdemeanor charges currently pending" },
+  { label: "Incarcerated in the last 10 years" },
+  { label: "Currently on probation, parole, or incarcerated" },
+];
+
+const IUL_FINANCIAL_KNOCKOUT_ITEMS: KnockoutItem[] = [
+  { label: "Bankruptcy, debt collection, or foreclosure", detail: "within the last 7 years" },
+  { label: "Multiple credit account delinquencies" },
+];
+
+const IUL_INSURANCE_ACTIVITY_KNOCKOUT_ITEMS: KnockoutItem[] = [
+  { label: "Applied for life insurance more than 4 times", detail: "within the last 12 months" },
+  { label: "Previously declined for an Ethos policy" },
+];
+
+const IUL_KNOCKOUT_SECTIONS: { key: string; title: string; items: KnockoutItem[] }[] = [
+  { key: "diabetes", title: "Ineligible diabetes", items: IUL_DIABETES_KNOCKOUT_ITEMS },
+  { key: "drugAlcohol", title: "Drug or alcohol abuse", items: IUL_DRUG_ALCOHOL_KNOCKOUT_ITEMS },
+  { key: "criminal", title: "Criminal history", items: IUL_CRIMINAL_KNOCKOUT_ITEMS },
+  { key: "financial", title: "Financial history", items: IUL_FINANCIAL_KNOCKOUT_ITEMS },
+  { key: "insuranceActivity", title: "Insurance activity", items: IUL_INSURANCE_ACTIVITY_KNOCKOUT_ITEMS },
+];
+
+/* IUL advanced options — Accumulation IUL only, replaces the knockout sections above */
 const IUL_INDEX_ACCOUNTS: { name: string; allocation: number }[] = [
   { name: "S&P 500® Annual Point-to-Point", allocation: 50 },
   { name: "High Par Fidelity Multifactor Yield Index SM 5% ER® Annual Point to Point", allocation: 50 },
@@ -2741,6 +2783,8 @@ function QuoteForm({
   knockoutCriminal,
   onKnockoutHealthChange,
   onKnockoutCriminalChange,
+  iulKnockouts,
+  onIulKnockoutChange,
 }: {
   activeProduct: number;
   onProductChange: (i: number) => void;
@@ -2758,14 +2802,18 @@ function QuoteForm({
   knockoutCriminal: boolean;
   onKnockoutHealthChange: (checked: boolean) => void;
   onKnockoutCriminalChange: (checked: boolean) => void;
+  iulKnockouts: Record<string, boolean>;
+  onIulKnockoutChange: (key: string, checked: boolean) => void;
 }) {
   const [tabLoading, setTabLoading] = useState(false);
   const [healthExpanded, setHealthExpanded] = useState(false);
   const [criminalExpanded, setCriminalExpanded] = useState(false);
+  const [iulKnockoutExpanded, setIulKnockoutExpanded] = useState<Record<string, boolean>>({});
   const [productResourcesOpen, setProductResourcesOpen] = useState(false);
   const [basicInfoExpanded, setBasicInfoExpanded] = useState(true);
   const [leftStrategyTab, setLeftStrategyTab] = useState(0);
   const isIUL = PRODUCT_CATEGORY_BY_ID[selectedProduct] === "IUL";
+  const isAccumulationIUL = selectedProduct === "Accumulation IUL";
 
   function handleTabChange(i: number) {
     if (i === activeProduct) return;
@@ -2779,7 +2827,9 @@ function QuoteForm({
   const tabs = subProductTabConfig?.tabs ?? [];
   const config = getProductConfig(selectedProduct);
   const heightInInvalid = formState.heightIn.trim() !== "" && Number(formState.heightIn) > 11;
-  const isKnockedOut = config.showKnockoutQuestions === true && (knockoutHealth || knockoutCriminal);
+  const isKnockedOut =
+    (config.showKnockoutQuestions === true && (knockoutHealth || knockoutCriminal)) ||
+    (isIUL && !isAccumulationIUL && Object.values(iulKnockouts).some(Boolean));
   const activeResourceLinks = hasTabs ? (subProductTabConfig?.resourceLinksByTab?.[activeProduct] ?? DEFAULT_RESOURCE_LINKS) : DEFAULT_RESOURCE_LINKS;
 
   return (
@@ -2972,7 +3022,7 @@ function QuoteForm({
           </>
         );
 
-        return isIUL ? (
+        return isAccumulationIUL ? (
           <AccordionSection title="Basic info" expanded={basicInfoExpanded} onToggle={() => setBasicInfoExpanded((v) => !v)}>
             <div className="flex flex-col gap-[20px]">{basicInfoFields}</div>
           </AccordionSection>
@@ -3114,7 +3164,28 @@ function QuoteForm({
         </>
       )}
 
-      {isIUL && (
+      {isIUL && !isAccumulationIUL && (
+        <>
+          {IUL_KNOCKOUT_SECTIONS.map((section) => (
+            <div key={section.key} className="flex flex-col gap-[16px]">
+              {/* Divider */}
+              <div className="h-px bg-[#F4F4F4]" />
+
+              <KnockoutCard
+                title={section.title}
+                items={section.items}
+                checked={iulKnockouts[section.key] === true}
+                onChange={(checked) => onIulKnockoutChange(section.key, checked)}
+                disabled={locked}
+                expanded={iulKnockoutExpanded[section.key] === true}
+                onToggleExpanded={() => setIulKnockoutExpanded((prev) => ({ ...prev, [section.key]: !prev[section.key] }))}
+              />
+            </div>
+          ))}
+        </>
+      )}
+
+      {isAccumulationIUL && (
         <>
           {/* Divider */}
           <div className="h-px bg-[#F4F4F4]" />
@@ -3233,6 +3304,7 @@ export default function App() {
   const [clientName, setClientName] = useState("");
   const [knockoutHealth, setKnockoutHealth] = useState(false);
   const [knockoutCriminal, setKnockoutCriminal] = useState(false);
+  const [iulKnockouts, setIulKnockouts] = useState<Record<string, boolean>>({});
   const [iulStrategyTab, setIulStrategyTab] = useState(0);
 
   const handleProductSelect = (name: string) => {
@@ -3255,6 +3327,7 @@ export default function App() {
     setQuoteLoading(false);
     setKnockoutHealth(false);
     setKnockoutCriminal(false);
+    setIulKnockouts({});
     setAdEnabled(false);
     setAdMultiplier(null);
     setIulStrategyTab(0);
@@ -3269,6 +3342,12 @@ export default function App() {
 
   const handleKnockoutCriminalChange = (checked: boolean) => {
     setKnockoutCriminal(checked);
+    setQuoteGenerated(false);
+    setQuoteLoading(false);
+  };
+
+  const handleIulKnockoutChange = (key: string, checked: boolean) => {
+    setIulKnockouts((prev) => ({ ...prev, [key]: checked }));
     setQuoteGenerated(false);
     setQuoteLoading(false);
   };
@@ -3319,7 +3398,8 @@ export default function App() {
     formState.residence !== "" &&
     (!activeConfig.showHealthCredit || (formState.rateClass !== "" && (activeConfig.showCreditEstimate === false || formState.credit !== ""))) &&
     (!activeConfig.showBMI || (formState.heightFt.trim() !== "" && formState.heightIn.trim() !== "" && formState.weight.trim() !== "")) &&
-    (!activeConfig.showKnockoutQuestions || (!knockoutHealth && !knockoutCriminal));
+    (!activeConfig.showKnockoutQuestions || (!knockoutHealth && !knockoutCriminal)) &&
+    (PRODUCT_CATEGORY_BY_ID[selectedProduct] !== "IUL" || selectedProduct === "Accumulation IUL" || Object.values(iulKnockouts).every((v) => !v));
 
   const activeSubProductName = SUB_PRODUCT_TABS[selectedProduct]?.tabs[activeProduct] ?? selectedProduct;
   const coverageRange = getCoverageRange(activeSubProductName);
@@ -3425,6 +3505,8 @@ export default function App() {
                 knockoutCriminal={knockoutCriminal}
                 onKnockoutHealthChange={handleKnockoutHealthChange}
                 onKnockoutCriminalChange={handleKnockoutCriminalChange}
+                iulKnockouts={iulKnockouts}
+                onIulKnockoutChange={handleIulKnockoutChange}
               />
             )}
           </div>

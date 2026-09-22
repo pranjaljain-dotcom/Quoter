@@ -2337,45 +2337,17 @@ const CRIMINAL_KNOCKOUT_ITEMS: KnockoutItem[] = [
   { label: "Illegal drug use, drug or alcohol abuse in the last 5 years" },
 ];
 
-/* IUL-specific knockout categories */
-const IUL_DIABETES_KNOCKOUT_ITEMS: KnockoutItem[] = [
-  { label: "Current age under 30" },
-  { label: "BMI over 41.49" },
-  { label: "A1C over 9.5, or no A1C testing within the last 12 months" },
-  { label: "Diabetic complications", detail: "(eyes, kidneys, neuropathy, heart, amputation, etc.)" },
+/* IUL advanced options — replaces the generic knockout sections for IUL products */
+const IUL_INDEX_ACCOUNTS: { name: string; allocation: number }[] = [
+  { name: "S&P 500® Annual Point-to-Point", allocation: 50 },
+  { name: "High Par Fidelity Multifactor Yield Index SM 5% ER® Annual Point to Point", allocation: 50 },
 ];
 
-const IUL_DRUG_ALCOHOL_KNOCKOUT_ITEMS: KnockoutItem[] = [
-  { label: "Illegal drug use", detail: "(other than marijuana), within the last 10 years" },
-  { label: "Drug or alcohol abuse or overuse", detail: "within the last 10 years" },
-  { label: "Advised by a medical professional to seek treatment or counseling", detail: "for alcohol or drug use, within the last 10 years" },
-  { label: "Treatment for alcohol or drug abuse/overuse", detail: "(inpatient or outpatient, illegal or prescription), within the last 10 years" },
-];
+type IulRateRange = { start: number; end: number; rate: string };
 
-const IUL_CRIMINAL_KNOCKOUT_ITEMS: KnockoutItem[] = [
-  { label: "Any criminal convictions", detail: "(felony or misdemeanor), within the last 10 years" },
-  { label: "Multiple felony, misdemeanor, or violent crime convictions", detail: "in the last 20 years" },
-  { label: "Felony or misdemeanor charges currently pending" },
-  { label: "Incarcerated in the last 10 years" },
-  { label: "Currently on probation, parole, or incarcerated" },
-];
-
-const IUL_FINANCIAL_KNOCKOUT_ITEMS: KnockoutItem[] = [
-  { label: "Bankruptcy, debt collection, or foreclosure", detail: "within the last 7 years" },
-  { label: "Multiple credit account delinquencies" },
-];
-
-const IUL_INSURANCE_ACTIVITY_KNOCKOUT_ITEMS: KnockoutItem[] = [
-  { label: "Applied for life insurance more than 4 times", detail: "within the last 12 months" },
-  { label: "Previously declined for an Ethos policy" },
-];
-
-const IUL_KNOCKOUT_SECTIONS: { key: string; title: string; items: KnockoutItem[] }[] = [
-  { key: "diabetes", title: "Ineligible diabetes", items: IUL_DIABETES_KNOCKOUT_ITEMS },
-  { key: "drugAlcohol", title: "Drug or alcohol abuse", items: IUL_DRUG_ALCOHOL_KNOCKOUT_ITEMS },
-  { key: "criminal", title: "Criminal history", items: IUL_CRIMINAL_KNOCKOUT_ITEMS },
-  { key: "financial", title: "Financial history", items: IUL_FINANCIAL_KNOCKOUT_ITEMS },
-  { key: "insuranceActivity", title: "Insurance activity", items: IUL_INSURANCE_ACTIVITY_KNOCKOUT_ITEMS },
+const IUL_DEFAULT_RATE_RANGES: IulRateRange[] = [
+  { start: 34, end: 34, rate: "" },
+  { start: 35, end: 119, rate: "" },
 ];
 
 function KnockoutCard({
@@ -2491,6 +2463,266 @@ function KnockoutCard({
   );
 }
 
+/* ─── IUL Advanced Options ──────────────────────────────────── */
+
+function AccordionSection({
+  title,
+  expanded,
+  onToggle,
+  children,
+}: {
+  title: string;
+  expanded: boolean;
+  onToggle: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="bg-white rounded-[8px] border border-[#e9e9e9] overflow-hidden">
+      <button
+        type="button"
+        onClick={onToggle}
+        className="w-full flex items-center justify-between gap-[8px] px-[16px] py-[14px] text-left bg-transparent border-none cursor-pointer"
+      >
+        <p
+          className="font-['Theinhardt:Medium',sans-serif] text-[#272727] text-[18px] leading-[26px]"
+          style={{ fontFeatureSettings: '"case" 1' }}
+        >
+          {title}
+        </p>
+        <img
+          alt=""
+          src="assets/d0a41.svg"
+          width="20"
+          height="20"
+          className={`shrink-0 transition-transform duration-200 ${expanded ? "rotate-180" : ""}`}
+        />
+      </button>
+      <div className={`transition-all duration-300 overflow-hidden ${expanded ? "max-h-[1200px] opacity-100" : "max-h-0 opacity-0"}`}>
+        <div className="border-t border-[#e9e9e9] px-[16px] py-[16px]">{children}</div>
+      </div>
+    </div>
+  );
+}
+
+function IndexStrategyContent() {
+  const [rateMode, setRateMode] = useState<"Maximum" | "Assumed">("Maximum");
+  const [assumedRate, setAssumedRate] = useState("");
+  const [customizeByRange, setCustomizeByRange] = useState(false);
+  const [rateRanges, setRateRanges] = useState<IulRateRange[]>(IUL_DEFAULT_RATE_RANGES);
+
+  const updateRange = (index: number, patch: Partial<IulRateRange>) => {
+    setRateRanges((prev) => prev.map((r, i) => (i === index ? { ...r, ...patch } : r)));
+  };
+
+  const addRange = () => {
+    setRateRanges((prev) => {
+      const last = prev[prev.length - 1];
+      const start = last.end + 1;
+      return [...prev, { start, end: start, rate: "" }];
+    });
+  };
+
+  return (
+    <div className="flex flex-col gap-[16px]">
+      <div className="flex items-center justify-between gap-[12px]">
+        <p
+          className="font-['Theinhardt:Medium',sans-serif] text-[#272727] text-[16px] leading-[24px]"
+          style={{ fontFeatureSettings: '"case" 1' }}
+        >
+          {IUL_INDEX_ACCOUNTS.length}/10 accounts selected
+        </p>
+        <button
+          type="button"
+          className="font-['Theinhardt:Medium',sans-serif] text-[#056257] text-[14px] leading-[20px] underline decoration-dotted underline-offset-2 bg-transparent border-none p-0 cursor-pointer"
+          style={{ fontFeatureSettings: '"case" 1' }}
+        >
+          Edit
+        </button>
+      </div>
+
+      <div className="flex flex-col gap-[12px]">
+        {IUL_INDEX_ACCOUNTS.map((acct) => (
+          <div key={acct.name} className="flex items-center justify-between gap-[12px]">
+            <p
+              className="font-['Theinhardt:Regular',sans-serif] text-[#272727] text-[16px] leading-[24px]"
+              style={{ fontFeatureSettings: '"case" 1' }}
+            >
+              {acct.name}
+            </p>
+            <p
+              className="font-['Theinhardt:Regular',sans-serif] text-[#272727] text-[16px] leading-[24px] shrink-0"
+              style={{ fontFeatureSettings: '"case" 1' }}
+            >
+              {acct.allocation}%
+            </p>
+          </div>
+        ))}
+      </div>
+
+      <div className="border-t border-dotted border-[#d4d4d4]" />
+
+      <p
+        className="font-['Theinhardt:Medium',sans-serif] text-[#525252] text-[16px] leading-[24px]"
+        style={{ fontFeatureSettings: '"case" 1' }}
+      >
+        Blended index illustrative rate
+      </p>
+
+      <div className="flex gap-[24px]">
+        {(["Maximum", "Assumed"] as const).map((mode) => (
+          <button
+            key={mode}
+            type="button"
+            onClick={() => setRateMode(mode)}
+            className="flex items-center gap-[8px] bg-transparent border-none p-0 cursor-pointer"
+          >
+            <span
+              className={`shrink-0 size-[20px] rounded-full border flex items-center justify-center ${
+                rateMode === mode ? "border-[#056257]" : "border-[#d4d4d4]"
+              }`}
+            >
+              {rateMode === mode && <span className="size-[10px] rounded-full bg-[#056257]" />}
+            </span>
+            <span
+              className={`font-['Theinhardt:Medium',sans-serif] text-[16px] leading-[24px] ${rateMode === mode ? "text-[#272727]" : "text-[#7e7e7e]"}`}
+              style={{ fontFeatureSettings: '"case" 1' }}
+            >
+              {mode}
+            </span>
+          </button>
+        ))}
+      </div>
+
+      {rateMode === "Assumed" && (
+        <div className="flex flex-col gap-[12px]">
+          <div className="flex items-center justify-between gap-[12px]">
+            <p
+              className="font-['Theinhardt:Medium',sans-serif] text-[#525252] text-[16px] leading-[24px]"
+              style={{ fontFeatureSettings: '"case" 1' }}
+            >
+              Assumed rate (%)
+            </p>
+            <button
+              type="button"
+              onClick={() => setCustomizeByRange((v) => !v)}
+              className="flex items-center gap-[8px] bg-transparent border-none p-0 cursor-pointer"
+            >
+              <span
+                className={`shrink-0 size-[18px] rounded-[4px] border flex items-center justify-center ${
+                  customizeByRange ? "bg-[#056257] border-[#056257]" : "bg-white border-[#d4d4d4]"
+                }`}
+              >
+                {customizeByRange && (
+                  <svg width="10" height="10" viewBox="0 0 12 12" fill="none">
+                    <path d="M2.5 6.5L4.5 8.5L9.5 3.5" stroke="white" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                )}
+              </span>
+              <span
+                className="font-['Theinhardt:Medium',sans-serif] text-[#272727] text-[14px] leading-[20px]"
+                style={{ fontFeatureSettings: '"case" 1' }}
+              >
+                Customize by range
+              </span>
+            </button>
+          </div>
+
+          {customizeByRange ? (
+            <div className="border border-[#e9e9e9] rounded-[8px] overflow-hidden">
+              <div className="grid grid-cols-3 bg-[#f9fafb]">
+                <p className="px-[12px] py-[10px] font-['Theinhardt:Medium',sans-serif] text-[#525252] text-[13px] leading-[18px]" style={{ fontFeatureSettings: '"case" 1' }}>
+                  Start age
+                </p>
+                <p className="px-[12px] py-[10px] font-['Theinhardt:Medium',sans-serif] text-[#525252] text-[13px] leading-[18px]" style={{ fontFeatureSettings: '"case" 1' }}>
+                  End age
+                </p>
+                <p className="px-[12px] py-[10px] font-['Theinhardt:Medium',sans-serif] text-[#525252] text-[13px] leading-[18px]" style={{ fontFeatureSettings: '"case" 1' }}>
+                  Rate (%)
+                </p>
+              </div>
+              {rateRanges.map((range, i) => (
+                <div key={i} className="grid grid-cols-3 border-t border-[#e9e9e9] items-center">
+                  <p
+                    className="px-[12px] py-[10px] font-['Theinhardt:Regular',sans-serif] text-[#a9a9a9] text-[14px] leading-[20px]"
+                    style={{ fontFeatureSettings: '"case" 1' }}
+                  >
+                    {range.start}
+                  </p>
+                  <input
+                    type="number"
+                    value={range.end}
+                    onChange={(e) => updateRange(i, { end: Number(e.target.value) })}
+                    className="px-[12px] py-[10px] bg-transparent outline-none font-['Theinhardt:Regular',sans-serif] text-[#272727] text-[14px] leading-[20px] w-full"
+                    style={{ fontFeatureSettings: '"case" 1' }}
+                  />
+                  <div className="flex items-center justify-between px-[12px] py-[10px] gap-[8px]">
+                    <input
+                      type="number"
+                      value={range.rate}
+                      onChange={(e) => updateRange(i, { rate: e.target.value })}
+                      placeholder="0"
+                      className="w-full bg-transparent outline-none font-['Theinhardt:Regular',sans-serif] text-[#272727] text-[14px] leading-[20px] placeholder:text-[#a9a9a9]"
+                      style={{ fontFeatureSettings: '"case" 1' }}
+                    />
+                    {i === rateRanges.length - 1 && (
+                      <button
+                        type="button"
+                        onClick={addRange}
+                        className="shrink-0 bg-transparent border-none cursor-pointer text-[#525252] text-[18px] leading-none"
+                      >
+                        +
+                      </button>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <input
+              type="number"
+              value={assumedRate}
+              onChange={(e) => setAssumedRate(e.target.value)}
+              placeholder="0"
+              className="w-full h-[48px] rounded-[8px] border border-[#d4d4d4] px-[14px] bg-white outline-none font-['Theinhardt:Regular',sans-serif] text-[#272727] text-[16px] leading-[24px] placeholder:text-[#a9a9a9]"
+              style={{ fontFeatureSettings: '"case" 1' }}
+            />
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+const IUL_ADVANCED_OPTION_SECTIONS = ["Custom solve", "Index strategy", "Disbursements", "Riders", "Other policy options"];
+
+function IulAdvancedOptions() {
+  const [expanded, setExpanded] = useState<Record<string, boolean>>({});
+
+  return (
+    <div className="flex flex-col gap-[12px]">
+      {IUL_ADVANCED_OPTION_SECTIONS.map((title) => (
+        <AccordionSection
+          key={title}
+          title={title}
+          expanded={expanded[title] === true}
+          onToggle={() => setExpanded((prev) => ({ ...prev, [title]: !prev[title] }))}
+        >
+          {title === "Index strategy" ? (
+            <IndexStrategyContent />
+          ) : (
+            <p
+              className="font-['Theinhardt:Regular',sans-serif] text-[#7e7e7e] text-[14px] leading-[20px]"
+              style={{ fontFeatureSettings: '"case" 1' }}
+            >
+              Details coming soon.
+            </p>
+          )}
+        </AccordionSection>
+      ))}
+    </div>
+  );
+}
+
 function QuoteForm({
   activeProduct,
   onProductChange,
@@ -2508,8 +2740,6 @@ function QuoteForm({
   knockoutCriminal,
   onKnockoutHealthChange,
   onKnockoutCriminalChange,
-  iulKnockouts,
-  onIulKnockoutChange,
 }: {
   activeProduct: number;
   onProductChange: (i: number) => void;
@@ -2527,13 +2757,10 @@ function QuoteForm({
   knockoutCriminal: boolean;
   onKnockoutHealthChange: (checked: boolean) => void;
   onKnockoutCriminalChange: (checked: boolean) => void;
-  iulKnockouts: Record<string, boolean>;
-  onIulKnockoutChange: (key: string, checked: boolean) => void;
 }) {
   const [tabLoading, setTabLoading] = useState(false);
   const [healthExpanded, setHealthExpanded] = useState(false);
   const [criminalExpanded, setCriminalExpanded] = useState(false);
-  const [iulKnockoutExpanded, setIulKnockoutExpanded] = useState<Record<string, boolean>>({});
   const [productResourcesOpen, setProductResourcesOpen] = useState(false);
   const isIUL = PRODUCT_CATEGORY_BY_ID[selectedProduct] === "IUL";
 
@@ -2549,9 +2776,7 @@ function QuoteForm({
   const tabs = subProductTabConfig?.tabs ?? [];
   const config = getProductConfig(selectedProduct);
   const heightInInvalid = formState.heightIn.trim() !== "" && Number(formState.heightIn) > 11;
-  const isKnockedOut =
-    (config.showKnockoutQuestions === true && (knockoutHealth || knockoutCriminal)) ||
-    (isIUL && Object.values(iulKnockouts).some(Boolean));
+  const isKnockedOut = config.showKnockoutQuestions === true && (knockoutHealth || knockoutCriminal);
   const activeResourceLinks = hasTabs ? (subProductTabConfig?.resourceLinksByTab?.[activeProduct] ?? DEFAULT_RESOURCE_LINKS) : DEFAULT_RESOURCE_LINKS;
 
   return (
@@ -2873,22 +3098,10 @@ function QuoteForm({
 
       {isIUL && (
         <>
-          {IUL_KNOCKOUT_SECTIONS.map((section) => (
-            <div key={section.key} className="flex flex-col gap-[16px]">
-              {/* Divider */}
-              <div className="h-px bg-[#F4F4F4]" />
+          {/* Divider */}
+          <div className="h-px bg-[#F4F4F4]" />
 
-              <KnockoutCard
-                title={section.title}
-                items={section.items}
-                checked={iulKnockouts[section.key] === true}
-                onChange={(checked) => onIulKnockoutChange(section.key, checked)}
-                disabled={locked}
-                expanded={iulKnockoutExpanded[section.key] === true}
-                onToggleExpanded={() => setIulKnockoutExpanded((prev) => ({ ...prev, [section.key]: !prev[section.key] }))}
-              />
-            </div>
-          ))}
+          <IulAdvancedOptions />
         </>
       )}
 
@@ -2982,7 +3195,6 @@ export default function App() {
   const [clientName, setClientName] = useState("");
   const [knockoutHealth, setKnockoutHealth] = useState(false);
   const [knockoutCriminal, setKnockoutCriminal] = useState(false);
-  const [iulKnockouts, setIulKnockouts] = useState<Record<string, boolean>>({});
   const [iulStrategyTab, setIulStrategyTab] = useState(0);
 
   const handleProductSelect = (name: string) => {
@@ -3005,7 +3217,6 @@ export default function App() {
     setQuoteLoading(false);
     setKnockoutHealth(false);
     setKnockoutCriminal(false);
-    setIulKnockouts({});
     setAdEnabled(false);
     setAdMultiplier(null);
     setIulStrategyTab(0);
@@ -3020,12 +3231,6 @@ export default function App() {
 
   const handleKnockoutCriminalChange = (checked: boolean) => {
     setKnockoutCriminal(checked);
-    setQuoteGenerated(false);
-    setQuoteLoading(false);
-  };
-
-  const handleIulKnockoutChange = (key: string, checked: boolean) => {
-    setIulKnockouts((prev) => ({ ...prev, [key]: checked }));
     setQuoteGenerated(false);
     setQuoteLoading(false);
   };
@@ -3076,8 +3281,7 @@ export default function App() {
     formState.residence !== "" &&
     (!activeConfig.showHealthCredit || (formState.rateClass !== "" && (activeConfig.showCreditEstimate === false || formState.credit !== ""))) &&
     (!activeConfig.showBMI || (formState.heightFt.trim() !== "" && formState.heightIn.trim() !== "" && formState.weight.trim() !== "")) &&
-    (!activeConfig.showKnockoutQuestions || (!knockoutHealth && !knockoutCriminal)) &&
-    (PRODUCT_CATEGORY_BY_ID[selectedProduct] !== "IUL" || Object.values(iulKnockouts).every((v) => !v));
+    (!activeConfig.showKnockoutQuestions || (!knockoutHealth && !knockoutCriminal));
 
   const activeSubProductName = SUB_PRODUCT_TABS[selectedProduct]?.tabs[activeProduct] ?? selectedProduct;
   const coverageRange = getCoverageRange(activeSubProductName);
@@ -3183,8 +3387,6 @@ export default function App() {
                 knockoutCriminal={knockoutCriminal}
                 onKnockoutHealthChange={handleKnockoutHealthChange}
                 onKnockoutCriminalChange={handleKnockoutCriminalChange}
-                iulKnockouts={iulKnockouts}
-                onIulKnockoutChange={handleIulKnockoutChange}
               />
             )}
           </div>

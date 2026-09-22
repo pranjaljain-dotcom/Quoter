@@ -1995,12 +1995,21 @@ function CompareIllustrationPanel({ open, onClose, currentQuote, healthClass, cl
               </div>
 
               <div className="flex flex-col gap-[12px] min-h-0">
-                <p
-                  className="font-['Theinhardt:Medium',sans-serif] text-[#272727] text-[16px] leading-[24px]"
-                  style={{ fontFeatureSettings: '"case" 1' }}
-                >
-                  Competitor Analysis
-                </p>
+                <div className="flex items-center justify-between gap-[12px]">
+                  <p
+                    className="font-['Theinhardt:Medium',sans-serif] text-[#272727] text-[16px] leading-[24px]"
+                    style={{ fontFeatureSettings: '"case" 1' }}
+                  >
+                    Competitor Analysis
+                  </p>
+                  <button
+                    type="button"
+                    className="shrink-0 font-['Theinhardt:Medium',sans-serif] text-[#865323] text-[14px] leading-[20px] underline decoration-dotted underline-offset-2 bg-transparent border-none p-0 cursor-pointer"
+                    style={{ fontFeatureSettings: '"case" 1' }}
+                  >
+                    Personalize pitch?
+                  </button>
+                </div>
                 <div className="border border-[#e9e9e9] rounded-[8px] overflow-hidden">
                   <div className="grid grid-cols-[100px_1fr_1fr] bg-[#f4f4f4] px-[16px] py-[10px] gap-[8px]">
                     <span />

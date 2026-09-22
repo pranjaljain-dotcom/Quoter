@@ -1138,6 +1138,7 @@ const POLICY_TERM_PREMIUM_MULTIPLIERS: Record<string, number> = {
 };
 
 const IUL_STRATEGY_TABS = ["Smart Solve™", "Maximize Cash Value", "Maximize Retirement Income"];
+const IUL_LEFT_PANEL_STRATEGY_TABS = ["Custom Solve", "Max Cash Value", "Max Retirement Income"];
 
 const PREMIUM_PAYMENT_YEARS_OPTIONS: { label: string; sublabel: string }[] = [
   { label: "7", sublabel: "7 premium payment years" },
@@ -2763,6 +2764,7 @@ function QuoteForm({
   const [criminalExpanded, setCriminalExpanded] = useState(false);
   const [productResourcesOpen, setProductResourcesOpen] = useState(false);
   const [basicInfoExpanded, setBasicInfoExpanded] = useState(true);
+  const [leftStrategyTab, setLeftStrategyTab] = useState(0);
   const isIUL = PRODUCT_CATEGORY_BY_ID[selectedProduct] === "IUL";
 
   function handleTabChange(i: number) {
@@ -3116,6 +3118,26 @@ function QuoteForm({
         <>
           {/* Divider */}
           <div className="h-px bg-[#F4F4F4]" />
+
+          <div className="relative grid grid-cols-3 bg-[#f3f7f7] rounded-full p-[4px]">
+            <div
+              className="absolute top-[4px] bottom-[4px] left-[4px] rounded-full bg-white shadow-[0px_1px_2px_0px_rgba(16,24,40,0.08)] transition-transform duration-300 ease-in-out"
+              style={{ width: "calc(33.333% - 2.667px)", transform: `translateX(${leftStrategyTab * 100}%)` }}
+            />
+            {IUL_LEFT_PANEL_STRATEGY_TABS.map((label, i) => (
+              <button
+                key={label}
+                type="button"
+                onClick={() => setLeftStrategyTab(i)}
+                className={`relative z-10 w-full h-[36px] rounded-full px-[4px] text-center border-none bg-transparent transition-colors cursor-pointer font-['Theinhardt:Medium',sans-serif] text-[12px] leading-[16px] truncate ${
+                  leftStrategyTab === i ? "text-[#056257]" : "text-[#525252] hover:text-[#272727]"
+                }`}
+                style={{ fontFeatureSettings: '"case" 1', letterSpacing: "-0.13px" }}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
 
           <IulAdvancedOptions />
         </>

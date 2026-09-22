@@ -2814,6 +2814,7 @@ function QuoteForm({
   const [leftStrategyTab, setLeftStrategyTab] = useState(0);
   const isIUL = PRODUCT_CATEGORY_BY_ID[selectedProduct] === "IUL";
   const isAccumulationIUL = selectedProduct === "Accumulation IUL";
+  const isTruStageFinalExpense = selectedProduct === "TruStage Final Expense";
 
   function handleTabChange(i: number) {
     if (i === activeProduct) return;
@@ -2882,7 +2883,9 @@ function QuoteForm({
         <div className={`relative grid grid-cols-2 bg-[#f3f7f7] rounded-full p-[4px] ${locked ? "opacity-50" : ""}`}>
           {/* Sliding highlight */}
           <div
-            className="absolute top-[4px] bottom-[4px] left-[4px] rounded-full bg-white shadow-[0px_1px_2px_0px_rgba(16,24,40,0.08)] transition-transform duration-300 ease-in-out"
+            className={`absolute top-[4px] bottom-[4px] left-[4px] rounded-full shadow-[0px_1px_2px_0px_rgba(16,24,40,0.08)] transition-transform duration-300 ease-in-out ${
+              isTruStageFinalExpense ? "bg-[#056257]" : "bg-white"
+            }`}
             style={{ width: "calc(50% - 4px)", transform: `translateX(${activeProduct * 100}%)` }}
           />
           {tabs.map((name, i) => (
@@ -2892,7 +2895,13 @@ function QuoteForm({
               disabled={locked}
               className={`relative z-10 w-full h-[40px] rounded-full px-[16px] text-center border-none bg-transparent transition-colors font-['Theinhardt:Medium',sans-serif] text-[14px] leading-[20px] truncate ${
                 locked ? "cursor-not-allowed" : "cursor-pointer"
-              } ${activeProduct === i ? "text-[#056257]" : "text-[#525252] hover:text-[#272727]"}`}
+              } ${
+                activeProduct === i
+                  ? isTruStageFinalExpense
+                    ? "text-white"
+                    : "text-[#056257]"
+                  : "text-[#525252] hover:text-[#272727]"
+              }`}
               style={{ fontFeatureSettings: '"case" 1', letterSpacing: "-0.14px" }}
             >
               {withTrustageTrademark(name)}

@@ -2762,6 +2762,7 @@ function QuoteForm({
   const [healthExpanded, setHealthExpanded] = useState(false);
   const [criminalExpanded, setCriminalExpanded] = useState(false);
   const [productResourcesOpen, setProductResourcesOpen] = useState(false);
+  const [basicInfoExpanded, setBasicInfoExpanded] = useState(true);
   const isIUL = PRODUCT_CATEGORY_BY_ID[selectedProduct] === "IUL";
 
   function handleTabChange(i: number) {
@@ -2881,98 +2882,113 @@ function QuoteForm({
         </div>
       ) : (
       <>
-      {/* Basic information */}
-      <div className="flex flex-col gap-[4px]">
-        <p
-          className="font-['Theinhardt:Medium',sans-serif] text-[#272727] text-[18px] leading-[26px]"
-          style={{ fontFeatureSettings: '"case" 1' }}
-        >
-          Basic information
-        </p>
-      </div>
-
-      <div className="flex gap-[20px]">
-        <div className="flex-1">
-          <SelectField
-            label="Sex"
-            value={formState.sex}
-            options={["Male", "Female"]}
-            onChange={(v) => onFormChange("sex", v)}
-            placeholder="Select biological sex"
-            disabled={locked}
-          />
-        </div>
-        <div className="flex-1">
-          <TextField
-            label="Birth date"
-            value={formState.birthdate}
-            placeholder="mm/dd/yyyy"
-            onChange={(v) => onFormChange("birthdate", v)}
-            dateMask
-            disabled={locked}
-          />
-        </div>
-      </div>
-
-      <div className="flex gap-[20px]">
-        <div className="flex-1">
-          <SelectField
-            label="Smoking"
-            value={formState.smoking}
-            options={["Non-smoker", "Smoker"]}
-            onChange={(v) => onFormChange("smoking", v)}
-            placeholder="Smoker or non-smoker?"
-            disabled={locked || config.smokingLocked}
-          />
-        </div>
-        <div className="flex-1">
-          <SelectField
-            label="Residence"
-            value={formState.residence}
-            options={STATE_OPTIONS.map((s) =>
-              config.excludedStates?.includes(s) ? { value: s, disabled: true, note: "(Not applicable for this product)" } : s
-            )}
-            onChange={(v) => onFormChange("residence", v)}
-            placeholder="Select state"
-            disabled={locked}
-            searchable
-          />
-        </div>
-      </div>
-
-      {config.showHealthCredit && (
-        <div className="flex gap-[20px]">
-          <div className="flex-1">
-            <SelectField
-              label="Health class"
-              value={formState.rateClass}
-              options={[
-                { value: "Preferred Plus", health: "Excellent health", bmi: "26–30" },
-                { value: "Preferred", health: "Good health", bmi: "18–26" },
-                { value: "Standard", health: "Average health", bmi: "30–40" },
-                { value: "Substandard", health: "Poor health", bmi: ">40" },
-                { value: "Substandard (Table Rating)", health: "Major health issues" },
-              ]}
-              onChange={(v) => onFormChange("rateClass", v)}
-              placeholder="Select health class"
-              disabled={locked || config.healthClassLocked}
-            />
-          </div>
-          {config.showCreditEstimate !== false && (
-            <div className="flex-1">
-              <SelectField
-                label="Credit estimate"
-                value={formState.credit}
-                options={["Strong", "Average", "Building Credit History"]}
-                onChange={(v) => onFormChange("credit", v)}
-                placeholder="Estimate credit score"
-                labelLink={{ text: "How it works", onClick: onShowCreditInfo }}
-                disabled={locked}
-              />
+      {(() => {
+        const basicInfoFields = (
+          <>
+            <div className="flex gap-[20px]">
+              <div className="flex-1">
+                <SelectField
+                  label="Sex"
+                  value={formState.sex}
+                  options={["Male", "Female"]}
+                  onChange={(v) => onFormChange("sex", v)}
+                  placeholder="Select biological sex"
+                  disabled={locked}
+                />
+              </div>
+              <div className="flex-1">
+                <TextField
+                  label="Birth date"
+                  value={formState.birthdate}
+                  placeholder="mm/dd/yyyy"
+                  onChange={(v) => onFormChange("birthdate", v)}
+                  dateMask
+                  disabled={locked}
+                />
+              </div>
             </div>
-          )}
-        </div>
-      )}
+
+            <div className="flex gap-[20px]">
+              <div className="flex-1">
+                <SelectField
+                  label="Smoking"
+                  value={formState.smoking}
+                  options={["Non-smoker", "Smoker"]}
+                  onChange={(v) => onFormChange("smoking", v)}
+                  placeholder="Smoker or non-smoker?"
+                  disabled={locked || config.smokingLocked}
+                />
+              </div>
+              <div className="flex-1">
+                <SelectField
+                  label="Residence"
+                  value={formState.residence}
+                  options={STATE_OPTIONS.map((s) =>
+                    config.excludedStates?.includes(s) ? { value: s, disabled: true, note: "(Not applicable for this product)" } : s
+                  )}
+                  onChange={(v) => onFormChange("residence", v)}
+                  placeholder="Select state"
+                  disabled={locked}
+                  searchable
+                />
+              </div>
+            </div>
+
+            {config.showHealthCredit && (
+              <div className="flex gap-[20px]">
+                <div className="flex-1">
+                  <SelectField
+                    label="Health class"
+                    value={formState.rateClass}
+                    options={[
+                      { value: "Preferred Plus", health: "Excellent health", bmi: "26–30" },
+                      { value: "Preferred", health: "Good health", bmi: "18–26" },
+                      { value: "Standard", health: "Average health", bmi: "30–40" },
+                      { value: "Substandard", health: "Poor health", bmi: ">40" },
+                      { value: "Substandard (Table Rating)", health: "Major health issues" },
+                    ]}
+                    onChange={(v) => onFormChange("rateClass", v)}
+                    placeholder="Select health class"
+                    disabled={locked || config.healthClassLocked}
+                  />
+                </div>
+                {config.showCreditEstimate !== false && (
+                  <div className="flex-1">
+                    <SelectField
+                      label="Credit estimate"
+                      value={formState.credit}
+                      options={["Strong", "Average", "Building Credit History"]}
+                      onChange={(v) => onFormChange("credit", v)}
+                      placeholder="Estimate credit score"
+                      labelLink={{ text: "How it works", onClick: onShowCreditInfo }}
+                      disabled={locked}
+                    />
+                  </div>
+                )}
+              </div>
+            )}
+          </>
+        );
+
+        return isIUL ? (
+          <AccordionSection title="Basic info" expanded={basicInfoExpanded} onToggle={() => setBasicInfoExpanded((v) => !v)}>
+            <div className="flex flex-col gap-[20px]">{basicInfoFields}</div>
+          </AccordionSection>
+        ) : (
+          <>
+            {/* Basic information */}
+            <div className="flex flex-col gap-[4px]">
+              <p
+                className="font-['Theinhardt:Medium',sans-serif] text-[#272727] text-[18px] leading-[26px]"
+                style={{ fontFeatureSettings: '"case" 1' }}
+              >
+                Basic information
+              </p>
+            </div>
+            {basicInfoFields}
+          </>
+        );
+      })()}
 
       {config.showBMI && (
         <>

@@ -2525,7 +2525,7 @@ function AccordionSection({
   onToggle,
   children,
 }: {
-  title: string;
+  title: React.ReactNode;
   expanded: boolean;
   onToggle: () => void;
   children: React.ReactNode;
@@ -2537,12 +2537,12 @@ function AccordionSection({
         onClick={onToggle}
         className="w-full flex items-center justify-between gap-[8px] px-[16px] py-[14px] text-left bg-transparent border-none cursor-pointer"
       >
-        <p
-          className="font-['Theinhardt:Medium',sans-serif] text-[#272727] text-[18px] leading-[26px]"
+        <div
+          className="flex items-center gap-[8px] font-['Theinhardt:Medium',sans-serif] text-[#272727] text-[18px] leading-[26px]"
           style={{ fontFeatureSettings: '"case" 1' }}
         >
           {title}
-        </p>
+        </div>
         <img
           alt=""
           src="assets/d0a41.svg"
@@ -2747,13 +2747,399 @@ function IndexStrategyContent() {
   );
 }
 
-const IUL_ADVANCED_OPTION_SECTIONS = ["Custom solve", "Index strategy", "Disbursements", "Riders", "Other policy options"];
+/* ─── Custom Solve ──────────────────────────────────────────── */
+
+function PencilIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 16 16" fill="none" className="shrink-0">
+      <path d="M11.5 2.5a1.414 1.414 0 0 1 2 2L5 13l-3 .5.5-3 9-9Z" stroke="#272727" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function AgeSwapIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="shrink-0">
+      <path d="M2 5.5H12.5M12.5 5.5L9.5 2.5M12.5 5.5L9.5 8.5M14 10.5H3.5M3.5 10.5L6.5 7.5M3.5 10.5L6.5 13.5" stroke="#525252" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function TableSortIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" className="shrink-0">
+      <path d="M3.5 8L7 4.5L10.5 8" stroke="#525252" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function InfoCircleIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="shrink-0">
+      <path d="M11 7H13V9H11V7ZM11 11H13V17H11V11ZM12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20Z" fill="#7e7e7e" />
+    </svg>
+  );
+}
+
+function AgeInput({ value, onChange, placeholder }: { value: string; onChange: (v: string) => void; placeholder?: string }) {
+  return (
+    <div className="relative rounded-[8px] border border-[#d4d4d4] w-full h-[56px] flex items-center px-[14px] gap-[6px] bg-white">
+      <input
+        type="text"
+        value={value}
+        placeholder={placeholder}
+        onChange={(e) => onChange(e.target.value)}
+        className="flex-1 w-0 bg-transparent font-['Theinhardt:Regular',sans-serif] text-[16px] outline-none placeholder:text-[#a9a9a9] text-[#272727]"
+        style={{ fontFeatureSettings: '"case" 1' }}
+      />
+      <span className="font-['Theinhardt:Regular',sans-serif] text-[#272727] text-[16px] shrink-0" style={{ fontFeatureSettings: '"case" 1' }}>
+        age
+      </span>
+      <AgeSwapIcon />
+    </div>
+  );
+}
+
+type CustomSolveRange = { start: number; end: number; value: string };
+
+function CustomSolveRangeTable({
+  columns,
+  rows,
+  onUpdateEnd,
+  renderValueCell,
+  onAddRow,
+}: {
+  columns: [string, string, string];
+  rows: CustomSolveRange[];
+  onUpdateEnd: (i: number, end: number) => void;
+  renderValueCell: (row: CustomSolveRange, i: number) => React.ReactNode;
+  onAddRow?: () => void;
+}) {
+  return (
+    <div className="border border-[#e9e9e9] rounded-[8px] overflow-hidden">
+      <div className="grid grid-cols-3 bg-[#f9fafb]">
+        <p className="px-[12px] py-[10px] font-['Theinhardt:Medium',sans-serif] text-[#525252] text-[13px] leading-[18px]" style={{ fontFeatureSettings: '"case" 1' }}>
+          {columns[0]}
+        </p>
+        <p className="px-[12px] py-[10px] font-['Theinhardt:Medium',sans-serif] text-[#525252] text-[13px] leading-[18px]" style={{ fontFeatureSettings: '"case" 1' }}>
+          {columns[1]}
+        </p>
+        <div className="flex items-center gap-[4px] px-[12px] py-[10px]">
+          <p className="font-['Theinhardt:Medium',sans-serif] text-[#525252] text-[13px] leading-[18px]" style={{ fontFeatureSettings: '"case" 1' }}>
+            {columns[2]}
+          </p>
+          <TableSortIcon />
+        </div>
+      </div>
+      {rows.map((row, i) => (
+        <div key={i} className="grid grid-cols-3 border-t border-[#e9e9e9] items-center">
+          <p className="px-[12px] py-[10px] font-['Theinhardt:Regular',sans-serif] text-[#a9a9a9] text-[14px] leading-[20px]" style={{ fontFeatureSettings: '"case" 1' }}>
+            {row.start}
+          </p>
+          <input
+            type="number"
+            value={row.end}
+            onChange={(e) => onUpdateEnd(i, Number(e.target.value))}
+            className="px-[12px] py-[10px] bg-transparent outline-none font-['Theinhardt:Regular',sans-serif] text-[#272727] text-[14px] leading-[20px] w-full"
+            style={{ fontFeatureSettings: '"case" 1' }}
+          />
+          <div className="flex items-center justify-between px-[12px] py-[10px] gap-[8px]">
+            {renderValueCell(row, i)}
+            {onAddRow && i === rows.length - 1 && (
+              <button
+                type="button"
+                onClick={onAddRow}
+                className="shrink-0 bg-transparent border-none cursor-pointer text-[#525252] text-[18px] leading-none"
+              >
+                +
+              </button>
+            )}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+const CUSTOM_SOLVE_COVERAGE_OPTIONS = [
+  "Min Death Benefit",
+  "Min Death Benefit & Max Distributions",
+  "Solve for Cash Value",
+  "Solve for Endowment",
+];
+const CUSTOM_SOLVE_DEATH_BENEFIT_OPTIONS = ["Death Benefit Option A - Level", "Death Benefit Option B - Increasing"];
+const CUSTOM_SOLVE_DB_CHANGE_OPTIONS = ["Maintain Initial DB", "Retain Current DB"];
+
+function CustomSolveContent() {
+  const [coverageOption, setCoverageOption] = useState(CUSTOM_SOLVE_COVERAGE_OPTIONS[0]);
+  const [premiumType, setPremiumType] = useState<"Monthly premium" | "Non-level premium">("Monthly premium");
+  const [monthlyPremium, setMonthlyPremium] = useState(500);
+  const [premiumRanges, setPremiumRanges] = useState<CustomSolveRange[]>([
+    { start: 34, end: 34, value: "" },
+    { start: 35, end: 64, value: "" },
+  ]);
+  const [deathBenefitOption, setDeathBenefitOption] = useState(CUSTOM_SOLVE_DEATH_BENEFIT_OPTIONS[0]);
+  const [customizeDB, setCustomizeDB] = useState(false);
+  const [dbRanges, setDbRanges] = useState<CustomSolveRange[]>([
+    { start: 34, end: 34, value: "Death Benefit Option B - Increasing" },
+    { start: 35, end: 119, value: "Death Benefit Option A - Level" },
+  ]);
+  const [dbChangeSelection, setDbChangeSelection] = useState(CUSTOM_SOLVE_DB_CHANGE_OPTIONS[0]);
+  const [ageToPayPremium, setAgeToPayPremium] = useState("64");
+  const [surrenderValue, setSurrenderValue] = useState("");
+  const [surrenderAge, setSurrenderAge] = useState("");
+  const [endowmentAge, setEndowmentAge] = useState("");
+
+  const showSurrenderFields = coverageOption === "Min Death Benefit & Max Distributions" || coverageOption === "Solve for Cash Value";
+  const showEndowmentField = coverageOption === "Solve for Endowment";
+
+  const updatePremiumRangeEnd = (i: number, end: number) => setPremiumRanges((prev) => prev.map((r, idx) => (idx === i ? { ...r, end } : r)));
+  const updatePremiumRangeValue = (i: number, value: string) => setPremiumRanges((prev) => prev.map((r, idx) => (idx === i ? { ...r, value } : r)));
+  const addPremiumRange = () =>
+    setPremiumRanges((prev) => {
+      const last = prev[prev.length - 1];
+      const start = last.end + 1;
+      return [...prev, { start, end: start, value: "" }];
+    });
+
+  const updateDbRangeEnd = (i: number, end: number) => setDbRanges((prev) => prev.map((r, idx) => (idx === i ? { ...r, end } : r)));
+  const updateDbRangeValue = (i: number, value: string) => setDbRanges((prev) => prev.map((r, idx) => (idx === i ? { ...r, value } : r)));
+
+  const labelClass = "font-['Theinhardt:Medium',sans-serif] text-[#525252] text-[16px] leading-[24px]";
+  const sliderPct = Math.min(100, Math.max(0, ((monthlyPremium - 50) / (20000 - 50)) * 100));
+
+  const ageToPayPremiumField = (
+    <div className="flex flex-col gap-[4px]">
+      <p className={labelClass} style={{ fontFeatureSettings: '"case" 1' }}>
+        Age to pay premium
+      </p>
+      <AgeInput value={ageToPayPremium} onChange={setAgeToPayPremium} />
+    </div>
+  );
+
+  return (
+    <div className="flex flex-col gap-[20px]">
+      <div className="flex gap-[20px]">
+        <div className="flex-1 flex flex-col gap-[4px]">
+          <p className={labelClass} style={{ fontFeatureSettings: '"case" 1' }}>
+            Solve for
+          </p>
+          <SelectField label="" value="Coverage" options={["Coverage"]} onChange={() => {}} />
+        </div>
+        <div className="flex-1 flex flex-col gap-[4px]">
+          <p className={labelClass} style={{ fontFeatureSettings: '"case" 1' }}>
+            Coverage options
+          </p>
+          <SelectField label="" value={coverageOption} options={CUSTOM_SOLVE_COVERAGE_OPTIONS} onChange={setCoverageOption} />
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-[16px]">
+        <div className="flex items-center justify-between gap-[16px]">
+          <div className="flex gap-[24px]">
+            {(["Monthly premium", "Non-level premium"] as const).map((opt) => (
+              <button
+                key={opt}
+                type="button"
+                onClick={() => setPremiumType(opt)}
+                className="flex items-center gap-[8px] bg-transparent border-none p-0 cursor-pointer"
+              >
+                <span
+                  className={`shrink-0 size-[20px] rounded-full border flex items-center justify-center ${
+                    premiumType === opt ? "border-[#056257]" : "border-[#d4d4d4]"
+                  }`}
+                >
+                  {premiumType === opt && <span className="size-[10px] rounded-full bg-[#056257]" />}
+                </span>
+                <span
+                  className={`font-['Theinhardt:Medium',sans-serif] text-[16px] leading-[24px] ${
+                    premiumType === opt ? "text-[#272727]" : "text-[#7e7e7e]"
+                  }`}
+                  style={{ fontFeatureSettings: '"case" 1' }}
+                >
+                  {opt}
+                </span>
+              </button>
+            ))}
+          </div>
+          {premiumType === "Monthly premium" && (
+            <div className="flex items-center gap-[6px]">
+              <span className="font-['Theinhardt:Medium',sans-serif] text-[#272727] text-[16px] leading-[24px]" style={{ fontFeatureSettings: '"case" 1' }}>
+                ${monthlyPremium.toLocaleString("en-US")}
+              </span>
+              <PencilIcon />
+            </div>
+          )}
+        </div>
+
+        {premiumType === "Monthly premium" ? (
+          <div className="flex flex-col gap-[4px]">
+            <div className="relative w-full h-[16px] pb-[4px]">
+              <div className="absolute bottom-1/4 left-0 right-0 top-1/4 bg-[rgba(0,0,0,0.04)] rounded-[6px]" />
+              <div className="absolute bottom-1/4 left-0 top-1/4 bg-[#054742] rounded-[6px]" style={{ right: `${100 - sliderPct}%` }} />
+              <input
+                type="range"
+                min={50}
+                max={20000}
+                step={10}
+                value={monthlyPremium}
+                onChange={(e) => setMonthlyPremium(Number(e.target.value))}
+                className="absolute inset-0 w-full opacity-0 cursor-pointer"
+              />
+              <div className="absolute top-1/2 -translate-y-1/2 size-[16px] bg-[#054742] rounded-full pointer-events-none" style={{ left: `calc(${sliderPct}% - 8px)` }} />
+            </div>
+            <div className="flex justify-between w-full">
+              <span className="font-['Theinhardt:Regular',sans-serif] text-[14px] leading-[20px]" style={{ fontFeatureSettings: '"case" 1' }}>
+                <span className="text-[#7e7e7e]">Min: </span>
+                <span className="text-[#272727] font-['Theinhardt:Medium',sans-serif]">$50</span>
+              </span>
+              <span className="font-['Theinhardt:Regular',sans-serif] text-[14px] leading-[20px]" style={{ fontFeatureSettings: '"case" 1' }}>
+                <span className="text-[#7e7e7e]">Max: </span>
+                <span className="text-[#272727] font-['Theinhardt:Medium',sans-serif]">$20,000</span>
+              </span>
+            </div>
+          </div>
+        ) : (
+          <CustomSolveRangeTable
+            columns={["Start age", "End age", "Monthly premium"]}
+            rows={premiumRanges}
+            onUpdateEnd={updatePremiumRangeEnd}
+            onAddRow={addPremiumRange}
+            renderValueCell={(row, i) => (
+              <input
+                type="number"
+                value={row.value}
+                onChange={(e) => updatePremiumRangeValue(i, e.target.value)}
+                placeholder="0"
+                className="w-full bg-transparent outline-none font-['Theinhardt:Regular',sans-serif] text-[#272727] text-[14px] leading-[20px] placeholder:text-[#a9a9a9]"
+                style={{ fontFeatureSettings: '"case" 1' }}
+              />
+            )}
+          />
+        )}
+      </div>
+
+      {customizeDB && ageToPayPremiumField}
+
+      {!customizeDB ? (
+        <div className="flex gap-[20px]">
+          <div className="flex-1 flex flex-col gap-[4px]">
+            <div className="flex items-center justify-between gap-[8px]">
+              <p className={labelClass} style={{ fontFeatureSettings: '"case" 1' }}>
+                Death benefit
+              </p>
+              <button
+                type="button"
+                onClick={() => setCustomizeDB(true)}
+                className="flex items-center gap-[8px] bg-transparent border-none p-0 cursor-pointer"
+              >
+                <span className="shrink-0 size-[18px] rounded-[4px] border border-[#d4d4d4] bg-white" />
+                <span className="font-['Theinhardt:Medium',sans-serif] text-[#272727] text-[14px] leading-[20px]" style={{ fontFeatureSettings: '"case" 1' }}>
+                  Customize by range
+                </span>
+              </button>
+            </div>
+            <SelectField label="" value={deathBenefitOption} options={CUSTOM_SOLVE_DEATH_BENEFIT_OPTIONS} onChange={setDeathBenefitOption} />
+          </div>
+          {ageToPayPremiumField}
+        </div>
+      ) : (
+        <div className="flex flex-col gap-[16px]">
+          <div className="flex items-center justify-between gap-[8px]">
+            <p className={labelClass} style={{ fontFeatureSettings: '"case" 1' }}>
+              Death benefit
+            </p>
+            <button
+              type="button"
+              onClick={() => setCustomizeDB(false)}
+              className="flex items-center gap-[8px] bg-transparent border-none p-0 cursor-pointer"
+            >
+              <span className="shrink-0 size-[18px] rounded-[4px] border border-[#056257] bg-[#056257] flex items-center justify-center">
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                  <path d="M2.5 6.5L4.5 8.5L9.5 3.5" stroke="white" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </span>
+              <span className="font-['Theinhardt:Medium',sans-serif] text-[#272727] text-[14px] leading-[20px]" style={{ fontFeatureSettings: '"case" 1' }}>
+                Customize by range
+              </span>
+            </button>
+          </div>
+          <CustomSolveRangeTable
+            columns={["Start age", "End age", "Death benefit option"]}
+            rows={dbRanges}
+            onUpdateEnd={updateDbRangeEnd}
+            renderValueCell={(row, i) => (
+              <select
+                value={row.value}
+                onChange={(e) => updateDbRangeValue(i, e.target.value)}
+                className="flex-1 w-0 bg-transparent outline-none cursor-pointer font-['Theinhardt:Regular',sans-serif] text-[#272727] text-[14px] leading-[20px]"
+                style={{ fontFeatureSettings: '"case" 1' }}
+              >
+                {CUSTOM_SOLVE_DEATH_BENEFIT_OPTIONS.map((o) => (
+                  <option key={o} value={o}>
+                    {o}
+                  </option>
+                ))}
+              </select>
+            )}
+          />
+          <div className="flex flex-col gap-[4px]">
+            <div className="flex items-center gap-[6px]">
+              <p className={labelClass} style={{ fontFeatureSettings: '"case" 1' }}>
+                DB change selection
+              </p>
+              <InfoCircleIcon />
+            </div>
+            <SelectField label="" value={dbChangeSelection} options={CUSTOM_SOLVE_DB_CHANGE_OPTIONS} onChange={setDbChangeSelection} />
+          </div>
+        </div>
+      )}
+
+      {showSurrenderFields && (
+        <div className="flex gap-[20px]">
+          <div className="flex-1">
+            <TextField label="Surrender value" value={surrenderValue} onChange={setSurrenderValue} placeholder="$1" />
+          </div>
+          <div className="flex-1 flex flex-col gap-[4px]">
+            <p className={labelClass} style={{ fontFeatureSettings: '"case" 1' }}>
+              Surrender age
+            </p>
+            <AgeInput value={surrenderAge} onChange={setSurrenderAge} placeholder="119" />
+          </div>
+        </div>
+      )}
+
+      {showEndowmentField && (
+        <div className="flex flex-col gap-[4px]">
+          <p className={labelClass} style={{ fontFeatureSettings: '"case" 1' }}>
+            Endowment age
+          </p>
+          <AgeInput value={endowmentAge} onChange={setEndowmentAge} />
+        </div>
+      )}
+
+      <button
+        type="button"
+        className="self-start font-['Theinhardt:Medium',sans-serif] text-[#056257] text-[16px] leading-[24px] underline underline-offset-2 bg-transparent border-none p-0 cursor-pointer"
+        style={{ fontFeatureSettings: '"case" 1' }}
+      >
+        Advance settings
+      </button>
+    </div>
+  );
+}
+
+const IUL_ADVANCED_OPTION_SECTIONS = ["Index strategy", "Disbursements", "Riders", "Other policy options"];
 
 function IulAdvancedOptions() {
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
 
   return (
     <div className="flex flex-col gap-[12px]">
+      {/* Custom solve has no accordion header — the Custom Solve tab above already labels it */}
+      <div className="bg-white rounded-[8px] border border-[#e9e9e9] p-[16px]">
+        <CustomSolveContent />
+      </div>
       {IUL_ADVANCED_OPTION_SECTIONS.map((title) => (
         <AccordionSection
           key={title}

@@ -3574,6 +3574,24 @@ export default function App() {
                   </div>
                 </div>
               )}
+              {selectedProduct === "TruStage Term Life" && (quoteGenerated || subProductQuoteLoading) && (
+                <div className="px-[24px] pb-[16px]">
+                  <button
+                    type="button"
+                    className="inline-flex items-center gap-[12px] bg-[#f5f8fc] px-[16px] py-[12px] rounded-[8px] border-none cursor-pointer transition-colors hover:bg-[#eaf1fa]"
+                  >
+                    <span
+                      className="font-['Theinhardt:Medium',sans-serif] text-[#336cc3] text-[14px] leading-[20px] tracking-[-0.14px]"
+                      style={{ fontFeatureSettings: '"case" 1' }}
+                    >
+                      Personalise client pitch
+                    </span>
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="shrink-0">
+                      <path d="M6 3.5L10.5 8L6 12.5" stroke="#336cc3" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  </button>
+                </div>
+              )}
             </div>
             <div className="flex-1 px-[24px] py-[32px]">
               {subProductQuoteLoading ? (

@@ -25,20 +25,20 @@ function NotificationBell() {
 /* ─── Sidebar nav data ──────────────────────────────────────── */
 
 const primaryNav = [
-  { id: "home",        label: "Home",              iconExp: "assets/81827.svg", iconCol: "assets/51741.svg" },
-  { id: "quote",       label: "Quote & application", iconExp: "assets/2dd50.svg", iconCol: "assets/2dd50.svg" },
-  { id: "customers",   label: "Customers",          iconExp: "assets/b6eb6.svg", iconCol: "assets/e975e.svg" },
+  { id: "home",        label: "Home",              iconExp: "assets/81827-v2.svg", iconCol: "assets/51741.svg" },
+  { id: "quote",       label: "Quote & application", iconExp: "assets/2dd50.svg", iconCol: "assets/2dd50-white.svg" },
+  { id: "customers",   label: "Customers",          iconExp: "assets/b6eb6-v2.svg", iconCol: "assets/e975e.svg" },
   { id: "earnings",    label: "Earnings",           iconExp: "assets/f4771.svg", iconCol: "assets/efa7c.svg" },
-  { id: "performance", label: "Performance",        iconExp: "assets/f4492.svg", iconCol: "assets/5a7f8.svg" },
-  { id: "rewards",     label: "Rewards",            iconExp: "assets/ffd18.svg", iconCol: "assets/cf6f9.svg" },
+  { id: "performance", label: "Performance",        iconExp: "assets/f4492-v2.svg", iconCol: "assets/5a7f8.svg" },
+  { id: "rewards",     label: "Rewards",            iconExp: "assets/ffd18-v2.svg", iconCol: "assets/cf6f9.svg" },
 ];
 
 const secondaryNav = [
-  { id: "share",     label: "Share website", iconExp: "assets/c6d9c.svg", iconCol: "assets/673c4.svg" },
-  { id: "resources", label: "Resources",     iconExp: "assets/61cdb.svg", iconCol: "assets/477b7.svg" },
-  { id: "faq",       label: "FAQs",          iconExp: "assets/130a4.svg", iconCol: "assets/d8d0e.svg" },
-  { id: "contact",   label: "Contact us",    iconExp: "assets/8234e.svg", iconCol: "assets/fc8d9.svg" },
-  { id: "settings",  label: "Settings",      iconExp: "assets/5aae0.svg", iconCol: "assets/cee3d.svg" },
+  { id: "share",     label: "Share website", iconExp: "assets/c6d9c-v2.svg", iconCol: "assets/673c4.svg" },
+  { id: "resources", label: "Resources",     iconExp: "assets/61cdb-v2.svg", iconCol: "assets/477b7.svg" },
+  { id: "faq",       label: "FAQs",          iconExp: "assets/130a4-v2.svg", iconCol: "assets/d8d0e.svg" },
+  { id: "contact",   label: "Contact us",    iconExp: "assets/8234e-v2.svg", iconCol: "assets/fc8d9.svg" },
+  { id: "settings",  label: "Settings",      iconExp: "assets/5aae0-v2.svg", iconCol: "assets/cee3d.svg" },
 ];
 
 const EthosLogo = () => (
